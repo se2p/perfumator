@@ -1,2 +1,4 @@
-# perfumator-java
-Repository for the Perfumator for Java project. Simple command line application to detect code perfumes.
+# Perfumator for Java
+
+Repository for the "Perfumator" project for Java. A simple command line application to detect certain
+code perfumes in Java source code.
