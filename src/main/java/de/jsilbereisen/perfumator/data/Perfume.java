@@ -1,16 +1,18 @@
 package de.jsilbereisen.perfumator.data;
 
-import de.jsilbereisen.perfumator.data.sources.PerfumeSource;
+import de.jsilbereisen.perfumator.util.ConstraintsUtil;
+import de.jsilbereisen.perfumator.util.StringUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Data object for a Code Perfume.
  */
 @Getter
 @Setter
@@ -22,9 +24,11 @@ public class Perfume {
 
     private String description;
 
-    private List<String> additionalNotes = new ArrayList<>();
+    private String source;
 
-    private PerfumeSource source;
+    private RelatedPatternType relatedPattern;
+
+    private List<String> additionalInformation = new ArrayList<>();
 
     private Class<?> detector;
 
@@ -32,12 +36,25 @@ public class Perfume {
 
     }
 
-    public Perfume(String name, String description, List<String> additionalNotes,
-                   PerfumeSource source, Class<?> detector) {
+    /**
+     * Constructor containing all fields. Note that the {@code name}, {@code description}
+     * must neither be {@code null} or empty (see {@link de.jsilbereisen.perfumator.util.StringUtil#isEmpty(String)})
+     * Also, the {@code detector} parameter must not be {@code null}.
+     */
+    public Perfume(String name, String description, @Nullable String source,
+                   @Nullable RelatedPatternType relatedPattern,
+                   @Nullable List<String> additionalInformation,
+                   Class<?> detector) {
+        if (StringUtil.anyEmpty(name, description) || detector == null) {
+            throw new IllegalArgumentException("Perfume must have a non-null name, " +
+                    "description and detector class.");
+        }
+
         this.name = name;
         this.description = description;
-        this.additionalNotes = additionalNotes;
         this.source = source;
+        this.relatedPattern = relatedPattern;
+        this.additionalInformation = additionalInformation;
         this.detector = detector;
     }
 

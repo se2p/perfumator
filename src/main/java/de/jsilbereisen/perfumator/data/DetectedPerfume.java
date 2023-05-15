@@ -6,6 +6,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A data class for a {@link Perfume} instance that was detected in a source file.
+ */
 @Getter
 @Setter
 @EqualsAndHashCode
