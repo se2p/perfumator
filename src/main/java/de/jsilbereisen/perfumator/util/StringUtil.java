@@ -1,12 +1,14 @@
 package de.jsilbereisen.perfumator.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
  * Utility class for {@link String} related operations.
  */
-public final class StringUtil {
+public class StringUtil {
 
     /**
      * {@link Pattern}, compiled from the regular expression for an empty or whitespace only {@link String}.
@@ -27,7 +29,7 @@ public final class StringUtil {
      * Returns {@code true} if any of the given {@link String}s is {@code null} or
      * empty, in the sense that it only consists of whitespaces.
      */
-    public static boolean anyEmpty(String... strings) {
+    public static boolean anyEmpty(String... strings) { // TODO: test with null?
         return Arrays.stream(strings).anyMatch(StringUtil::isEmpty);
     }
 }

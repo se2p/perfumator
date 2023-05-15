@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Utility class for checking different constraints.
  */
-public final class ConstraintsUtil {
+public class ConstraintsUtil {
 
     private ConstraintsUtil() { }
 
