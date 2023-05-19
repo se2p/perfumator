@@ -1,8 +1,10 @@
 package de.jsilbereisen.perfumator.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 /**
@@ -21,7 +23,7 @@ public class StringUtil {
      * Returns whether the given {@link String} is {@code null} or empty, in the sense
      * that it only consists of whitespaces.
      */
-    public static boolean isEmpty(String str) {
+    public static boolean isEmpty(@Nullable String str) {
         return str == null || EMPTY_STRING.matcher(str).matches();
     }
 
@@ -29,7 +31,25 @@ public class StringUtil {
      * Returns {@code true} if any of the given {@link String}s is {@code null} or
      * empty, in the sense that it only consists of whitespaces.
      */
-    public static boolean anyEmpty(String... strings) { // TODO: test with null?
+    public static boolean anyEmpty(@NotNull String... strings) { // TODO: test with null?
         return Arrays.stream(strings).anyMatch(StringUtil::isEmpty);
+    }
+
+    /**
+     * Joins all Strings in the given {@link Iterable} using the provided delimiter.
+     */
+    public static @NotNull String joinStrings(@NotNull Iterable<String> strings, @NotNull String delimiter) {
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<String> iterator = strings.iterator();
+
+        while (iterator.hasNext()) {
+            stringBuilder.append(iterator.next());
+
+            if (iterator.hasNext()) {
+                stringBuilder.append(delimiter);
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }
