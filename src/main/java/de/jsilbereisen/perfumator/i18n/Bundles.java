@@ -60,4 +60,11 @@ public class Bundles {
     public static @Nullable String getApplicationResource(@NotNull String key) {
         return RESOURCES.get(BundlesLoader.APPLICATION_BASE_BUNDLE_NAME + "." + key);
     }
+
+    /**
+     * Removes all loaded resources.
+     */
+    public static void resetResources() {
+        RESOURCES.clear();
+    }
 }

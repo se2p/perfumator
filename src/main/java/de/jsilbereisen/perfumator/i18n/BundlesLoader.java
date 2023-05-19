@@ -45,7 +45,7 @@ public class BundlesLoader {
     /**
      * Pattern to match a resource bundle file with a locale-ending.
      */
-    public static final Pattern LOCALE_ENDING_PATTERN = Pattern.compile("_[a-z]{2}_[A-Z]{2}$");
+    public static final Pattern LOCALE_ENDING_PATTERN = Pattern.compile("_[a-z]{2}$");
 
     private BundlesLoader() { }
 
@@ -59,16 +59,16 @@ public class BundlesLoader {
      */
     public static void loadBundles(@Nullable Locale locale, @NotNull Path resourcesPath) throws IOException {
         Locale useLocale = locale != null ? locale : Locale.ENGLISH;
-        Locale.setDefault(Locale.ENGLISH);
 
         loadApplicationBundle(useLocale);
         loadPerfumeBundles(useLocale, resourcesPath);
     }
 
     private static void loadApplicationBundle(@NotNull Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle(PATH_TO_APPLICATION_BUNDLE.toString(), locale);
+        ResourceBundle bundle = ResourceBundle.getBundle(PATH_TO_APPLICATION_BUNDLE.toString(), locale,
+                ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-        log.info("Loaded application resource bundle.");
+        log.info("Loaded application resource bundle for locale " + locale + ".");
         Bundles.addBundle(bundle);
     }
 
@@ -84,7 +84,7 @@ public class BundlesLoader {
                         String baseBundleName = fileName.substring(0, fileName.length() - ".properties".length());
 
                         if (LOCALE_ENDING_PATTERN.matcher(baseBundleName).find()) {
-                            baseBundleName = baseBundleName.substring(0, baseBundleName.length() - 6);
+                            baseBundleName = baseBundleName.substring(0, baseBundleName.length() - 3);
                         }
 
                         detectedBaseBundles.add(baseBundleName);
@@ -93,9 +93,10 @@ public class BundlesLoader {
 
         detectedBaseBundles.forEach(detectedBaseBundle -> {
             ResourceBundle bundle = ResourceBundle.getBundle(PATH_TO_PERFUME_BUNDLES_DIR
-                    .resolve(detectedBaseBundle).toString(), locale);
+                    .resolve(detectedBaseBundle).toString(), locale,
+                    ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-            log.info("Loaded bundle with base name \"" + detectedBaseBundle + "\"");
+            log.info("Loaded bundle with base name \"" + detectedBaseBundle + "\" for locale " + locale + ".");
             Bundles.addBundle(bundle);
         });
     }

@@ -1,5 +1,8 @@
 package de.jsilbereisen.perfumator.i18n;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -19,6 +22,11 @@ class BundlesLoaderTest {
     private static class TestA { }
 
     private static class TestB { }
+
+    @AfterEach
+    void cleanup() {
+        Bundles.resetResources();
+    }
 
     @Test
     void testLoadApplicationBundlesWithLocale() throws IOException {
