@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
@@ -29,14 +30,25 @@ public class StringUtil {
 
     /**
      * Returns {@code true} if any of the given {@link String}s is {@code null} or
-     * empty, in the sense that it only consists of whitespaces.
+     * empty, in the sense that it only consists of whitespaces. If no arguments are given,
+     * {@code false} is returned as there is no empty string.
      */
-    public static boolean anyEmpty(@NotNull String... strings) { // TODO: test with null?
+    public static boolean anyEmpty(@NotNull String... strings) {
         return Arrays.stream(strings).anyMatch(StringUtil::isEmpty);
     }
 
     /**
+     * Returns {@code true} if any of the given {@link String}s is {@code null} or
+     * empty, in the sense that it only consists of whitespaces.
+     * If the given {@link Collection} is empty, {@code false} is returned, as there is no empty string.
+     */
+    public static boolean anyEmpty(@NotNull Collection<String> strings) {
+        return strings.stream().anyMatch(StringUtil::isEmpty);
+    }
+
+    /**
      * Joins all Strings in the given {@link Iterable} using the provided delimiter.
+     * If there are no strings to join, the empty string with length 0 is returned.
      */
     public static @NotNull String joinStrings(@NotNull Iterable<String> strings, @NotNull String delimiter) {
         StringBuilder stringBuilder = new StringBuilder();

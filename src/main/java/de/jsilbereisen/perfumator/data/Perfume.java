@@ -1,6 +1,5 @@
 package de.jsilbereisen.perfumator.data;
 
-import de.jsilbereisen.perfumator.util.ConstraintsUtil;
 import de.jsilbereisen.perfumator.util.StringUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

@@ -16,7 +16,7 @@ import java.util.Locale;
  */
 public class LocaleOptionHandler extends OptionHandler<Locale> {
 
-    protected LocaleOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Locale> setter) {
+    public LocaleOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Locale> setter) {
         super(parser, option, setter);
     }
 

@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator.io;
 
+import lombok.Getter;
 import org.kohsuke.args4j.Option;
 
 import java.nio.file.Path;
@@ -9,6 +10,7 @@ import java.util.Locale;
  * Representation of the available command line options and arguments.
  * Uses the <b>Args4j</b> library (see <a href="https://github.com/kohsuke/args4j">here</a>).
  */
+@Getter
 public class CommandLineInput {
 
     @Option(name = "-i", aliases = { "--input" }, metaVar = "<path>",
@@ -39,5 +41,18 @@ public class CommandLineInput {
             handler = LocaleOptionHandler.class)
     private Locale locale;
 
+    /**
+     * Creates a copy of {@code this}.
+     */
+    public CommandLineInput copy() {
+        CommandLineInput copy = new CommandLineInput();
 
+        copy.pathToSourceDir = pathToSourceDir; // Path is immutable
+        copy.pathToOutputDir = pathToOutputDir;
+        copy.printHelp = printHelp;
+        copy.outputFormat = outputFormat;
+        copy.locale = (Locale) locale.clone(); // Not sure if Locale is immutable - not mentioned in the class doc
+
+        return copy;
+    }
 }

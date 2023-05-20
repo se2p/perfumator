@@ -44,33 +44,13 @@
     </properties>
 
     <dependencies>
-        <!-- Scope: Tests -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>5.9.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>24.0.1</version>
-            <scope>compile</scope>
         </dependency>
 
+        <!-- Parsing source files to an AST, providing AST API -->
         <!-- https://mvnrepository.com/artifact/com.github.javaparser/javaparser-core -->
         <dependency>
             <groupId>com.github.javaparser</groupId>
@@ -78,6 +58,7 @@
             <version>${javaparser.version}</version>
         </dependency>
 
+        <!-- Command line parsing -->
         <!-- https://mvnrepository.com/artifact/args4j/args4j -->
         <dependency>
             <groupId>args4j</groupId>
@@ -85,6 +66,7 @@
             <version>${args4j.version}</version>
         </dependency>
 
+        <!-- Jackson object mapping library -->
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -92,6 +74,7 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- Lombok boiler plate code generator -->
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -101,7 +84,6 @@
         </dependency>
 
         <!-- Logging -->
-
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -114,6 +96,27 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -141,15 +144,13 @@
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.3.0</version>
-                    <!-- NOT IN USE YET
                     <configuration>
                         <archive>
                             <manifest>
-                                <mainClass>de.jsilbereisen.perfumator.Main</mainClass>
+                                <mainClass>de.jsilbereisen.perfumator.PerfumatorStarter</mainClass>
                             </manifest>
                         </archive>
                     </configuration>
-                    -->
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -176,7 +177,37 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.4.1</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>
+                                        de.jsilbereisen.perfumator.PerfumatorStarter
+                                    </mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
