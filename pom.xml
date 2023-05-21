@@ -34,6 +34,7 @@
         <lombok.version>1.18.26</lombok.version>
         <sl4j.version>2.0.7</sl4j.version>
         <logback.version>1.4.7</logback.version>
+        <classgraph.version>4.8.158</classgraph.version>
 
         <!-- Build properties -->
         <java.version>17</java.version>
@@ -73,6 +74,15 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
+        <!-- Classpath scanning for Resource Bundles and Perfume JSONs -->
+        <!-- https://mvnrepository.com/artifact/io.github.classgraph/classgraph -->
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>${classgraph.version}</version>
+        </dependency>
+
 
         <!-- Lombok boiler plate code generator -->
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->

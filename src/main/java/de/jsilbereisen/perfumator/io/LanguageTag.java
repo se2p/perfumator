@@ -63,6 +63,13 @@ public enum LanguageTag {
     }
 
     /**
+     * Returns the language tag that is used as a default.
+     */
+    public static LanguageTag getDefault() {
+        return LanguageTag.EN;
+    }
+
+    /**
      * Returns {@code true} if the other String equals the language tag's name of {@code this} after
      * trimming and ignoring case.
      */

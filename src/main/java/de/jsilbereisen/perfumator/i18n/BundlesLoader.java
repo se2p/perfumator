@@ -1,16 +1,20 @@
 package de.jsilbereisen.perfumator.i18n;
 
+import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
+import de.jsilbereisen.perfumator.util.StringUtil;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.Resource;
+import io.github.classgraph.ResourceList;
+import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Loads all resource bundles for the application and for perfumes, if such resources exist.
@@ -20,27 +24,34 @@ import java.util.stream.Stream;
 public class BundlesLoader {
 
     /**
-     * The standard path for the application's resources, relative to the project root.
-     */
-    public static final Path STANDARD_RESOURCES_DIRECTORY = Paths.get("src", "main", "resources");
-
-    /**
-     * The path where the resource bundles for perfumes are stored, relative to the resources folder (p.e.
+     * Standard package for internationalization resources, relative to the resources folder (e.g.
      * src/main/resources or src/test/resources).
      */
-    public static final Path PATH_TO_PERFUME_BUNDLES_DIR = Paths.get("i18n", "perfumes");
+    public static final String INTERNATIONALIZATION_PACKAGE = "de/jsilbereisen/perfumator/i18n";
 
     /**
-     * Standard name for the application base bundle. Contains resources that are not related to
+     * Standard package of the bundle with application resources, relative to the resources folder (e.g.
+     * src/main/resources or src/test/resources).
+     */
+    public static final String APPLICATION_PACKAGE = "application";
+
+    /**
+     * The package where the resource bundles for perfumes are stored, relative to the resources folder (e.g.
+     * src/main/resources or src/test/resources).
+     */
+    public static final String PERFUMES_PACKAGE = "perfumes";
+
+    /**
+     * Name for the application base bundle. Contains resources that are not related to
      * specific perfumes.
      */
     public static final String APPLICATION_BASE_BUNDLE_NAME = "application";
 
     /**
-     * Standard path to the bundle with non-perfume-related resources, relative to the resources folder (p.e.
-     * src/main/resources or src/test/resources).
+     * Name for the command line base bundle. Contains resources for printing the usage text
+     * on the command line.
      */
-    public static final Path PATH_TO_APPLICATION_BUNDLE = Paths.get("i18n", APPLICATION_BASE_BUNDLE_NAME, APPLICATION_BASE_BUNDLE_NAME);
+    public static final String CLI_BASE_BUNDLE_NAME = "commandline";
 
     /**
      * Pattern to match a resource bundle file with a locale-ending.
@@ -50,54 +61,91 @@ public class BundlesLoader {
     private BundlesLoader() { }
 
     /**
-     * Loads the resource bundles for the application and the Code Perfumes for the given {@link Locale}.
-     * If the given locale is {@code null}, the default is set to {@link Locale#ENGLISH} and the fallback-files
+     * Loads the resource bundles for the application for the given {@link Locale}.
+     * If the given locale is {@code null}, the default is set to
+     * {@link LocaleOptionHandler#getDefault()} and the fallback-files
      * should be loaded.
      *
      * @param locale The locale for which the resources should be loaded.
-     * @param resourcesPath Path to the applications resources folder (e.g. src/main/resources).
      */
-    public static void loadBundles(@Nullable Locale locale, @NotNull Path resourcesPath) throws IOException {
-        Locale useLocale = locale != null ? locale : Locale.ENGLISH;
+    public static void loadApplicationBundle(@Nullable Locale locale) {
+        Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
 
-        loadApplicationBundle(useLocale);
-        loadPerfumeBundles(useLocale, resourcesPath);
-    }
-
-    private static void loadApplicationBundle(@NotNull Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle(PATH_TO_APPLICATION_BUNDLE.toString(), locale,
+        String applicationBundleFullQualified = StringUtil.joinStrings(
+                List.of(INTERNATIONALIZATION_PACKAGE, APPLICATION_PACKAGE, APPLICATION_BASE_BUNDLE_NAME), "/");
+        ResourceBundle applicationBundle =
+                ResourceBundle.getBundle(applicationBundleFullQualified, useLocale,
                 ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-        log.info("Loaded application resource bundle for locale " + locale + ".");
-        Bundles.addBundle(bundle);
+
+        Bundles.addBundle(applicationBundle);
     }
 
-    private static void loadPerfumeBundles(@NotNull Locale locale, @NotNull Path resourcesPath) throws IOException {
+    /**
+     * Loads the resource bundles for the Code Perfumes for the given {@link Locale}.
+     * If the given locale is {@code null}, the default is set to
+     * {@link LocaleOptionHandler#getDefault()} and the fallback-files
+     * are loaded.
+     *
+     * @param locale The locale for which the resources should be loaded.
+     */
+    public static void loadPerfumeBundles(@Nullable Locale locale) {
+        Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
+
+        ClassGraph resourceScanner = new ClassGraph().acceptPathsNonRecursive(INTERNATIONALIZATION_PACKAGE +
+                "/perfumes");
         Set<String> detectedBaseBundles = new HashSet<>();
 
-        try (Stream<Path> pathsInDir = Files.list(resourcesPath.resolve(PATH_TO_PERFUME_BUNDLES_DIR))) {
-            pathsInDir.filter(path -> !Files.isDirectory(path))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .filter(fileName -> fileName.endsWith(".properties"))
-                    .forEach(fileName -> {
-                        String baseBundleName = fileName.substring(0, fileName.length() - ".properties".length());
+        try (ScanResult result = resourceScanner.scan()) {
+            ResourceList all = result.getAllResources();
+            all.stream().map(Resource::getPath)
+                    .filter(resourcePath -> resourcePath.endsWith(".properties"))
+                    .forEach(resourcePath -> {
+                        int lastPathDelimiter = resourcePath.lastIndexOf("/");
+                        String fileNameWithExt = resourcePath.substring(lastPathDelimiter + 1);
 
-                        if (LOCALE_ENDING_PATTERN.matcher(baseBundleName).find()) {
-                            baseBundleName = baseBundleName.substring(0, baseBundleName.length() - 3);
+                        String fileName = fileNameWithExt.substring(0,
+                                fileNameWithExt.length() - ".properties".length());
+
+                        if (LOCALE_ENDING_PATTERN.matcher(fileName).find()) {
+                            fileName = fileName.substring(0, fileName.length() - 3);
                         }
 
-                        detectedBaseBundles.add(baseBundleName);
+                        detectedBaseBundles.add(fileName);
                     });
+        } catch (Exception e) {
+            log.error("Could not load Perfume resource bundles.");
         }
 
+        Bundles.DETECTED_PERFUME_BUNDLES.clear();
+
         detectedBaseBundles.forEach(detectedBaseBundle -> {
-            ResourceBundle bundle = ResourceBundle.getBundle(PATH_TO_PERFUME_BUNDLES_DIR
-                    .resolve(detectedBaseBundle).toString(), locale,
+            ResourceBundle bundle = ResourceBundle.getBundle(
+                    StringUtil.joinStrings(List.of(INTERNATIONALIZATION_PACKAGE, PERFUMES_PACKAGE,
+                            detectedBaseBundle), "/"),
+                    useLocale,
                     ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-            log.info("Loaded bundle with base name \"" + detectedBaseBundle + "\" for locale " + locale + ".");
             Bundles.addBundle(bundle);
+            Bundles.DETECTED_PERFUME_BUNDLES.add(detectedBaseBundle);
         });
+    }
+
+    /**
+     * Loads the resources related to the command line inputs and outputs.
+     * If the given locale is {@code null}, the default is set to
+     * {@link LocaleOptionHandler#getDefault()} and the fallback-files
+     * are loaded.
+     */
+    public static void loadCliBundle(@Nullable Locale locale) {
+        Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
+
+        ResourceBundle cliBundle = ResourceBundle.getBundle(
+                StringUtil.joinStrings(List.of(INTERNATIONALIZATION_PACKAGE, APPLICATION_PACKAGE,
+                        CLI_BASE_BUNDLE_NAME), "/"),
+                useLocale,
+                ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
+
+        Bundles.setCliBundle(cliBundle);
     }
 }

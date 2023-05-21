@@ -22,4 +22,11 @@ public enum OutputFormat {
     public String getLongName() {
         return longName;
     }
+
+    /**
+     * Returns the {@link OutputFormat} that is used as a default for the application.
+     */
+    public static OutputFormat getDefault() {
+        return OutputFormat.JSON;
+    }
 }

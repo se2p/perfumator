@@ -3,9 +3,6 @@ package de.jsilbereisen.perfumator.i18n;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,8 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Test class for the {@link BundlesLoader}.
  */
 class BundlesLoaderTest {
-
-    private static final Path TEST_RESOURCES = Paths.get("src", "test", "resources");
 
     private static class TestA { }
 
@@ -27,8 +22,8 @@ class BundlesLoaderTest {
     }
 
     @Test
-    void testLoadApplicationBundlesWithLocale() throws IOException {
-        BundlesLoader.loadBundles(Locale.GERMAN, TEST_RESOURCES);
+    void loadApplicationBundlesWithLocale() {
+        BundlesLoader.loadApplicationBundle(Locale.GERMAN);
 
         assertThat(Bundles.getApplicationResource("test.prop")).isEqualTo("hallo");
         assertThat(Bundles.getApplicationResource("test.fallback")).isEqualTo("oui");
@@ -36,8 +31,8 @@ class BundlesLoaderTest {
     }
 
     @Test
-    void testLoadPerfumeBundlesWithLocale() throws IOException {
-        BundlesLoader.loadBundles(Locale.GERMAN, TEST_RESOURCES);
+    void loadPerfumeBundlesWithLocale() {
+        BundlesLoader.loadPerfumeBundles(Locale.GERMAN);
 
         // Bundle for TestA perfume
         assertThat(Bundles.getResource("TestA.perfume.name")).isEqualTo("ein Parfüm");
@@ -54,8 +49,9 @@ class BundlesLoaderTest {
     }
 
     @Test
-    void testLoadBundlesNoLocale() throws IOException {
-        BundlesLoader.loadBundles(null, TEST_RESOURCES);
+    void loadBundlesNoLocale() {
+        BundlesLoader.loadApplicationBundle(null);
+        BundlesLoader.loadPerfumeBundles(null);
 
         // Application Bundle
         assertThat(Bundles.getApplicationResource("test.prop")).isEqualTo("bonjour");
@@ -72,5 +68,11 @@ class BundlesLoaderTest {
         assertThat(Bundles.getResource("perfume.name", TestB.class)).isEqualTo("un parfum");
         assertThat(Bundles.getResource("perfume.description", TestB.class)).isEqualTo("oui oui");
         assertThat(Bundles.getResource("perfume.doesnt_exist", TestB.class)).isNull();
+    }
+
+    @Test
+    void loadCliBundlesDefault() {
+        BundlesLoader.loadCliBundle(Locale.ENGLISH);
+        assertThat(Bundles.getCliBundle().getString("hello.world")).isEqualTo("Hello world");
     }
 }

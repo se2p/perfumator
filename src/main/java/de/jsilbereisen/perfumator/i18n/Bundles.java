@@ -1,12 +1,16 @@
 package de.jsilbereisen.perfumator.i18n;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Class that holds a map with all known resources from {@link ResourceBundle}s that are loaded by the
@@ -15,6 +19,19 @@ import java.util.ResourceBundle;
 public class Bundles {
 
     private static final Map<String, String> RESOURCES = new HashMap<>();
+
+    /**
+     * The name of all perfume-related bundles that the {@link BundlesLoader} detected on its
+     * last call to {@link BundlesLoader#loadPerfumeBundles}.
+     */
+    public static final Set<String> DETECTED_PERFUME_BUNDLES = new HashSet<>();
+
+    /**
+     * Needed for command line internationalization with the <b>Args4j</b> library.
+     */
+    @Getter
+    @Setter
+    private static ResourceBundle cliBundle;
 
     private Bundles() { }
 
@@ -66,5 +83,7 @@ public class Bundles {
      */
     public static void resetResources() {
         RESOURCES.clear();
+        DETECTED_PERFUME_BUNDLES.clear();
+        cliBundle = null;
     }
 }
