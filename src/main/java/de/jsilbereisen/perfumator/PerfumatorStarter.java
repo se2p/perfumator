@@ -13,7 +13,8 @@ public class PerfumatorStarter {
 
     public static void main(String[] args) {
         CommandLineInput cliInput = new CommandLineInput();
-        CmdLineParser cliParser = new CmdLineParser(cliInput, ParserProperties.defaults().withUsageWidth(120));
+        CmdLineParser cliParser = new CmdLineParser(cliInput,
+                ParserProperties.defaults().withUsageWidth(120).withShowDefaults(false));
         CommandLineHandler cliHandler = new CommandLineHandler(cliParser);
 
         try {

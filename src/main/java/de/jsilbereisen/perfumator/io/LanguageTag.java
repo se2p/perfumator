@@ -21,22 +21,22 @@ public enum LanguageTag {
     /**
      * German.
      */
-    DE("de", "German", Locale.GERMAN),
+    DE("de", "Deutsch", Locale.GERMAN),
 
     /**
      * French.
      */
-    FR("fr", "French", Locale.FRENCH),
+    FR("fr", "Francais", Locale.FRENCH),
 
     /**
      * Spanish.
      */
-    ES("es", "Spanish", Locale.forLanguageTag("es")),
+    ES("es", "Espanol", Locale.forLanguageTag("es")),
 
     /**
      * Italian.
      */
-    IT("it", "Italian", Locale.ITALIAN);
+    IT("it", "Italiano", Locale.ITALIAN);
 
     private final String tagName;
 
@@ -87,6 +87,21 @@ public enum LanguageTag {
     public static @NotNull LanguageTag of(@Nullable String str) {
         return Arrays.stream(LanguageTag.values())
                 .filter(languageTag -> languageTag.equalsTrimIgnoreCase(str))
+                .findFirst()
+                .orElse(LanguageTag.EN);
+    }
+
+    /**
+     * Returns the matching {@link LanguageTag}, matched by {@link LanguageTag#getRelatedLocale()},
+     * for the given {@link Locale}.
+     * If no particular {@link LanguageTag} matches, {@link LanguageTag#EN} is returned.
+     *
+     * @param locale {@link Locale} to match against the available tags. Can be {@code null}.
+     * @return       The matching {@link LanguageTag}, or {@link LanguageTag#EN} if no match was found.
+     */
+    public static @NotNull LanguageTag of(@Nullable Locale locale) {
+        return Arrays.stream(LanguageTag.values())
+                .filter(languageTag -> languageTag.relatedLocale.equals(locale))
                 .findFirst()
                 .orElse(LanguageTag.EN);
     }
