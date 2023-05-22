@@ -53,16 +53,16 @@ public class CommandLineHandler {
         BundlesLoader.loadCliBundle(locale);
         ResourceBundle cliBundle = Bundles.getCliBundle();
 
-        System.err.println(cliBundle.getString("out.error.errorPrompt") + " "
-                + cliBundle.getString("out.error.unableToHandleInput"));
-        System.err.println(cliBundle.getString("out.error.errorPrompt") + " "
-                + cliException.getMessage() + "\n");
+        log.error(cliBundle.getString("out.error.unableToHandleInput"));
+        log.error(cliException.getMessage() + "\n");
         printHelp();
+
+        log.error(cliBundle.getString("out.generic.terminate"));
     }
 
     private void printHelp() {
         ResourceBundle cliBundle = Bundles.getCliBundle();
-        System.out.println(cliBundle.getString("out.generic.preHelp"));
+        log.error(cliBundle.getString("out.generic.preHelp"));
         parser.printUsage(new OutputStreamWriter(System.out), cliBundle);
     }
 }
