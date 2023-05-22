@@ -19,7 +19,7 @@ public class PerfumatorStarter {
         try {
             cliParser.parseArgument(args);
         } catch (CmdLineException cliException) {
-            cliHandler.handleError(args);
+            cliHandler.handleError(args, cliException);
             System.exit(1);
         }
 

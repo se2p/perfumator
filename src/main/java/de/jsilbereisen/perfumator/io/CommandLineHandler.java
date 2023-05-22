@@ -4,6 +4,7 @@ import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import java.io.OutputStreamWriter;
@@ -34,11 +35,12 @@ public class CommandLineHandler {
             printHelp();
         }
 
+        log.info(cliInput.toString());
         // TODO: Log the read values
         // TODO: Check Paths (util class?), start application logic (own class)
     }
 
-    public void handleError(@NotNull String[] args) {
+    public void handleError(@NotNull String[] args, @NotNull CmdLineException cliException) {
         Locale locale = LocaleOptionHandler.getDefault();
 
         for (int i = 0; i < args.length; i++) {
@@ -51,7 +53,10 @@ public class CommandLineHandler {
         BundlesLoader.loadCliBundle(locale);
         ResourceBundle cliBundle = Bundles.getCliBundle();
 
-        System.err.println(cliBundle.getString("out.error.unableToHandleInput") + "\n");
+        System.err.println(cliBundle.getString("out.error.errorPrompt") + " "
+                + cliBundle.getString("out.error.unableToHandleInput"));
+        System.err.println(cliBundle.getString("out.error.errorPrompt") + " "
+                + cliException.getMessage() + "\n");
         printHelp();
     }
 

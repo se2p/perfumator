@@ -114,6 +114,7 @@ public class BundlesLoader {
                         detectedBaseBundles.add(fileName);
                     });
         } catch (Exception e) {
+            // TODO: Define + throw own exception?
             log.error("Could not load Perfume resource bundles.");
         }
 
