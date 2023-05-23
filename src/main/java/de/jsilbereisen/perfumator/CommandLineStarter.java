@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator;
 
+import de.jsilbereisen.perfumator.engine.EngineConfiguration;
 import de.jsilbereisen.perfumator.io.CommandLineHandler;
 import de.jsilbereisen.perfumator.io.CommandLineInput;
 import org.kohsuke.args4j.CmdLineException;
@@ -9,7 +10,7 @@ import org.kohsuke.args4j.ParserProperties;
 /**
  * Entry point of the application when running from the command line.
  */
-public class PerfumatorStarter {
+public class CommandLineStarter {
 
     public static void main(String[] args) {
         CommandLineInput cliInput = new CommandLineInput();
@@ -24,6 +25,8 @@ public class PerfumatorStarter {
             System.exit(1);
         }
 
-        cliHandler.handleArguments(cliInput);
+        EngineConfiguration config = cliHandler.handleArguments(cliInput);
+
+        // TODO
     }
 }

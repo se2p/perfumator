@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator.io;
 
+import de.jsilbereisen.perfumator.engine.EngineConfiguration;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class CommandLineHandler {
 
     private final CmdLineParser parser;
 
-    public CommandLineHandler(CmdLineParser parser) {
+    public CommandLineHandler(@NotNull CmdLineParser parser) {
         this.parser = parser;
     }
 
@@ -32,7 +33,7 @@ public class CommandLineHandler {
     /**
      * Handles the given application input according to the set options.
      */
-    public void handleArguments(CommandLineInput cliInput) {
+    public @Nullable EngineConfiguration handleArguments(@NotNull CommandLineInput cliInput) {
         Locale applicationLocale = cliInput.getLocale();
         String applicationLanguageName = LanguageTag.of(applicationLocale).getFullLanguageName();
 
@@ -43,7 +44,7 @@ public class CommandLineHandler {
         if (cliInput.isPrintHelp()) {
             printHelp();
             log.info(cliBundle.getString("log.generic.terminate"));
-            return;
+            return null;
         }
 
         Path inputPath = cliInput.getPathToSourceDir();
@@ -53,19 +54,17 @@ public class CommandLineHandler {
         boolean isOutputPathValid = checkOutputPath(outputPath);
         if (!isInputPathValid || !isOutputPathValid) {
             log.error(cliBundle.getString("log.generic.terminate"));
-            return;
-        } else {
-            log.info(cliBundle.getString("log.generic.inputPath") + " "
-                    + cliInput.getPathToSourceDir().toAbsolutePath());
-            log.info(cliBundle.getString("log.generic.outputPath") + " "
-                    + cliInput.getPathToOutputDir().toAbsolutePath());
-            // TODO: Actually set values
+            return null;
         }
 
+        log.info(cliBundle.getString("log.generic.inputPath") + " "
+                + inputPath.toAbsolutePath());
+        log.info(cliBundle.getString("log.generic.outputPath") + " "
+                + outputPath.toAbsolutePath());
         log.info(cliBundle.getString("log.generic.outputFormat") + " "
                 + cliInput.getOutputFormat().getAbbreviation());
 
-        // TODO: start application logic (own class)
+        return new EngineConfiguration(inputPath, outputPath, applicationLocale, cliInput.getOutputFormat());
     }
 
     public void handleError(@NotNull String[] args, @NotNull CmdLineException cliException) {
@@ -105,7 +104,7 @@ public class CommandLineHandler {
         assert path != null;
 
         // TODO: Refactoring: Util class, Method isJavaFile?
-        if (!Files.isDirectory(path) && !path.getFileName().endsWith(".java")) {
+        if (!Files.isDirectory(path) && !path.getFileName().toString().endsWith(".java")) {
             log.error(cliBundle.getString("log.error.invalidInputPath"));
             return false;
         }

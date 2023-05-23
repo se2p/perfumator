@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,13 +41,13 @@ public class Perfume {
      * must neither be {@code null} or empty (see {@link de.jsilbereisen.perfumator.util.StringUtil#isEmpty(String)})
      * Also, the {@code detector} parameter must not be {@code null}.
      */
-    public Perfume(String name, String description, @Nullable String source,
+    public Perfume(@NotNull String name, @NotNull String description, @Nullable String source,
                    @Nullable RelatedPatternType relatedPattern,
                    @Nullable List<String> additionalInformation,
-                   Class<?> detector) {
+                   @NotNull Class<?> detector) {
         if (StringUtil.anyEmpty(name, description) || detector == null) {
-            throw new IllegalArgumentException("Perfume must have a non-null name, " +
-                    "description and detector class.");
+            throw new IllegalArgumentException("Perfume must have a non-null, non-empty name and " +
+                    "description, and a non-null detector class.");
         }
 
         this.name = name;
