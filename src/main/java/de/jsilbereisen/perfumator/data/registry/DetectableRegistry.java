@@ -1,4 +1,4 @@
-package de.jsilbereisen.perfumator.data.loader;
+package de.jsilbereisen.perfumator.data.registry;
 
 import de.jsilbereisen.perfumator.data.model.Detectable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;

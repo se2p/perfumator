@@ -2,10 +2,7 @@ package de.jsilbereisen.perfumator.i18n;
 
 import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
 import de.jsilbereisen.perfumator.util.StringUtil;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.Resource;
-import io.github.classgraph.ResourceList;
-import io.github.classgraph.ScanResult;
+import io.github.classgraph.*;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,9 +110,10 @@ public class BundlesLoader {
 
                         detectedBaseBundles.add(fileName);
                     });
-        } catch (Exception e) {
+        } catch (ClassGraphException e) {
             // TODO: Define + throw own exception?
             log.error("Could not load Perfume resource bundles.");
+            throw e;
         }
 
         Bundles.DETECTED_PERFUME_BUNDLES.clear();
