@@ -30,21 +30,24 @@ public abstract class Detectable implements Internationalizable {
     private String detectorClassSimpleName;
 
     @I18nIgnore
-    private String i18nBundleBaseName;
+    private String i18nBaseBundleName;
+
+    /**
+     * Default constructor to allow deserialization via the <b>Jackson</b> object mapper.
+     */
+    protected Detectable() { }
 
     // TODO: extend doc
     /**
      * Simple name of the {@link Detector} class that is responsible for detecting this {@link Detectable}.
-     * The detector class must be located in the package <b>de.jsilbereisen.perfumator.engine.detector</b> package
-     * in order for it to be instanced in the application engine.
      *
      * @param detectorClassSimpleName Simple class name as string, not fully qualified.
-     * @param i18nBundleBaseName The base name of the bundle that should be used for internationalization of this
+     * @param i18nBaseBundleName The base name of the bundle that should be used for internationalization of this
      *                           {@link Detectable}. Can be {@code null}.
      * @throws IllegalArgumentException If the given detector class name is {@code null} or empty.
      */
      protected Detectable(String name, String description, String detectorClassSimpleName,
-                          @Nullable String i18nBundleBaseName) {
+                          @Nullable String i18nBaseBundleName) {
          if (StringUtil.anyEmpty(name, description, detectorClassSimpleName)) {
              throw new IllegalArgumentException("Perfume must have a non-null, non-empty name, " +
                      "description and detector class name.");
@@ -53,14 +56,14 @@ public abstract class Detectable implements Internationalizable {
          this.name = name;
          this.description = description;
          this.detectorClassSimpleName = detectorClassSimpleName;
-         this.i18nBundleBaseName = i18nBundleBaseName;
+         this.i18nBaseBundleName = i18nBaseBundleName;
     }
 
     /**
      * <p>
      * Sets all internationalizable fields of the calling instance to their internationalized content, if available.
-     * The resource is queried using the {@link #i18nBundleBaseName}, dot-concatenated with the field name.
-     * If the {@link #i18nBundleBaseName} is {@code null}, the method immediately returns without any action.
+     * The resource is queried using the {@link #i18nBaseBundleName}, dot-concatenated with the field name.
+     * If the {@link #i18nBaseBundleName} is {@code null}, the method immediately returns without any action.
      * If no internationalized resource for the field is available, the field's content does not change.<br/>
      * A field is seen as internationalizable if its type is {@link String} and if it not explicitly excluded
      * from internationalization, meaning it is not annotated with {@link I18nIgnore}.
@@ -78,7 +81,7 @@ public abstract class Detectable implements Internationalizable {
      */
     @Override
     public void internationalize(@NotNull Bundles resourceHolder) {
-        if (i18nBundleBaseName == null) {
+        if (i18nBaseBundleName == null) {
             // No internationalization bundle is set => just ignore
             return;
         }
@@ -90,7 +93,7 @@ public abstract class Detectable implements Internationalizable {
         for (Field field: classFields) {
             if (field.getType().equals(String.class) && !field.isAnnotationPresent(I18nIgnore.class)) {
                 String fieldName = field.getName();
-                String internationalizedContent = resourceHolder.getResource(i18nBundleBaseName + "." + fieldName);
+                String internationalizedContent = resourceHolder.getResource(i18nBaseBundleName + "." + fieldName);
 
                 if (!StringUtil.isEmpty(internationalizedContent)) {
                     String setterName = "set" + fieldName.substring(0, 1).toUpperCase()

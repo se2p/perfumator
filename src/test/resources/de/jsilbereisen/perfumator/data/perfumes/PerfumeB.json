@@ -1,0 +1,9 @@
+{
+  "name": "Perfume B",
+  "description": "Another Perfume.",
+  "detectorClassSimpleName": "DummyDetector",
+  "i18nBaseBundleName": "TestResources",
+  "source": "My head",
+  "relatedPattern": "BUG",
+  "additionalInformation": "More information."
+}

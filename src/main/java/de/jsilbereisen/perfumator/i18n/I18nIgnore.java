@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marker annotation for fields that should be ignored by internationalization.
+ * Marker annotation for {@link String} fields that should be explicitly ignored by internationalization.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

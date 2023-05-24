@@ -1,0 +1,9 @@
+{
+  "name": "Perfume A",
+  "description": "Test description.",
+  "detectorClassSimpleName": "DummyDetector",
+  "i18nBaseBundleName": null,
+  "source": "My head",
+  "relatedPattern": "BUG",
+  "additionalInformation": null
+}

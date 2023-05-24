@@ -21,6 +21,11 @@ public class Perfume extends Detectable {
     private String additionalInformation;
 
     /**
+     * Default constructor to allow deserialization via the <b>Jackson</b> object mapper.
+     */
+    public Perfume() { }
+
+    /**
      * Constructor containing all fields. Note that the {@code name}, {@code description} and {@code detectorClassSimpleName}
      * parameters must neither be {@code null} or empty (see {@link de.jsilbereisen.perfumator.util.StringUtil#isEmpty(String)}.
      *

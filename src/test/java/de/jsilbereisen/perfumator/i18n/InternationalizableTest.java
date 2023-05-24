@@ -75,7 +75,7 @@ class InternationalizableTest {
         assertThat(i18nMeDetectable.getName()).isEqualTo("changed");
         assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
         assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
-        assertThat(i18nMeDetectable.getI18nBundleBaseName()).isEqualTo("some_bundle");
+        assertThat(i18nMeDetectable.getI18nBaseBundleName()).isEqualTo("some_bundle");
     }
 
     @Test
@@ -88,6 +88,6 @@ class InternationalizableTest {
         assertThat(i18nMeDetectable.getName()).isEqualTo("name");
         assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
         assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
-        assertThat(i18nMeDetectable.getI18nBundleBaseName()).isEqualTo(null);
+        assertThat(i18nMeDetectable.getI18nBaseBundleName()).isEqualTo(null);
     }
 }
