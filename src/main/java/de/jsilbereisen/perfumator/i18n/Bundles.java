@@ -21,13 +21,6 @@ public class Bundles {
     private final Map<String, String> resources = new HashMap<>();
 
     /**
-     * The name of all perfume-related bundles that the {@link BundlesLoader} detected on its
-     * last call to {@link BundlesLoader#loadPerfumeBundles}.
-     */
-    @Getter(onMethod = @__({@NotNull}))
-    private final Set<String> detectedPerfumeBundles = new HashSet<>();
-
-    /**
      * Needed for command line internationalization with the <b>Args4j</b> library.
      */
     @Getter(onMethod = @__({@Nullable}))

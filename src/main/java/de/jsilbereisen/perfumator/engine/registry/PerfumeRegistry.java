@@ -42,6 +42,9 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      */
     public static final String PERFUME_DEFINITIONS_PACKAGE = "de/jsilbereisen/perfumator/data/perfumes";
 
+    /**
+     * Standard package where all Perfume detectors are located.
+     */
     public static final String PERFUME_DETECTORS_PACKAGE = "de.jsilbereisen.perfumator.engine.detector.perfume";
 
     private final Map<Perfume, Detector<Perfume>> registry;
@@ -68,8 +71,10 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
     @Override
     public void loadRegistry(@NotNull Locale locale) {
         Bundles bundles = new Bundles();
-        BundlesLoader.loadPerfumeBundles(bundles, locale);
-        BundlesLoader.loadApplicationBundle(bundles, locale);
+        BundlesLoader bundlesLoader = new BundlesLoader(BundlesLoader.STANDARD_INTERNATIONALIZATION_PACKAGE,
+                BundlesLoader.STANDARD_PERFUMES_PACKAGE);
+        bundlesLoader.loadDetectableBundles(bundles, locale);
+        bundlesLoader.loadApplicationBundle(bundles, locale);
 
         List<Perfume> loadedPerfumes = loadPerfumes(bundles);
         if (loadedPerfumes.isEmpty()) {

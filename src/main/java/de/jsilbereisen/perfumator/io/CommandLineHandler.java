@@ -27,9 +27,13 @@ public class CommandLineHandler {
 
     private final Bundles cliResourceHolder;
 
+    private final BundlesLoader bundlesLoader;
+
     public CommandLineHandler(@NotNull CmdLineParser parser, @NotNull Bundles cliResourceHolder) {
         this.parser = parser;
         this.cliResourceHolder = cliResourceHolder;
+        this.bundlesLoader = new BundlesLoader(BundlesLoader.STANDARD_INTERNATIONALIZATION_PACKAGE,
+                BundlesLoader.STANDARD_PERFUMES_PACKAGE);
     }
 
     // TODO: refactor method
@@ -40,7 +44,7 @@ public class CommandLineHandler {
         Locale applicationLocale = cliInput.getLocale();
         String applicationLanguageName = LanguageTag.of(applicationLocale).getFullLanguageName();
 
-        BundlesLoader.loadCliBundle(cliResourceHolder, applicationLocale);
+        bundlesLoader.loadCliBundle(cliResourceHolder, applicationLocale);
         ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
         assert cliBundle != null;
 
@@ -82,7 +86,7 @@ public class CommandLineHandler {
             }
         }
 
-        BundlesLoader.loadCliBundle(cliResourceHolder, locale);
+        bundlesLoader.loadCliBundle(cliResourceHolder, locale);
         ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
         assert cliBundle != null;
 

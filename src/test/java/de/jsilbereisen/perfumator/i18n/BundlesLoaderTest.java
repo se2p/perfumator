@@ -18,14 +18,17 @@ class BundlesLoaderTest {
 
     private Bundles resourceHolder;
 
+    private static final BundlesLoader testBundlesLoader = new BundlesLoader("i18n",
+            BundlesLoader.STANDARD_PERFUMES_PACKAGE);
+
     @BeforeEach
-    void cleanup() {
+    void resetLoadedResources() {
         resourceHolder = new Bundles();
     }
 
     @Test
     void loadApplicationBundlesWithLocale() {
-        BundlesLoader.loadApplicationBundle(resourceHolder, Locale.GERMAN);
+        testBundlesLoader.loadApplicationBundle(resourceHolder, Locale.GERMAN);
 
         assertThat(resourceHolder.getApplicationResource("test.prop")).isEqualTo("hallo");
         assertThat(resourceHolder.getApplicationResource("test.fallback")).isEqualTo("oui");
@@ -34,7 +37,7 @@ class BundlesLoaderTest {
 
     @Test
     void loadPerfumeBundlesWithLocale() {
-        BundlesLoader.loadPerfumeBundles(resourceHolder, Locale.GERMAN);
+        testBundlesLoader.loadDetectableBundles(resourceHolder, Locale.GERMAN);
 
         // Bundle for TestA perfume
         assertThat(resourceHolder.getResource("TestA.perfume.name")).isEqualTo("ein Parfüm");
@@ -52,8 +55,8 @@ class BundlesLoaderTest {
 
     @Test
     void loadBundlesNoLocale() {
-        BundlesLoader.loadApplicationBundle(resourceHolder, null);
-        BundlesLoader.loadPerfumeBundles(resourceHolder, null);
+        testBundlesLoader.loadApplicationBundle(resourceHolder, null);
+        testBundlesLoader.loadDetectableBundles(resourceHolder, null);
 
         // Application Bundle
         assertThat(resourceHolder.getApplicationResource("test.prop")).isEqualTo("bonjour");
@@ -74,7 +77,9 @@ class BundlesLoaderTest {
 
     @Test
     void loadCliBundlesDefault() {
-        BundlesLoader.loadCliBundle(resourceHolder, Locale.ENGLISH);
+        testBundlesLoader.loadCliBundle(resourceHolder, Locale.ENGLISH);
+
+        assertThat(resourceHolder.getCliBundle()).isNotNull();
         assertThat(resourceHolder.getCliBundle().getString("hello.world")).isEqualTo("Hello world");
     }
 }
