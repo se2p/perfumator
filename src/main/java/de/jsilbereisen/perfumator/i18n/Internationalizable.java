@@ -10,15 +10,13 @@ import java.lang.reflect.Method;
 
 /**
  * Interface for internationalizable data objects.
- * Uses the {@link Bundles} class to access the loaded resources for internationalization,
- * so make sure to first load the required resources at some point through calls to the {@link BundlesLoader}, before
- * calling {@link #internationalize()}.
  */
 public interface Internationalizable {
 
     /**
      * <p>
      * Sets all internationalizable fields of the calling instance to their internationalized content, if available.
+     * The resource is queried using the instances class name and the field name.
      * If no internationalized resource for the field is available, the field's content does not change.<br/>
      * A field is seen as internationalizable if its type is {@link String} and if it not explicitly excluded
      * from internationalization, meaning it is not annotated with {@link I18nIgnore}.
@@ -63,7 +61,5 @@ public interface Internationalizable {
                 }
             }
         }
-
-
-    }
+    };
 }

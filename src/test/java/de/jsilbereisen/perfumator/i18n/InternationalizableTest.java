@@ -1,6 +1,8 @@
 package de.jsilbereisen.perfumator.i18n;
 
+import de.jsilbereisen.perfumator.model.Detectable;
 import lombok.Setter;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -26,6 +28,15 @@ class InternationalizableTest {
         private int notAString;
     }
 
+    @Setter
+    private static class I18nMeDetectable extends Detectable {
+
+        public I18nMeDetectable(String name, String description, String detectorClassSimpleName,
+                           @Nullable String i18nBundleBaseName) {
+            super(name, description, detectorClassSimpleName, i18nBundleBaseName);
+        }
+    }
+
     private static final Bundles MOCKED_BUNDLES = Mockito.mock(Bundles.class);
 
     @BeforeAll
@@ -34,13 +45,16 @@ class InternationalizableTest {
         when(MOCKED_BUNDLES.getResource("missingResource", I18nMe.class)).thenReturn(null);
         when(MOCKED_BUNDLES.getResource("ignored", I18nMe.class)).thenReturn("not ignored");
         when(MOCKED_BUNDLES.getResource("notAString", I18nMe.class)).thenReturn("this will hurts");
+
+        when(MOCKED_BUNDLES.getResource("some_bundle.name")).thenReturn("changed");
+        when(MOCKED_BUNDLES.getResource("some_bundle.detectorClassSimpleName")).thenReturn("must not change");
     }
 
     /**
      * Test the default implementation for internationalisation.
      */
     @Test
-    void internationalize() {
+    void internationalizeDefaultImpl() {
         I18nMe i18nMe = new I18nMe();
 
         i18nMe.internationalize(MOCKED_BUNDLES);
@@ -49,5 +63,31 @@ class InternationalizableTest {
         assertThat(i18nMe.missingResource).isEqualTo("missing");
         assertThat(i18nMe.ignored).isEqualTo("ignored");
         assertThat(i18nMe.notAString).isZero();
+    }
+
+    @Test
+    void internationalizeDetectable() {
+        I18nMeDetectable i18nMeDetectable = new I18nMeDetectable("name", "description",
+                "ignored", "some_bundle");
+
+        i18nMeDetectable.internationalize(MOCKED_BUNDLES);
+
+        assertThat(i18nMeDetectable.getName()).isEqualTo("changed");
+        assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
+        assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
+        assertThat(i18nMeDetectable.getI18nBundleBaseName()).isEqualTo("some_bundle");
+    }
+
+    @Test
+    void internationalizeDetectableNoBundleSet() {
+        I18nMeDetectable i18nMeDetectable = new I18nMeDetectable("name", "description",
+                "ignored", null);
+
+        i18nMeDetectable.internationalize(MOCKED_BUNDLES);
+
+        assertThat(i18nMeDetectable.getName()).isEqualTo("name");
+        assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
+        assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
+        assertThat(i18nMeDetectable.getI18nBundleBaseName()).isEqualTo(null);
     }
 }

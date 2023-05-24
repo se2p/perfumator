@@ -29,8 +29,8 @@ public class Perfume extends Detectable {
     public Perfume(String name, String description, @Nullable String source,
                    @Nullable RelatedPatternType relatedPattern,
                    @Nullable String additionalInformation,
-                   String detectorClassSimpleName) {
-        super(name, description, detectorClassSimpleName);
+                   String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
+        super(name, description, detectorClassSimpleName, i18nBaseBundleName);
 
         this.source = source;
         this.relatedPattern = relatedPattern;
