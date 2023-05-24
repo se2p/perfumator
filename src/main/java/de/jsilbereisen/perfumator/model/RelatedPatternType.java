@@ -1,4 +1,4 @@
-package de.jsilbereisen.perfumator.data.model;
+package de.jsilbereisen.perfumator.model;
 
 /**
  * Enumeration for different types of patterns from which a {@link Perfume}

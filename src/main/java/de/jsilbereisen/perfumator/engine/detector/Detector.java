@@ -1,8 +1,8 @@
 package de.jsilbereisen.perfumator.engine.detector;
 
 import com.github.javaparser.ast.CompilationUnit;
-import de.jsilbereisen.perfumator.data.model.Detectable;
-import de.jsilbereisen.perfumator.data.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.Detectable;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

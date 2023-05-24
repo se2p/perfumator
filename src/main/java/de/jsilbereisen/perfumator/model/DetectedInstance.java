@@ -1,4 +1,4 @@
-package de.jsilbereisen.perfumator.data.model;
+package de.jsilbereisen.perfumator.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;

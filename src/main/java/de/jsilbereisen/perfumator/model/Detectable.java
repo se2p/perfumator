@@ -1,4 +1,4 @@
-package de.jsilbereisen.perfumator.data.model;
+package de.jsilbereisen.perfumator.model;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.i18n.I18nIgnore;

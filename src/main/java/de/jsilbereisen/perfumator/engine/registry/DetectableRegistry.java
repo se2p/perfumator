@@ -1,6 +1,6 @@
-package de.jsilbereisen.perfumator.data.registry;
+package de.jsilbereisen.perfumator.engine.registry;
 
-import de.jsilbereisen.perfumator.data.model.Detectable;
+import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,5 +22,5 @@ public interface DetectableRegistry<T extends Detectable> {
 
     List<Detector<T>> getRegisteredDetectors();
 
-    Detector<T> getDetector(T detectable);
+    Detector<T> getDetector(@NotNull T detectable);
 }

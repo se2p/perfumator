@@ -1,4 +1,4 @@
-package de.jsilbereisen.perfumator.data.model;
+package de.jsilbereisen.perfumator.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
