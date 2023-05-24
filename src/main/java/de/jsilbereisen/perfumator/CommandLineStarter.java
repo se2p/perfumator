@@ -1,6 +1,7 @@
 package de.jsilbereisen.perfumator;
 
 import de.jsilbereisen.perfumator.engine.EngineConfiguration;
+import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.io.CommandLineHandler;
 import de.jsilbereisen.perfumator.io.CommandLineInput;
 import org.kohsuke.args4j.CmdLineException;
@@ -16,7 +17,7 @@ public class CommandLineStarter {
         CommandLineInput cliInput = new CommandLineInput();
         CmdLineParser cliParser = new CmdLineParser(cliInput,
                 ParserProperties.defaults().withUsageWidth(120).withShowDefaults(false));
-        CommandLineHandler cliHandler = new CommandLineHandler(cliParser);
+        CommandLineHandler cliHandler = new CommandLineHandler(cliParser, new Bundles());
 
         try {
             cliParser.parseArgument(args);

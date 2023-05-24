@@ -3,6 +3,8 @@ package de.jsilbereisen.perfumator.engine.registry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.jsilbereisen.perfumator.engine.detector.DetectorLoadException;
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import de.jsilbereisen.perfumator.model.Perfume;
 import de.jsilbereisen.perfumator.model.PerfumeLoadException;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
@@ -45,38 +47,46 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
 
     private final Map<Perfume, Detector<Perfume>> registry = new HashMap<>();
 
+    // TODO: i18n exception messages
     /**
      * Detects and loads all Perfumes that are in the {@link #PERFUME_DEFINITIONS_PACKAGE} from their JSONs into the
      * registry and links them with their respective {@link Detector}.
+     * Also performs internationalization for each loaded {@link Perfume} with the given {@link Locale},
+     * if there are resources available.
      *
      * @param locale The locale to use for loading internationalized versions of the Perfumes.
      * @throws PerfumeLoadException If any failures occur within the detection and loading process.
      */
     @Override
     public void loadRegistry(@NotNull Locale locale) {
-        List<Perfume> loadedPerfumes = loadPerfumes();
+        Bundles bundles = new Bundles();
+        BundlesLoader.loadPerfumeBundles(bundles, locale);
+        BundlesLoader.loadApplicationBundle(bundles, locale);
+
+        List<Perfume> loadedPerfumes = loadPerfumes(bundles);
         if (loadedPerfumes.isEmpty()) {
             log.warn("No perfumes loaded. Check the Registry configuration.");
             return;
         }
 
-        loadedPerfumes.forEach(Internationalizable::internationalize);
+        loadedPerfumes.forEach(perfume -> perfume.internationalize(bundles));
 
         String loadedPerfumeNames = StringUtil.joinStrings(loadedPerfumes.stream().map(Perfume::getName).toList(),
                 "\", \"");
         log.info("Loaded Perfumes (internationalized): [\"" + loadedPerfumeNames + "\"]");
 
-        linkPerfumesToDetectors(loadedPerfumes);
+        linkPerfumesToDetectors(bundles, loadedPerfumes);
     }
 
     /**
      * Scans the {@link #PERFUME_DEFINITIONS_PACKAGE} for all JSONs and tries to load a {@link Perfume}
      * instance for each of those, with the help of the <i>Jackson</i> object mapper.
      *
+     * @param bundles Resources for internationalized exception messages.
      * @return The list of loaded Perfumes. Never {@code null}, might be empty.
      * @throws PerfumeLoadException If anything goes wrong in the process.
      */
-    private @NotNull List<Perfume> loadPerfumes() {
+    private @NotNull List<Perfume> loadPerfumes(@NotNull Bundles bundles) {
         List<Perfume> loadedPerfumes = new ArrayList<>();
         ClassGraph resourceScanner = new ClassGraph().acceptPathsNonRecursive(PERFUME_DEFINITIONS_PACKAGE);
         JsonMapper jsonMapper = new JsonMapper();
@@ -86,7 +96,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
             allPerfumes.stream()
                     .filter(resource -> resource.getPath().endsWith(".json"))
                     .forEach(resource -> {
-                        Perfume perfume = loadSinglePerfume(resource, jsonMapper);
+                        Perfume perfume = loadSinglePerfume(bundles, resource, jsonMapper);
 
                         if (perfume != null) {
                             loadedPerfumes.add(perfume);
@@ -101,7 +111,8 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
         return loadedPerfumes;
     }
 
-    private @Nullable Perfume loadSinglePerfume(@NotNull Resource resource, @NotNull JsonMapper jsonMapper) {
+    private @Nullable Perfume loadSinglePerfume(@NotNull Bundles resourceHolder, @NotNull Resource resource,
+                                                @NotNull JsonMapper jsonMapper) {
         String jsonRepresentation;
         Perfume loadedPerfume = null;
 
@@ -129,12 +140,13 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * The detector is loaded by the fully qualified class name, given by
      * {@link Perfume#getDetectorClassSimpleName()}, with the {@link #PERFUME_DETECTORS_PACKAGE} prepended.
      *
+     * @param bundles Resources for internationalized exception messages.
      * @param loadedPerfumes The Perfumes for which the detectors should be instanced.
      * @throws DetectorLoadException When being unable to instantiate the {@link Detector} for a {@link Perfume}
      *                               or when simply no {@link Detector} is found for it.
      */
     @SuppressWarnings("unchecked")
-    private void linkPerfumesToDetectors(@NotNull List<Perfume> loadedPerfumes) {
+    private void linkPerfumesToDetectors(@NotNull Bundles bundles, @NotNull List<Perfume> loadedPerfumes) {
         for (Perfume perfume: loadedPerfumes) {
             Class<?> detectorClass = null;
             try {

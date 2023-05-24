@@ -18,22 +18,21 @@ import java.util.Set;
  */
 public class Bundles {
 
-    private static final Map<String, String> RESOURCES = new HashMap<>();
+    private final Map<String, String> resources = new HashMap<>();
 
     /**
      * The name of all perfume-related bundles that the {@link BundlesLoader} detected on its
      * last call to {@link BundlesLoader#loadPerfumeBundles}.
      */
-    public static final Set<String> DETECTED_PERFUME_BUNDLES = new HashSet<>();
+    @Getter(onMethod = @__({@NotNull}))
+    private final Set<String> detectedPerfumeBundles = new HashSet<>();
 
     /**
      * Needed for command line internationalization with the <b>Args4j</b> library.
      */
-    @Getter
+    @Getter(onMethod = @__({@Nullable}))
     @Setter
-    private static ResourceBundle cliBundle;
-
-    private Bundles() { }
+    private ResourceBundle cliBundle;
 
     /**
      * Adds all contents of a resource bundle to the map of known resources.
@@ -44,12 +43,12 @@ public class Bundles {
      * The value of key <i>hello.world</i> in the bundle <i>some_bundle_de_DE</i>
      * is added with the key <i>some_bundle.hello.world</i>.
      */
-    public static void addBundle(@NotNull ResourceBundle bundle) {
+    public void addBundle(@NotNull ResourceBundle bundle) {
         String baseBundle = bundle.getBaseBundleName();
         String baseBundleWithoutPath = Paths.get(baseBundle).getFileName().toString();
 
         for (String key : bundle.keySet()) {
-            RESOURCES.put(baseBundleWithoutPath + "." + key, bundle.getString(key));
+            resources.put(baseBundleWithoutPath + "." + key, bundle.getString(key));
         }
     }
 
@@ -57,8 +56,8 @@ public class Bundles {
      * Returns the resource that is stored for the given key.
      * The returned value might be {@code null} if no resource is found.
      */
-    public static @Nullable String getResource(@NotNull String key) {
-        return RESOURCES.get(key);
+    public @Nullable String getResource(@NotNull String key) {
+        return resources.get(key);
     }
 
     /**
@@ -66,24 +65,15 @@ public class Bundles {
      * class as a prefix.
      * Return value might be {@code null} if no resource is found.
      */
-    public static @Nullable String getResource(@NotNull String key, @NotNull Class<?> clazz) {
-        return RESOURCES.get(clazz.getSimpleName() + "." + key);
+    public @Nullable String getResource(@NotNull String key, @NotNull Class<?> clazz) {
+        return resources.get(clazz.getSimpleName() + "." + key);
     }
 
     /**
      * Returns the resource that is stored for the given key with the prefix "application.".
      * The returned value might be {@code null} if no resource is found.
      */
-    public static @Nullable String getApplicationResource(@NotNull String key) {
-        return RESOURCES.get(BundlesLoader.APPLICATION_BASE_BUNDLE_NAME + "." + key);
-    }
-
-    /**
-     * Removes all loaded resources.
-     */
-    public static void resetResources() {
-        RESOURCES.clear();
-        DETECTED_PERFUME_BUNDLES.clear();
-        cliBundle = null;
+    public @Nullable String getApplicationResource(@NotNull String key) {
+        return resources.get(BundlesLoader.APPLICATION_BASE_BUNDLE_NAME + "." + key);
     }
 }

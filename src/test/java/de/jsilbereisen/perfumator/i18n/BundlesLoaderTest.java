@@ -1,6 +1,7 @@
 package de.jsilbereisen.perfumator.i18n;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
@@ -16,63 +17,65 @@ class BundlesLoaderTest {
 
     private static class TestB { }
 
-    @AfterEach
+    private Bundles resourceHolder;
+
+    @BeforeEach
     void cleanup() {
-        Bundles.resetResources();
+        resourceHolder = new Bundles();
     }
 
     @Test
     void loadApplicationBundlesWithLocale() {
-        BundlesLoader.loadApplicationBundle(Locale.GERMAN);
+        BundlesLoader.loadApplicationBundle(resourceHolder, Locale.GERMAN);
 
-        assertThat(Bundles.getApplicationResource("test.prop")).isEqualTo("hallo");
-        assertThat(Bundles.getApplicationResource("test.fallback")).isEqualTo("oui");
-        assertThat(Bundles.getApplicationResource("test.only_de")).isEqualTo("deutsch");
+        assertThat(resourceHolder.getApplicationResource("test.prop")).isEqualTo("hallo");
+        assertThat(resourceHolder.getApplicationResource("test.fallback")).isEqualTo("oui");
+        assertThat(resourceHolder.getApplicationResource("test.only_de")).isEqualTo("deutsch");
     }
 
     @Test
     void loadPerfumeBundlesWithLocale() {
-        BundlesLoader.loadPerfumeBundles(Locale.GERMAN);
+        BundlesLoader.loadPerfumeBundles(resourceHolder, Locale.GERMAN);
 
         // Bundle for TestA perfume
-        assertThat(Bundles.getResource("TestA.perfume.name")).isEqualTo("ein Parfüm");
-        assertThat(Bundles.getResource("perfume.name", TestA.class)).isEqualTo("ein Parfüm");
-        assertThat(Bundles.getResource("perfume.source", TestA.class)).isEqualTo("Lösungsmuster");
-        assertThat(Bundles.getResource("perfume.description", TestA.class)).isEqualTo("cest un parfum");
-        assertThat(Bundles.getResource("perfume.information", TestA.class)).isNull();
+        assertThat(resourceHolder.getResource("TestA.perfume.name")).isEqualTo("ein Parfüm");
+        assertThat(resourceHolder.getResource("perfume.name", TestA.class)).isEqualTo("ein Parfüm");
+        assertThat(resourceHolder.getResource("perfume.source", TestA.class)).isEqualTo("Lösungsmuster");
+        assertThat(resourceHolder.getResource("perfume.description", TestA.class)).isEqualTo("cest un parfum");
+        assertThat(resourceHolder.getResource("perfume.information", TestA.class)).isNull();
 
         // Bundle for TestB perfume
-        assertThat(Bundles.getResource("TestB.perfume.name")).isEqualTo("anderes Parfüm");
-        assertThat(Bundles.getResource("perfume.name", TestB.class)).isEqualTo("anderes Parfüm");
-        assertThat(Bundles.getResource("perfume.description", TestB.class)).isEqualTo("noch ein Code Parfüm");
-        assertThat(Bundles.getResource("perfume.doesnt_exist", TestB.class)).isNull();
+        assertThat(resourceHolder.getResource("TestB.perfume.name")).isEqualTo("anderes Parfüm");
+        assertThat(resourceHolder.getResource("perfume.name", TestB.class)).isEqualTo("anderes Parfüm");
+        assertThat(resourceHolder.getResource("perfume.description", TestB.class)).isEqualTo("noch ein Code Parfüm");
+        assertThat(resourceHolder.getResource("perfume.doesnt_exist", TestB.class)).isNull();
     }
 
     @Test
     void loadBundlesNoLocale() {
-        BundlesLoader.loadApplicationBundle(null);
-        BundlesLoader.loadPerfumeBundles(null);
+        BundlesLoader.loadApplicationBundle(resourceHolder, null);
+        BundlesLoader.loadPerfumeBundles(resourceHolder, null);
 
         // Application Bundle
-        assertThat(Bundles.getApplicationResource("test.prop")).isEqualTo("bonjour");
-        assertThat(Bundles.getApplicationResource("test.fallback")).isEqualTo("oui");
-        assertThat(Bundles.getApplicationResource("test.only_de")).isNull();
+        assertThat(resourceHolder.getApplicationResource("test.prop")).isEqualTo("bonjour");
+        assertThat(resourceHolder.getApplicationResource("test.fallback")).isEqualTo("oui");
+        assertThat(resourceHolder.getApplicationResource("test.only_de")).isNull();
 
         // Bundle for TestA perfume
-        assertThat(Bundles.getResource("perfume.name", TestA.class)).isEqualTo("le parfum");
-        assertThat(Bundles.getResource("perfume.source", TestA.class)).isNull();
-        assertThat(Bundles.getResource("perfume.description", TestA.class)).isEqualTo("cest un parfum");
-        assertThat(Bundles.getResource("perfume.information", TestA.class)).isNull();
+        assertThat(resourceHolder.getResource("perfume.name", TestA.class)).isEqualTo("le parfum");
+        assertThat(resourceHolder.getResource("perfume.source", TestA.class)).isNull();
+        assertThat(resourceHolder.getResource("perfume.description", TestA.class)).isEqualTo("cest un parfum");
+        assertThat(resourceHolder.getResource("perfume.information", TestA.class)).isNull();
 
         // Bundle for TestB perfume
-        assertThat(Bundles.getResource("perfume.name", TestB.class)).isEqualTo("un parfum");
-        assertThat(Bundles.getResource("perfume.description", TestB.class)).isEqualTo("oui oui");
-        assertThat(Bundles.getResource("perfume.doesnt_exist", TestB.class)).isNull();
+        assertThat(resourceHolder.getResource("perfume.name", TestB.class)).isEqualTo("un parfum");
+        assertThat(resourceHolder.getResource("perfume.description", TestB.class)).isEqualTo("oui oui");
+        assertThat(resourceHolder.getResource("perfume.doesnt_exist", TestB.class)).isNull();
     }
 
     @Test
     void loadCliBundlesDefault() {
-        BundlesLoader.loadCliBundle(Locale.ENGLISH);
-        assertThat(Bundles.getCliBundle().getString("hello.world")).isEqualTo("Hello world");
+        BundlesLoader.loadCliBundle(resourceHolder, Locale.ENGLISH);
+        assertThat(resourceHolder.getCliBundle().getString("hello.world")).isEqualTo("Hello world");
     }
 }

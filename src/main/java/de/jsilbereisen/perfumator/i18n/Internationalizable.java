@@ -2,10 +2,12 @@ package de.jsilbereisen.perfumator.i18n;
 
 import de.jsilbereisen.perfumator.util.StringUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * Interface for internationalizable data objects.
@@ -27,9 +29,13 @@ public interface Internationalizable {
      * "setFoo" (set + field name, first letter of field's name is capitalized).
      * </p>
      *
-     * @throws RuntimeException If a problem occurs when calling the detected Setters for the internationalizable fields.
+     * @param resourceHolder {@link Bundles} with resources for internationalization. Make sure to load resources
+     *                                      into this instance via {@link BundlesLoader#loadPerfumeBundles} before,
+     *                                      otherwise the call to this method won't have any effect.
+     * @throws InternationalizationException If a problem occurs when calling the detected Setters for the
+     *                                       internationalizable fields.
      */
-    default void internationalize() {
+    default void internationalize(@NotNull Bundles resourceHolder) {
         Class<? extends Internationalizable> clazz = getClass();
         Field[] classFields = FieldUtils.getAllFields(getClass());
         Method[] classMethods = clazz.getMethods();
@@ -37,7 +43,7 @@ public interface Internationalizable {
         for (Field field: classFields) {
             if (field.getType().equals(String.class) && !field.isAnnotationPresent(I18nIgnore.class)) {
                 String fieldName = field.getName();
-                String internationalizedContent = Bundles.getResource(fieldName, clazz);
+                String internationalizedContent = resourceHolder.getResource(fieldName, clazz);
 
                 if (!StringUtil.isEmpty(internationalizedContent)) {
                     String setterName = "set" + fieldName.substring(0, 1).toUpperCase()
@@ -48,7 +54,10 @@ public interface Internationalizable {
                             try {
                                 method.invoke(this, internationalizedContent);
                             } catch (InvocationTargetException | IllegalAccessException e) {
-                                throw new RuntimeException(e);
+                                throw new InternationalizationException(
+                                        String.format("Invocation of setter \"%s\" for Field \"%s\" of class "
+                                                + "\"%s\" failed.", setterName, fieldName, clazz.getSimpleName()),
+                                        e);
                             }
                         }
                     }

@@ -25,8 +25,11 @@ public class CommandLineHandler {
 
     private final CmdLineParser parser;
 
-    public CommandLineHandler(@NotNull CmdLineParser parser) {
+    private final Bundles cliResourceHolder;
+
+    public CommandLineHandler(@NotNull CmdLineParser parser, @NotNull Bundles cliResourceHolder) {
         this.parser = parser;
+        this.cliResourceHolder = cliResourceHolder;
     }
 
     // TODO: refactor method
@@ -37,8 +40,10 @@ public class CommandLineHandler {
         Locale applicationLocale = cliInput.getLocale();
         String applicationLanguageName = LanguageTag.of(applicationLocale).getFullLanguageName();
 
-        BundlesLoader.loadCliBundle(applicationLocale);
-        ResourceBundle cliBundle = Bundles.getCliBundle();
+        BundlesLoader.loadCliBundle(cliResourceHolder, applicationLocale);
+        ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
+        assert cliBundle != null;
+
         log.info(cliBundle.getString("log.generic.locale") + " " + applicationLanguageName);
 
         if (cliInput.isPrintHelp()) {
@@ -77,8 +82,9 @@ public class CommandLineHandler {
             }
         }
 
-        BundlesLoader.loadCliBundle(locale);
-        ResourceBundle cliBundle = Bundles.getCliBundle();
+        BundlesLoader.loadCliBundle(cliResourceHolder, locale);
+        ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
+        assert cliBundle != null;
 
         log.error(cliBundle.getString("log.error.unableToHandleInput"));
         log.error(cliException.getMessage() + "\n");
@@ -88,19 +94,21 @@ public class CommandLineHandler {
     }
 
     private void printHelp() {
-        ResourceBundle cliBundle = Bundles.getCliBundle();
+        ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
+        assert cliBundle != null;
+
         log.info(cliBundle.getString("log.generic.preHelp"));
         parser.printUsage(new OutputStreamWriter(System.out), cliBundle);
     }
 
     private boolean checkInputPath(@Nullable Path path) {
-        ResourceBundle cliBundle = Bundles.getCliBundle();
+        ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
+        assert cliBundle != null;
 
         if (!checkForNullAndExists(path, cliBundle.getString("log.error.inputPathMissing"),
                 cliBundle.getString("log.error.invalidInputPath"))) {
             return false;
         }
-
         assert path != null;
 
         // TODO: Refactoring: Util class, Method isJavaFile?
@@ -113,7 +121,8 @@ public class CommandLineHandler {
     }
 
     private boolean checkOutputPath(@Nullable Path path) {
-        ResourceBundle cliBundle = Bundles.getCliBundle();
+        ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
+        assert cliBundle != null;
 
         if (!checkForNullAndExists(path, cliBundle.getString("log.error.outputPathMissing"),
                 cliBundle.getString("log.error.invalidOutputPath"))) {

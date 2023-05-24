@@ -2,9 +2,9 @@ package de.jsilbereisen.perfumator.io;
 
 import de.jsilbereisen.perfumator.engine.EngineConfiguration;
 import de.jsilbereisen.perfumator.i18n.Bundles;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.CmdLineParser;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.nio.file.Path;
@@ -23,25 +23,27 @@ class CommandLineHandlerTest {
     private static final Path PATH_TO_THIS_DIR = Paths.get("src", "test", "java", "de",
             "jsilbereisen", "perfumator", "io");
 
+    private static final Bundles MOCKED_BUNDLES = Mockito.mock(Bundles.class);
+
+    private static final CmdLineParser MOCKED_PARSER = Mockito.mock(CmdLineParser.class);
+
+    @BeforeAll
+    static void setupBundlesMock() {
+        ResourceBundle mockedBundle = Mockito.mock(ResourceBundle.class);
+        when(mockedBundle.getString(anyString())).thenReturn("Mocked");
+        when(MOCKED_BUNDLES.getCliBundle()).thenReturn(mockedBundle);
+    }
+
     @Test
     void singleJavaFileAsInput() {
         CommandLineInput commandLineInput = new CommandLineInput();
         commandLineInput.setPathToSourceDir(PATH_TO_THIS_CLASS);
         commandLineInput.setPathToOutputDir(PATH_TO_THIS_DIR);
 
-        // Mocks
-        ResourceBundle mockedBundle = Mockito.mock(ResourceBundle.class);
-        when(mockedBundle.getString(anyString())).thenReturn("Mocked");
-        CmdLineParser mockedParser = Mockito.mock(CmdLineParser.class);
+        CommandLineHandler handler = new CommandLineHandler(MOCKED_PARSER, MOCKED_BUNDLES);
 
-        CommandLineHandler handler = new CommandLineHandler(mockedParser);
-
-        try (MockedStatic<Bundles> bundles = Mockito.mockStatic(Bundles.class)) {
-            bundles.when(Bundles::getCliBundle).thenReturn(mockedBundle);
-
-            assertThat(handler.handleArguments(commandLineInput))
-                    .isEqualTo(new EngineConfiguration(PATH_TO_THIS_CLASS, PATH_TO_THIS_DIR));
-        }
+        assertThat(handler.handleArguments(commandLineInput))
+                .isEqualTo(new EngineConfiguration(PATH_TO_THIS_CLASS, PATH_TO_THIS_DIR));
     }
 
 }

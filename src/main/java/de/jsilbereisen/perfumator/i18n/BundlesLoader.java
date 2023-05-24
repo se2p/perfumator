@@ -4,6 +4,7 @@ import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
 import de.jsilbereisen.perfumator.util.StringUtil;
 import io.github.classgraph.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -65,7 +66,7 @@ public class BundlesLoader {
      *
      * @param locale The locale for which the resources should be loaded.
      */
-    public static void loadApplicationBundle(@Nullable Locale locale) {
+    public static void loadApplicationBundle(@NotNull Bundles bundlesHolder, @Nullable Locale locale) {
         Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
 
         String applicationBundleFullQualified = StringUtil.joinStrings(
@@ -75,7 +76,7 @@ public class BundlesLoader {
                 ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
 
-        Bundles.addBundle(applicationBundle);
+        bundlesHolder.addBundle(applicationBundle);
     }
 
     /**
@@ -86,7 +87,7 @@ public class BundlesLoader {
      *
      * @param locale The locale for which the resources should be loaded.
      */
-    public static void loadPerfumeBundles(@Nullable Locale locale) {
+    public static void loadPerfumeBundles(@NotNull Bundles bundlesHolder, @Nullable Locale locale) {
         Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
 
         ClassGraph resourceScanner = new ClassGraph().acceptPathsNonRecursive(INTERNATIONALIZATION_PACKAGE +
@@ -116,7 +117,7 @@ public class BundlesLoader {
             throw e;
         }
 
-        Bundles.DETECTED_PERFUME_BUNDLES.clear();
+        bundlesHolder.getDetectedPerfumeBundles().clear();
 
         detectedBaseBundles.forEach(detectedBaseBundle -> {
             ResourceBundle bundle = ResourceBundle.getBundle(
@@ -125,8 +126,8 @@ public class BundlesLoader {
                     useLocale,
                     ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-            Bundles.addBundle(bundle);
-            Bundles.DETECTED_PERFUME_BUNDLES.add(detectedBaseBundle);
+            bundlesHolder.addBundle(bundle);
+            bundlesHolder.getDetectedPerfumeBundles().add(detectedBaseBundle);
         });
     }
 
@@ -136,7 +137,7 @@ public class BundlesLoader {
      * {@link LocaleOptionHandler#getDefault()} and the fallback-files
      * are loaded.
      */
-    public static void loadCliBundle(@Nullable Locale locale) {
+    public static void loadCliBundle(@NotNull Bundles bundlesHolder, @Nullable Locale locale) {
         Locale useLocale = locale != null ? locale : LocaleOptionHandler.getDefault();
 
         ResourceBundle cliBundle = ResourceBundle.getBundle(
@@ -145,6 +146,6 @@ public class BundlesLoader {
                 useLocale,
                 ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
-        Bundles.setCliBundle(cliBundle);
+        bundlesHolder.setCliBundle(cliBundle);
     }
 }
