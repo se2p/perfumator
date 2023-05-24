@@ -8,7 +8,6 @@ import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import de.jsilbereisen.perfumator.model.Perfume;
 import de.jsilbereisen.perfumator.model.PerfumeLoadException;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.i18n.Internationalizable;
 import de.jsilbereisen.perfumator.util.StringUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassGraphException;
@@ -45,17 +44,26 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
 
     public static final String PERFUME_DETECTORS_PACKAGE = "de.jsilbereisen.perfumator.engine.detector.perfume";
 
-    private final Map<Perfume, Detector<Perfume>> registry = new HashMap<>();
+    private final Map<Perfume, Detector<Perfume>> registry;
+
+    private final  JsonMapper jsonMapper;
+
+    public PerfumeRegistry() {
+        registry = new HashMap<>();
+        jsonMapper = new JsonMapper();
+    }
 
     // TODO: i18n exception messages
     /**
      * Detects and loads all Perfumes that are in the {@link #PERFUME_DEFINITIONS_PACKAGE} from their JSONs into the
-     * registry and links them with their respective {@link Detector}.
+     * registry and links them with their respective {@link Detector<Perfume>}.
      * Also performs internationalization for each loaded {@link Perfume} with the given {@link Locale},
      * if there are resources available.
      *
      * @param locale The locale to use for loading internationalized versions of the Perfumes.
      * @throws PerfumeLoadException If any failures occur within the detection and loading process.
+     * @throws DetectorLoadException When being unable to instantiate the {@link Detector<Perfume>} for a
+     *                               {@link Perfume} or when simply no {@link Detector} is found for it.
      */
     @Override
     public void loadRegistry(@NotNull Locale locale) {
@@ -89,14 +97,13 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
     private @NotNull List<Perfume> loadPerfumes(@NotNull Bundles bundles) {
         List<Perfume> loadedPerfumes = new ArrayList<>();
         ClassGraph resourceScanner = new ClassGraph().acceptPathsNonRecursive(PERFUME_DEFINITIONS_PACKAGE);
-        JsonMapper jsonMapper = new JsonMapper();
 
         try (ScanResult result = resourceScanner.scan()) {
             ResourceList allPerfumes = result.getAllResources();
             allPerfumes.stream()
                     .filter(resource -> resource.getPath().endsWith(".json"))
                     .forEach(resource -> {
-                        Perfume perfume = loadSinglePerfume(bundles, resource, jsonMapper);
+                        Perfume perfume = loadSinglePerfume(bundles, resource);
 
                         if (perfume != null) {
                             loadedPerfumes.add(perfume);
@@ -111,8 +118,18 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
         return loadedPerfumes;
     }
 
-    private @Nullable Perfume loadSinglePerfume(@NotNull Bundles resourceHolder, @NotNull Resource resource,
-                                                @NotNull JsonMapper jsonMapper) {
+    /**
+     * Loads a single {@link Perfume} from its string-representation in JSON format with the <i>Jackson</i>
+     * mapping library's API.
+     *
+     * @param bundles Resources for internationalized exception messages.
+     * @param resource Resource with the {@link Perfume}'s JSON representation.
+     * @return The loaded {@link Perfume} or {@code null} if some unknown failure, that does not trigger an
+     *         exception, occurred
+     * @throws PerfumeLoadException If the given resource could not be read or if the mapping of the resource's
+     *                              content to a {@link Perfume} instance failed notably.
+     */
+    private @Nullable Perfume loadSinglePerfume(@NotNull Bundles bundles, @NotNull Resource resource) {
         String jsonRepresentation;
         Perfume loadedPerfume = null;
 
@@ -176,17 +193,17 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
     }
 
     @Override
-    public List<Perfume> getRegisteredDetectables() {
+    public @NotNull List<Perfume> getRegisteredDetectables() {
         return new ArrayList<>(registry.keySet());
     }
 
     @Override
-    public List<Detector<Perfume>> getRegisteredDetectors() {
+    public @NotNull List<Detector<Perfume>> getRegisteredDetectors() {
         return new ArrayList<>(registry.values());
     }
 
     @Override
-    public Detector<Perfume> getDetector(@NotNull Perfume detectable) {
+    public @Nullable Detector<Perfume> getDetector(@NotNull Perfume detectable) {
         return registry.get(detectable);
     }
 }

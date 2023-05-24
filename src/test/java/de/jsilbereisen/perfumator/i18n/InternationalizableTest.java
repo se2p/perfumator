@@ -3,7 +3,6 @@ package de.jsilbereisen.perfumator.i18n;
 import lombok.Setter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
