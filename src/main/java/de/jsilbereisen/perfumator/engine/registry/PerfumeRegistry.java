@@ -8,7 +8,6 @@ import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import de.jsilbereisen.perfumator.model.Perfume;
 import de.jsilbereisen.perfumator.model.PerfumeLoadException;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.model.PerfumeNameComparator;
 import de.jsilbereisen.perfumator.util.StringUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassGraphException;
@@ -21,7 +20,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 // TODO: i18n
 /**
@@ -198,18 +203,16 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * Returns the registered {@link Perfume}s, sorted by their name.
      */
     @Override
-    public @NotNull List<Perfume> getRegisteredDetectables() {
-        List<Perfume> registeredPerfumes = new ArrayList<>(registry.keySet());
-        registeredPerfumes.sort(new PerfumeNameComparator());
-        return registeredPerfumes;
+    public @NotNull Set<Perfume> getRegisteredDetectables() {
+        return new HashSet<>(registry.keySet());
     }
 
     /**
      * Returns all registered detectors.
      */
     @Override
-    public @NotNull List<Detector<Perfume>> getRegisteredDetectors() {
-        return new ArrayList<>(new HashSet<>(registry.values()));
+    public @NotNull Set<Detector<Perfume>> getRegisteredDetectors() {
+        return new HashSet<>(registry.values());
     }
 
     @Override

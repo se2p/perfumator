@@ -9,6 +9,9 @@ import java.util.List;
 
 /**
  * Interface for a {@link Detector} for a type {@link T} that is a Detectable.
+ * Implementations must override {@link Object#equals} and {@link Object#hashCode},
+ * to allow {@link de.jsilbereisen.perfumator.engine.registry.DetectableRegistry} implementations
+ * to conveniently use {@link java.util.Set}s for their return types.
  *
  * @param <T> Type of detectable that is to be detected.
  */
@@ -22,4 +25,10 @@ public interface Detector<T extends Detectable> {
      *         are found, returns an empty list.
      */
     @NotNull List<DetectedInstance<T>> detect(@NotNull CompilationUnit astRoot);
+
+    @Override
+    boolean equals(Object o);
+
+    @Override
+    int hashCode();
 }

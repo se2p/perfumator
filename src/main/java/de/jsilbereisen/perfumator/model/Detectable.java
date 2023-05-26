@@ -16,11 +16,15 @@ import java.lang.reflect.Method;
 
 /**
  * Abstract class for data objects with information for detectable concepts, e.g. Code Perfumes or Code Smells.
+ * In the context of the <b>Perfumator</b> application, instances of deriving classes of this class are intended
+ * to be loaded from JSON-representations with the help of the <i>Jackson</i> object mapper.
+ * <br/>
+ * Every subclass of {@link Detectable} should also implement {@link #equals} and {@link #hashCode}.
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-public abstract class Detectable implements Internationalizable {
+public abstract class Detectable implements Internationalizable, Comparable<Detectable> {
 
     private String name;
 
@@ -39,20 +43,20 @@ public abstract class Detectable implements Internationalizable {
 
     // TODO: extend doc
     /**
-     * Simple name of the {@link Detector} class that is responsible for detecting this {@link Detectable}.
+     * Constructor for a {@link Detectable} with a name, description, {@link Detector} class name and bundle name for
+     * internationalisation.
+     * No checks are performed whether a {@link Detector} class with the given name even exists.
      *
-     * @param detectorClassSimpleName Simple class name as string, not fully qualified.
+     * @param name Name for the detectable.
+     * @param description A description for this detectable
+     * @param detectorClassSimpleName Simple class name as string, not fully qualified. Another class, like a
+     *                                {@link de.jsilbereisen.perfumator.engine.registry.DetectableRegistry},
+     *                                should be responsible to take value from that name.
      * @param i18nBaseBundleName The base name of the bundle that should be used for internationalization of this
-     *                           {@link Detectable}. Can be {@code null}.
-     * @throws IllegalArgumentException If the given detector class name is {@code null} or empty.
+     *                           detectable.
      */
-     protected Detectable(String name, String description, String detectorClassSimpleName,
-                          @Nullable String i18nBaseBundleName) {
-         if (StringUtil.anyEmpty(name, description, detectorClassSimpleName)) {
-             throw new IllegalArgumentException("Perfume must have a non-null, non-empty name, " +
-                     "description and detector class name.");
-         }
-
+     protected Detectable(@Nullable String name, @Nullable String description,
+                          @Nullable String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
          this.name = name;
          this.description = description;
          this.detectorClassSimpleName = detectorClassSimpleName;
@@ -114,6 +118,27 @@ public abstract class Detectable implements Internationalizable {
                 }
             }
         }
+    }
+
+    /**
+     * Compares {@code this} to the {@link Detectable} {@code other} by their names.<br/>
+     * <b>Note:</b> the ordering is inconsistent with {@link #equals}.
+     */
+    @Override
+    public int compareTo(@Nullable Detectable other) {
+        if (other == null) {
+            return 1;
+        }
+
+        if (this.getName() == null) {
+            if (other.getName() == null) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+
+        return this.getName().compareTo(other.getName());
     }
 
     // TODO: useful toString

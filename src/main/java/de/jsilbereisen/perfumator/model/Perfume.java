@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator.model;
 
+import de.jsilbereisen.perfumator.engine.detector.Detector;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Data object for a Code Perfume definition.
- * In the application, instances of this are created from JSON representations.
+ * In the application, instances of this class are created from JSON representations.
  */
 @Getter
 @Setter
@@ -26,15 +27,13 @@ public class Perfume extends Detectable {
     public Perfume() { }
 
     /**
-     * Constructor containing all fields. Note that the {@code name}, {@code description} and {@code detectorClassSimpleName}
-     * parameters must neither be {@code null} or empty (see {@link de.jsilbereisen.perfumator.util.StringUtil#isEmpty(String)}.
-     *
-     * @throws IllegalArgumentException If the given name, description or detector class name is {@code null} or empty.
+     * Constructor containing all fields.
+     * No checks are performed whether a {@link Detector} class with the given name even exists.
      */
-    public Perfume(String name, String description, @Nullable String source,
+    public Perfume(@Nullable String name, @Nullable String description, @Nullable String source,
                    @Nullable RelatedPatternType relatedPattern,
                    @Nullable String additionalInformation,
-                   String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
+                   @Nullable String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
         super(name, description, detectorClassSimpleName, i18nBaseBundleName);
 
         this.source = source;

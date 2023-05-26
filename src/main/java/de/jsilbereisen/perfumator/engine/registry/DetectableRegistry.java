@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Interface for a registry that loads and stores {@link T} {@link Detectable}s and links them with their
@@ -37,22 +38,22 @@ public interface DetectableRegistry<T extends Detectable> {
     void loadRegistry(@NotNull Locale locale);
 
     /**
-     * Returns a list of all {@link T} {@link Detectable}s that are currently loaded in the registry.
+     * Returns a set of all {@link T} {@link Detectable}s that are currently loaded in the registry.
      * If none are loaded, maybe because no call to {@link #loadRegistry} was issued yet,
-     * returns an empty list.
+     * returns an empty set.
      *
-     * @return List of {@link T}s that are currently registered.
+     * @return Set of {@link T}s that are currently registered.
      */
-    @NotNull List<T> getRegisteredDetectables();
+    @NotNull Set<T> getRegisteredDetectables();
 
     /**
-     * Returns a list of all {@link Detector<T>}s that are currently loaded in the registry.
+     * Returns a set of all {@link Detector<T>}s that are currently loaded in the registry.
      * If none are loaded, maybe because no call to {@link #loadRegistry} was issued yet,
-     * returns an empty list.
+     * returns an empty set.
      *
-     * @return List of {@link Detector<T>}s that are currently registered.
+     * @return Set of {@link Detector<T>}s that are currently registered.
      */
-    @NotNull List<Detector<T>> getRegisteredDetectors();
+    @NotNull Set<Detector<T>> getRegisteredDetectors();
 
     /**
      * Returns the {@link Detector<T>} that is linked to the given {@link T} {@link Detectable}.

@@ -38,18 +38,4 @@ public class CommandLineInput {
             handler = LocaleOptionHandler.class)
     private Locale locale = LocaleOptionHandler.getDefault();
 
-    /**
-     * Creates a copy of {@code this}.
-     */
-    public CommandLineInput copy() {
-        CommandLineInput copy = new CommandLineInput();
-
-        copy.pathToSourceDir = pathToSourceDir; // Path is immutable
-        copy.pathToOutputDir = pathToOutputDir;
-        copy.printHelp = printHelp;
-        copy.outputFormat = outputFormat;
-        copy.locale = (Locale) locale.clone(); // Not sure if Locale is immutable - not mentioned in the class doc
-
-        return copy;
-    }
 }

@@ -3,23 +3,36 @@ package de.jsilbereisen.perfumator.engine.registry;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.DummyDetector;
 import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.DetectableComparator;
 import de.jsilbereisen.perfumator.model.RelatedPatternType;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for the {@link PerfumeRegistry} implementation.
+ */
 class PerfumeRegistryTest {
 
+    /**
+     * Test auto-detection and loading of Perfumes in the default location.
+     * Also tests whether instantiation of the specified {@link Detector} (here: {@link DummyDetector}) works with
+     * the implicit default constructor.
+     */
     @Test
     void loadPerfumes() {
         PerfumeRegistry perfumeRegistry = new PerfumeRegistry();
 
         perfumeRegistry.loadRegistry(Locale.GERMAN);
 
-        List<Perfume> loadedPerfumes = perfumeRegistry.getRegisteredDetectables();
+        List<Perfume> loadedPerfumes = new ArrayList<>(perfumeRegistry.getRegisteredDetectables());
+        loadedPerfumes.sort(new DetectableComparator()); // Ensure consistent ordering in the test
+
         assertThat(loadedPerfumes).hasSize(2);
 
         Perfume perfumeB = loadedPerfumes.get(0);
@@ -43,11 +56,11 @@ class PerfumeRegistryTest {
         assertThat(perfumeB.getRelatedPattern()).isEqualTo(RelatedPatternType.BUG);
         assertThat(perfumeB.getAdditionalInformation()).isEqualTo("More information.");
 
-        List<Detector<Perfume>> registeredDetectors = perfumeRegistry.getRegisteredDetectors();
+        Set<Detector<Perfume>> registeredDetectors = perfumeRegistry.getRegisteredDetectors();
 
         assertThat(registeredDetectors).hasSize(1);
 
-        Detector<Perfume> dummyDetector = registeredDetectors.get(0);
+        Detector<Perfume> dummyDetector = registeredDetectors.stream().findFirst().orElse(null);
         assertThat(dummyDetector).isInstanceOf(DummyDetector.class);
     }
 }

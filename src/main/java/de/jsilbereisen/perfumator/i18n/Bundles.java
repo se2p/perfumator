@@ -7,10 +7,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 /**
  * Class that holds a map with all known resources from {@link ResourceBundle}s that are loaded by the

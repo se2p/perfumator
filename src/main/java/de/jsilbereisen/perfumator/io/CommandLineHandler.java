@@ -76,8 +76,16 @@ public class CommandLineHandler {
         return new EngineConfiguration(inputPath, outputPath, applicationLocale, cliInput.getOutputFormat());
     }
 
+    /**
+     * Gets called when a {@link CmdLineException} is thrown when parsing the command line on application startup.
+     * Tries to extract a language option from the command line arguments, to set the {@link Locale} for loading the
+     * command line resources accordingly. If no valid language option is given, the resources are loaded with the default
+     * application language (extracted from {@link LanguageTag#getDefault()}).<br/>
+     * Prints out the un-internationalized error message,
+     * then prints out the usage text from the loaded resources.
+     */
     public void handleError(@NotNull String[] args, @NotNull CmdLineException cliException) {
-        Locale locale = LocaleOptionHandler.getDefault();
+        Locale locale = LanguageTag.getDefault().getRelatedLocale();
 
         for (int i = 0; i < args.length; i++) {
             if ((args[i].equals("-l") || args[i].equals("--language")) && i+1 < args.length) {

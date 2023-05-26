@@ -61,5 +61,5 @@ public interface Internationalizable {
                 }
             }
         }
-    };
+    }
 }

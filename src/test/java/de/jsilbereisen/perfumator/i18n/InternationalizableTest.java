@@ -31,8 +31,8 @@ class InternationalizableTest {
     @Setter
     private static class I18nMeDetectable extends Detectable {
 
-        public I18nMeDetectable(String name, String description, String detectorClassSimpleName,
-                           @Nullable String i18nBundleBaseName) {
+        public I18nMeDetectable(@Nullable String name, @Nullable String description,
+                                @Nullable String detectorClassSimpleName, @Nullable String i18nBundleBaseName) {
             super(name, description, detectorClassSimpleName, i18nBundleBaseName);
         }
     }
@@ -88,6 +88,6 @@ class InternationalizableTest {
         assertThat(i18nMeDetectable.getName()).isEqualTo("name");
         assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
         assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
-        assertThat(i18nMeDetectable.getI18nBaseBundleName()).isEqualTo(null);
+        assertThat(i18nMeDetectable.getI18nBaseBundleName()).isNull();
     }
 }

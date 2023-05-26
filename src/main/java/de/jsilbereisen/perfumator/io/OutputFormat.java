@@ -1,5 +1,8 @@
 package de.jsilbereisen.perfumator.io;
 
+/**
+ * Available output formats for the command line application.
+ */
 public enum OutputFormat {
 
     JSON("JSON", "JavaScript Object Notation"),

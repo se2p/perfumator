@@ -3,6 +3,7 @@ package de.jsilbereisen.perfumator.model;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -10,17 +11,18 @@ import org.jetbrains.annotations.NotNull;
  * Holds meta information on the detection location etc.
  */
 @Getter
+@Setter
 @EqualsAndHashCode
 public class DetectedInstance<T extends Detectable> {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass")
-    private final T detectable;
+    private T detectable;
 
-    private final String className;
+    private String className;
 
-    private final int lineNumber;
+    private int lineNumber;
 
-    private final String concreteCode;
+    private String concreteCode;
 
     public DetectedInstance(@NotNull T detectable, @NotNull String className, int lineNumber,
                             @NotNull String concreteCode) {
@@ -30,20 +32,6 @@ public class DetectedInstance<T extends Detectable> {
         this.concreteCode = concreteCode;
     }
 
-    @Override
-    public String toString() {
-        if (detectable == null) {
-            return "No information";
-        }
-
-        String ret = "Detected \"" + detectable.getName() + "\"";
-
-        if (className != null) {
-            ret += " in class \"" + className + "\", line " + lineNumber;
-        }
-
-        return ret;
-    }
-
     // TODO: i18n
+    // TODO: toString
 }
