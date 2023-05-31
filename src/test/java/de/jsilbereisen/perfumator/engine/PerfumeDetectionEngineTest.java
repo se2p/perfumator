@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,6 +34,11 @@ class PerfumeDetectionEngineTest {
 
     private static final Path SINGLE_NON_JAVA = Path.of("src", "test", "resources", "sources", "other",
             "some_other_file.txt");
+
+    private static final Path DIR_EMPTY = Path.of("src", "test", "resources", "sources", "empty");
+
+    private static final Path DIR_SMALL_PROJECT = Path.of("src", "test", "resources", "sources", "projects",
+            "small_project", "src");
 
     @BeforeAll
     static void setupMocks() {
@@ -59,5 +65,25 @@ class PerfumeDetectionEngineTest {
 
         assertThatThrownBy(() -> engine.detect(SINGLE_NON_JAVA)).isInstanceOf(IllegalArgumentException.class);
         assertThat(engine.detect(SINGLE_MALFORMED_JAVA_SOURCE)).isEmpty();
+    }
+
+    @Test
+    void detectInEmptyDir() {
+        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null, bundlesMock);
+
+        assertThat(engine.detect(DIR_EMPTY)).isEmpty();
+    }
+
+    @Test
+    void detectInSmallProject() {
+        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null, bundlesMock);
+
+        List<DetectedInstance<Perfume>> detectedInstances = engine.detect(DIR_SMALL_PROJECT);
+        assertThat(detectedInstances).hasSize(4);
+
+        List<String> detectedTypesNames = detectedInstances.stream().map(DetectedInstance::getParentTypeName)
+                .collect(Collectors.toList());
+        assertThat(detectedTypesNames).containsExactlyInAnyOrder("AnotherDirClass", "SubpackageClassOne",
+                "SubpackageClassTwo", "Main");
     }
 }

@@ -27,7 +27,8 @@ public class DummyDetector implements Detector<Perfume> {
 
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
-        return List.of(new DetectedInstance<>(perfume, "SomeClassName", 1, "public class SomeClassName { }"));
+        return List.of(new DetectedInstance<>(perfume, astRoot.getPrimaryTypeName().orElse("No type name found"), 1,
+                "public class SomeClassName { }"));
     }
 
     @Override

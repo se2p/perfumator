@@ -18,16 +18,16 @@ public class DetectedInstance<T extends Detectable> {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass")
     private T detectable;
 
-    private String className;
+    private String parentTypeName;
 
     private int lineNumber;
 
     private String concreteCode;
 
-    public DetectedInstance(@NotNull T detectable, @NotNull String className, int lineNumber,
+    public DetectedInstance(@NotNull T detectable, @NotNull String parentTypeName, int lineNumber,
                             @NotNull String concreteCode) {
         this.detectable = detectable;
-        this.className = className;
+        this.parentTypeName = parentTypeName;
         this.lineNumber = lineNumber;
         this.concreteCode = concreteCode;
     }
