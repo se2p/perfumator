@@ -5,7 +5,6 @@ import de.jsilbereisen.perfumator.engine.detector.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 

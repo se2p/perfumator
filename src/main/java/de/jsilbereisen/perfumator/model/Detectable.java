@@ -6,6 +6,7 @@ import de.jsilbereisen.perfumator.util.StringUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,7 @@ import java.lang.reflect.Method;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public abstract class Detectable implements Internationalizable, Comparable<Detectable> {
 

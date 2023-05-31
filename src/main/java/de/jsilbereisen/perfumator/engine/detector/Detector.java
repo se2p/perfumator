@@ -26,6 +26,14 @@ public interface Detector<T extends Detectable> {
      */
     @NotNull List<DetectedInstance<T>> detect(@NotNull CompilationUnit astRoot);
 
+    /**
+     * Sets the concrete {@link T} instance that is detected by this {@link Detector<T>}.
+     * This might for example be the specific Perfume that this detector is responsible for.
+     *
+     * @param concreteDetectable The {@link Detectable} that this detector detects.
+     */
+    void setConcreteDetectable(@NotNull T concreteDetectable);
+
     @Override
     boolean equals(Object o);
 
