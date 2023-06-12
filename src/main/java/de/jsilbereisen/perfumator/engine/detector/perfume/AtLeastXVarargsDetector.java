@@ -59,6 +59,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
             detected.setDetectable(perfume);
             methodDeclaration.getBegin().ifPresent(pos -> detected.setBeginningLineNumber(pos.line));
             methodDeclaration.getEnd().ifPresent(pos -> detected.setEndingLineNumber(pos.line));
+            detected.setConcreteCode(methodDeclaration.toString());
 
             return Optional.of(detected);
         }
