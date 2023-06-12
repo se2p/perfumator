@@ -1,0 +1,9 @@
+{
+  "name": "At least X varargs",
+  "description": "Varargs are used when you want to accept multiple arguments of the same type for a method,\nwithout restricting the exact amount. But sometimes, you want to have a lower bound of X parameters passed\nfor the vararg, for example, lets say you want at least one int. You could possibly check within the method itself,\nwhether varargs.length >= X and only then continue in the method, or check varargs.length < X and then return instantly or throw an\nexception, in order to not execute the rest of the method.\nThe disadvantage of this approach is that it produces unnecessary and not as easily readable code.\nThis Perfume rewards the more preferable approach, also described by Joshua Bloch in his book \"Effective Java\" in Chapter 8.5.\nInstead of validating the amount of parameters given within the method's body, one can simply change the method declaration and put\nX times a parameter of the same type as the varargs in front of the latter.\nFor example, if you want at least one int, declare the parameters like \"int first, int... others\".",
+  "detectorClassSimpleName": "AtLeastXVarargs",
+  "i18nBaseBundleName": "atLeastXVarargs",
+  "source": "J. Bloch: Effective Java, Chap. 8.5",
+  "relatedPattern": "SMELL",
+  "additionalInformation": null
+}

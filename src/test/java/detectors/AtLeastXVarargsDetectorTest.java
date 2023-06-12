@@ -1,0 +1,38 @@
+package detectors;
+
+import com.github.javaparser.ast.CompilationUnit;
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.perfume.AtLeastXVarargsDetector;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.Perfume;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import test.dummy.AbstractDetectorTest;
+
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
+
+    // TODO: refactoring step: super class which can initialize and set perfume for detector
+    private static final Detector<Perfume> DETECTOR = new AtLeastXVarargsDetector();
+
+    private static final Path TEST_FILE = Path.of("src", "test", "resources", "detectors", "VarargsPerfume.java");
+
+    private static CompilationUnit ast;
+
+    @BeforeAll
+    static void getAst() {
+        ast = parseAstForFile(TEST_FILE);
+    }
+
+    @Test
+    void detectPerfume() {
+        List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
+
+        assertThat(detected).hasSize(1);
+    }
+
+}
