@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * {@link Detectable} instance that was detected in a source file.
@@ -24,8 +25,10 @@ public class DetectedInstance<T extends Detectable> {
 
     private String concreteCode;
 
-    public DetectedInstance(@NotNull T detectable, @NotNull String parentTypeName, int lineNumber,
-                            @NotNull String concreteCode) {
+    public DetectedInstance() { }
+
+    public DetectedInstance(@Nullable T detectable, @Nullable String parentTypeName, int lineNumber,
+                            @Nullable String concreteCode) {
         this.detectable = detectable;
         this.parentTypeName = parentTypeName;
         this.lineNumber = lineNumber;
