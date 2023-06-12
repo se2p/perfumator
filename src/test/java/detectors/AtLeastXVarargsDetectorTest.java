@@ -43,6 +43,7 @@ class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
         assertThat(detected.get(0).getBeginningLineNumber()).isEqualTo(5);
         assertThat(detected.get(0).getEndingLineNumber()).isEqualTo(8);
         assertThat(detected.get(0).getParentTypeName()).isEqualTo("VarargsPerfume");
+        assertThat(detected.get(0).getConcreteCode()).isNotEmpty();
     }
 
 }
