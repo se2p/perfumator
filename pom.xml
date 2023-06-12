@@ -153,6 +153,32 @@
     <build>
         <pluginManagement>
             <plugins>
+                <!-- For testing of different linter outputs
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.21.0</version>
+                    <configuration>
+                        <format>net.sourceforge.pmd.renderers.HTMLRenderer</format>
+                        <includeXmlInSite>true</includeXmlInSite>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.7.2.1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>4.7.3</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <xmlOutput>false</xmlOutput>
+                    </configuration>
+                </plugin>
+                -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.2.0</version>
