@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @Getter
 @Setter
+@Accessors(chain = true)
 @EqualsAndHashCode
 public class DetectedInstance<T extends Detectable> {
 
@@ -21,17 +23,20 @@ public class DetectedInstance<T extends Detectable> {
 
     private String parentTypeName;
 
-    private int lineNumber;
+    private int beginningLineNumber;
+
+    private int endingLineNumber;
 
     private String concreteCode;
 
     public DetectedInstance() { }
 
-    public DetectedInstance(@Nullable T detectable, @Nullable String parentTypeName, int lineNumber,
-                            @Nullable String concreteCode) {
+    public DetectedInstance(@Nullable T detectable, @Nullable String parentTypeName, int beginningLineNumber,
+                            int endingLineNumber, @Nullable String concreteCode) {
         this.detectable = detectable;
         this.parentTypeName = parentTypeName;
-        this.lineNumber = lineNumber;
+        this.beginningLineNumber = beginningLineNumber;
+        this.endingLineNumber = endingLineNumber;
         this.concreteCode = concreteCode;
     }
 

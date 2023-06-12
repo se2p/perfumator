@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class AtLeastXVarargsDetector implements Detector<Perfume> {
+
+    private Perfume perfume;
+
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
@@ -25,7 +28,10 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
 
         for (MethodDeclaration methodDeclaration : methodDeclarations) {
             Optional<DetectedInstance<Perfume>> detected = checkForPerfume(methodDeclaration);
-            detected.ifPresent(detectedPerfumes::add);
+            detected.ifPresent(det -> {
+                astRoot.getPrimaryTypeName().ifPresent(det::setParentTypeName);
+                detectedPerfumes.add(det);
+            });
         }
 
         return detectedPerfumes;
@@ -33,7 +39,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
 
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
-
+        perfume = concreteDetectable;
     }
 
     @NotNull
@@ -49,7 +55,12 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
 
         Parameter varargsParameter = parameters.stream().filter(Parameter::isVarArgs).findFirst().get();
         if (parameters.stream().anyMatch(parameter -> parameter.getType().equals(varargsParameter.getType()))) {
-            return Optional.of(new DetectedInstance<>());
+            DetectedInstance<Perfume> detected = new DetectedInstance<>();
+            detected.setDetectable(perfume);
+            methodDeclaration.getBegin().ifPresent(pos -> detected.setBeginningLineNumber(pos.line));
+            methodDeclaration.getEnd().ifPresent(pos -> detected.setEndingLineNumber(pos.line));
+
+            return Optional.of(detected);
         }
 
         return Optional.empty();
