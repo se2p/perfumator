@@ -1,5 +1,7 @@
-package de.jsilbereisen.perfumator.util;
+package util;
 
+import de.jsilbereisen.perfumator.util.StringUtil;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -15,7 +17,7 @@ class StringUtilTest {
     @Test
     void isEmpty() {
         // Happy Paths
-        assertThat(StringUtil.isEmpty(null)).isTrue();
+        Assertions.assertThat(StringUtil.isEmpty(null)).isTrue();
         assertThat(StringUtil.isEmpty("")).isTrue();
         assertThat(StringUtil.isEmpty(" \n\t")).isTrue();
 

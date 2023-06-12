@@ -1,7 +1,8 @@
-package de.jsilbereisen.perfumator.engine.registry;
+package registry;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.engine.detector.perfume.DummyDetector;
+import test.dummy.DummyDetector;
+import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
 import de.jsilbereisen.perfumator.model.Perfume;
 import de.jsilbereisen.perfumator.model.DetectableComparator;
 import de.jsilbereisen.perfumator.model.RelatedPatternType;
@@ -26,7 +27,8 @@ class PerfumeRegistryTest {
      */
     @Test
     void loadPerfumes() {
-        PerfumeRegistry perfumeRegistry = new PerfumeRegistry();
+        PerfumeRegistry perfumeRegistry = new PerfumeRegistry("perfumes", "test.dummy",
+                "i18n", "registry_test");
 
         perfumeRegistry.loadRegistry(Locale.GERMAN);
 

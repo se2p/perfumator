@@ -1,7 +1,9 @@
-package de.jsilbereisen.perfumator.io;
+package io;
 
 import de.jsilbereisen.perfumator.engine.EngineConfiguration;
 import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.io.CommandLineHandler;
+import de.jsilbereisen.perfumator.io.CommandLineInput;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.kohsuke.args4j.CmdLineParser;
@@ -17,11 +19,10 @@ import static org.mockito.Mockito.when;
 
 class CommandLineHandlerTest {
 
-    private static final Path PATH_TO_THIS_CLASS = Paths.get("src", "test", "java", "de",
-            "jsilbereisen", "perfumator", "io", "CommandLineHandlerTest.java");
+    private static final Path PATH_TO_THIS_CLASS = Paths.get("src", "test", "java", "io",
+            "CommandLineHandlerTest.java");
 
-    private static final Path PATH_TO_THIS_DIR = Paths.get("src", "test", "java", "de",
-            "jsilbereisen", "perfumator", "io");
+    private static final Path PATH_TO_THIS_DIR = Paths.get("src", "test", "java", "io");
 
     private static final Bundles MOCKED_BUNDLES = Mockito.mock(Bundles.class);
 

@@ -1,5 +1,7 @@
-package de.jsilbereisen.perfumator.i18n;
+package i18n;
 
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,7 @@
-package de.jsilbereisen.perfumator.engine;
+package engine;
 
-import de.jsilbereisen.perfumator.engine.detector.perfume.DummyDetector;
+import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
+import test.dummy.DummyDetector;
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;

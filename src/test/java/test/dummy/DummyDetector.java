@@ -1,15 +1,12 @@
-package de.jsilbereisen.perfumator.engine.detector.perfume;
+package test.dummy;
 
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.Perfume;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

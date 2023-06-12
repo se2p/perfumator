@@ -1,5 +1,8 @@
-package de.jsilbereisen.perfumator.i18n;
+package i18n;
 
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.I18nIgnore;
+import de.jsilbereisen.perfumator.i18n.Internationalizable;
 import de.jsilbereisen.perfumator.model.Detectable;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +19,7 @@ import static org.mockito.Mockito.when;
 class InternationalizableTest {
 
     @Setter
-    private static class I18nMe implements Internationalizable {
+    public static class I18nMe implements Internationalizable {
 
         private String name = "foo";
 
@@ -29,7 +32,7 @@ class InternationalizableTest {
     }
 
     @Setter
-    private static class I18nMeDetectable extends Detectable {
+    public static class I18nMeDetectable extends Detectable {
 
         public I18nMeDetectable(@Nullable String name, @Nullable String description,
                                 @Nullable String detectorClassSimpleName, @Nullable String i18nBundleBaseName) {
