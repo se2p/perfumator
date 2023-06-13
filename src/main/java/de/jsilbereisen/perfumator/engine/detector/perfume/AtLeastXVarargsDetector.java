@@ -1,14 +1,11 @@
 package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
-import com.github.javaparser.ast.expr.IntegerLiteralExpr;
-import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -136,11 +133,11 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
 
             boolean isNotPerfumed = false;
             if (left.isFieldAccessExpr() && right.isIntegerLiteralExpr()) {
-                isNotPerfumed = checksLengthAndEndsMethod(ifStmt, operator, left.asFieldAccessExpr(),
+                isNotPerfumed = doesCheckLengthAndEndMethod(ifStmt, binaryExpr, operator, left.asFieldAccessExpr(),
                         right.asIntegerLiteralExpr(), varargsParamName);
 
             } else if (left.isIntegerLiteralExpr() && right.isFieldAccessExpr()) {
-                isNotPerfumed = checksLengthAndEndsMethod(ifStmt, operator, right.asFieldAccessExpr(),
+                isNotPerfumed = doesCheckLengthAndEndMethod(ifStmt, binaryExpr, operator, right.asFieldAccessExpr(),
                         left.asIntegerLiteralExpr(), varargsParamName);
             }
 
@@ -164,6 +161,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
      * }
      * </pre>
      * @param ifStmt The {@link IfStmt} to check.
+     * @param binaryExpr The {@link BinaryExpr} that is looked at.
      * @param operator The operator of the {@link BinaryExpr} that is looked at.
      * @param fieldAccessExpr The part of the {@link BinaryExpr} that performs the field access on the varargs param.
      * @param numberToCompareExpr The part of the {@link BinaryExpr} that is compared to the value obtained through the
@@ -171,8 +169,9 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
      * @param varargsParamName The name of the Varargs parameter of the method.
      * @return {@code true} if the {@link IfStmt} immediately quits the method in dependence of the length check of the Varargs.
      */
-    private boolean checksLengthAndEndsMethod(@NotNull IfStmt ifStmt, @NotNull BinaryExpr.Operator operator, @NotNull FieldAccessExpr fieldAccessExpr,
-                                              @NotNull IntegerLiteralExpr numberToCompareExpr, @NotNull String varargsParamName) {
+    private boolean doesCheckLengthAndEndMethod(@NotNull IfStmt ifStmt, @NotNull BinaryExpr binaryExpr,
+                                                @NotNull BinaryExpr.Operator operator, @NotNull FieldAccessExpr fieldAccessExpr,
+                                                @NotNull IntegerLiteralExpr numberToCompareExpr, @NotNull String varargsParamName) {
 
         // Check if the Field access is actually on the Varargs parameter
         NameExpr fieldName;
@@ -187,30 +186,32 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
             return false;
         }
 
-        // Dependent on the comparison (greater, less), we look at the then/else branch
+        // Dependent on the (negated) comparison, we look at the then/else branch
+        Statement branchToCheck;
+        boolean isNegated = binaryExpr.getParentNode().filter(node -> node instanceof EnclosedExpr)
+                .flatMap(Node::getParentNode).map(node -> {
+                    if (node instanceof UnaryExpr expr) {
+                        return UnaryExpr.Operator.LOGICAL_COMPLEMENT.equals(expr.getOperator());
+                    }
+
+                    return false;
+                }).orElse(false);
+
         switch (operator) {
             case LESS, LESS_EQUALS -> {
-                Statement thenBranch = ifStmt.getThenStmt();
-                if (thenBranch == null) {
-                    return false;
-                }
-
-                return isMethodImmediatelyTerminated(thenBranch);
+                branchToCheck = isNegated ? ifStmt.getElseStmt().orElse(null) : ifStmt.getThenStmt();
             }
 
             case GREATER, GREATER_EQUALS -> {
-                Optional<Statement> elseBranch = ifStmt.getElseStmt();
-                if (elseBranch.isEmpty()) {
-                    return false;
-                }
-
-                return isMethodImmediatelyTerminated(elseBranch.get());
+                branchToCheck = isNegated ? ifStmt.getThenStmt() : ifStmt.getElseStmt().orElse(null);
             }
 
             default -> {
                 return false;
             }
         }
+
+        return branchToCheck != null && isMethodImmediatelyTerminated(branchToCheck);
     }
 
     /**
