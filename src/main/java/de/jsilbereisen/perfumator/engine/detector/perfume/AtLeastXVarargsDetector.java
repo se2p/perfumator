@@ -87,8 +87,8 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
         Parameter varargsParameter = parameters.stream().filter(Parameter::isVarArgs).findFirst().get();
         String varargsParamName = varargsParameter.getNameAsString();
 
-        // TODO: test case: only Varargs Param should return optional#empty here
-        if (parameters.stream().noneMatch(parameter -> parameter.getType().equals(varargsParameter.getType()))) {
+        if (parameters.stream().noneMatch(parameter -> !parameter.isVarArgs()
+                && parameter.getType().equals(varargsParameter.getType()))) {
             return Optional.empty();
         }
 
