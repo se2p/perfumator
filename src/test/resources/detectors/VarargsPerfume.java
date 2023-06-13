@@ -15,6 +15,9 @@ public class VarargsPerfume {
         doSomething();
     }
 
+    void noOtherArgOfSameType(String str, Object... objects) {
+        doSomething();
+    }
     // TODO: test case with exception in if-statement
 
     // TODO: test case with length
