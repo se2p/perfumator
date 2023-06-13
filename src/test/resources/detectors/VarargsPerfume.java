@@ -18,4 +18,8 @@ public class VarargsPerfume {
     // TODO: test case with exception in if-statement
 
     // TODO: test case with length
+
+    // TODO: test case: if (length > 1) ... else return
+
+    // TODO: test case: if (length > SOME_INT_VAR)  => Class field / method param?
 }

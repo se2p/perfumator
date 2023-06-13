@@ -20,7 +20,7 @@ public interface Detector<T extends Detectable> {
     /**
      * Searches for and detects instances of {@link T} in the AST, given by the root node.
      *
-     * @param astRoot The root node of the AST where the {@link T} should be detected.
+     * @param astRoot The root node of the AST in which the {@link T} should be searched for.
      * @return A {@link List} with all {@link DetectedInstance <T>}s of {@link T}. If no instances
      *         are found, returns an empty list.
      */
