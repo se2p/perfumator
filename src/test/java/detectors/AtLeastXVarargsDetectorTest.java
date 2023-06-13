@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
 
-    // TODO: refactoring step: super class which can initialize and set perfume for detector
     private static final Detector<Perfume> DETECTOR = new AtLeastXVarargsDetector();
 
     private static final Path TEST_FILE = Path.of("src", "test", "resources", "detectors", "VarargsPerfume.java");

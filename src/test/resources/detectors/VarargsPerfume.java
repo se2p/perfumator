@@ -7,15 +7,13 @@ public class VarargsPerfume {
         return;
     }
 
-    /*
-    void notPerfumed(int... numbers) {
+    void notPerfumed(int number, int... numbers) {
         if (numbers.length < 1) {
             return;
         }
 
         doSomething();
     }
-     */
 
     // TODO: test case with exception in if-statement
 
