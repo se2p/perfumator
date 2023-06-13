@@ -57,5 +57,14 @@ public class VarargsPerfume {
         }
     }
 
+    // Not perfumed: BinaryExpr is negated, so have to search in the opposite branch for the return
+    void notPerfumedNegatedBinaryExpr(int number, int... numbers) {
+        if (!(numbers.length < 1)) {
+            doSomething();
+        } else {
+            return;
+        }
+    }
+
     // TODO: test case: if (length > SOME_INT_VAR)  => Class field / method param?
 }
