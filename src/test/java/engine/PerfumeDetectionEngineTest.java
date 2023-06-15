@@ -82,7 +82,7 @@ class PerfumeDetectionEngineTest {
         List<DetectedInstance<Perfume>> detectedInstances = engine.detect(DIR_SMALL_PROJECT);
         assertThat(detectedInstances).hasSize(4);
 
-        List<String> detectedTypesNames = detectedInstances.stream().map(DetectedInstance::getParentTypeName)
+        List<String> detectedTypesNames = detectedInstances.stream().map(DetectedInstance::getTypeName)
                 .collect(Collectors.toList());
         assertThat(detectedTypesNames).containsExactlyInAnyOrder("AnotherDirClass", "SubpackageClassOne",
                 "SubpackageClassTwo", "Main");

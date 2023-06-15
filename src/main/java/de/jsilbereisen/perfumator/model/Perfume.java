@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
+// TODO: own "perfume" sub-package
 /**
  * Data object for a Code Perfume definition.
  * In the application, instances of this class are created from JSON representations.
@@ -44,4 +45,6 @@ public class Perfume extends Detectable {
     }
 
     // TODO: i18n toString
+
+    // TODO: override compareTo
 }

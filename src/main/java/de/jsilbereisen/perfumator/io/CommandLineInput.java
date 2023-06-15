@@ -2,7 +2,6 @@ package de.jsilbereisen.perfumator.io;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.kohsuke.args4j.Option;
 
 import java.nio.file.Path;

@@ -50,7 +50,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
         for (MethodDeclaration methodDeclaration : methodDeclarations) {
             Optional<DetectedInstance<Perfume>> detected = checkForPerfume(methodDeclaration);
             detected.ifPresent(det -> {
-                astRoot.getPrimaryTypeName().ifPresent(det::setParentTypeName);
+                astRoot.getPrimaryTypeName().ifPresent(det::setTypeName);
                 detectedPerfumes.add(det);
             });
         }

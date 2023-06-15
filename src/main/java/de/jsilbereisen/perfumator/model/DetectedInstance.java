@@ -21,10 +21,13 @@ import org.jetbrains.annotations.Nullable;
 @EqualsAndHashCode
 public class DetectedInstance<T extends Detectable> {
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass") // TODO
     private T detectable;
 
-    private String parentTypeName;
+    /**
+     * Type name (e.g. class/interface name) where the {@link #detectable} was detected.
+     */
+    private String typeName;
 
     private int beginningLineNumber;
 
@@ -34,10 +37,10 @@ public class DetectedInstance<T extends Detectable> {
 
     public DetectedInstance() { }
 
-    public DetectedInstance(@Nullable T detectable, @Nullable String parentTypeName, int beginningLineNumber,
+    public DetectedInstance(@Nullable T detectable, @Nullable String typeName, int beginningLineNumber,
                             int endingLineNumber, @Nullable String concreteCode) {
         this.detectable = detectable;
-        this.parentTypeName = parentTypeName;
+        this.typeName = typeName;
         this.beginningLineNumber = beginningLineNumber;
         this.endingLineNumber = endingLineNumber;
         this.concreteCode = concreteCode;
@@ -57,10 +60,10 @@ public class DetectedInstance<T extends Detectable> {
      * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
-    public static <T extends Detectable> DetectedInstance<T> from(NodeWithRange<?> node, T detected,
-                                                                  CompilationUnit compilationUnit) {
+    public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @NotNull T detected,
+                                                                  @NotNull CompilationUnit compilationUnit) {
         DetectedInstance<T> detectedInstance = from(node, detected);
-        compilationUnit.getPrimaryTypeName().ifPresent(detectedInstance::setParentTypeName);
+        compilationUnit.getPrimaryTypeName().ifPresent(detectedInstance::setTypeName);
 
         return detectedInstance;
     }
@@ -76,9 +79,9 @@ public class DetectedInstance<T extends Detectable> {
      * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
-    public static <T extends Detectable> DetectedInstance<T> from(NodeWithRange<?> node, T detected,
-                                                                  String parentTypeName) {
-        return from(node, detected).setParentTypeName(parentTypeName);
+    public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @Nullable T detected,
+                                                                  @Nullable String parentTypeName) {
+        return from(node, detected).setTypeName(parentTypeName);
     }
 
     /**
@@ -91,7 +94,7 @@ public class DetectedInstance<T extends Detectable> {
      * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
-    public static <T extends Detectable> DetectedInstance<T> from(NodeWithRange<?> node, T detected) {
+    public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @Nullable T detected) {
         DetectedInstance<T> detectedInstance = new DetectedInstance<>();
 
         detectedInstance.setDetectable(detected);
@@ -101,4 +104,6 @@ public class DetectedInstance<T extends Detectable> {
 
         return detectedInstance;
     }
+
+    // TODO: implement comparable
 }

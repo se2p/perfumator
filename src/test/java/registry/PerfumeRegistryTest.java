@@ -33,7 +33,7 @@ class PerfumeRegistryTest {
         perfumeRegistry.loadRegistry(Locale.GERMAN);
 
         List<Perfume> loadedPerfumes = new ArrayList<>(perfumeRegistry.getRegisteredDetectables());
-        loadedPerfumes.sort(new DetectableComparator()); // Ensure consistent ordering in the test
+        loadedPerfumes.sort(new DetectableComparator<>()); // Ensure consistent ordering in the test
 
         assertThat(loadedPerfumes).hasSize(2);
 

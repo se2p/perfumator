@@ -1,6 +1,5 @@
 package de.jsilbereisen.perfumator.engine.visitor;
 
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import lombok.Getter;
