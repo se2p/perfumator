@@ -1,49 +1,31 @@
 package de.jsilbereisen.perfumator.model;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Comparator;
 
-// TODO: tests
+/**
+ * Implementation of {@link Comparator} for {@link DetectedInstance}s.
+ *
+ * @param <T> The (sub-)type of {@link Detectable} that is held by the {@link DetectedInstance}s to compare.
+ */
 public class DetectedInstanceComparator<T extends Detectable> implements Comparator<DetectedInstance<T>> {
 
+    /**
+     * Compares two {@link DetectedInstance}s. If the comparison is non-trivial (both are non-null),
+     * calls {@link DetectedInstance#compareTo}.
+     * @param o1 the first object to be compared.
+     * @param o2 the second object to be compared.
+     * @return the comparison result, semantics are as describes in {@link Comparator}.
+     */
     @Override
-    public int compare(DetectedInstance<T> o1, DetectedInstance<T> o2) {
-        // trivial comparison
+    public int compare(@Nullable DetectedInstance<T> o1, @Nullable DetectedInstance<T> o2) {
         if (o1 == null) {
             return o2 == null ? 0 : -1;
-        }
-        if (o2 == null) {
+        } else if (o2 == null) {
             return 1;
         }
 
-        // compare first by Detectable
-        int detectableComparisonResult = 0;
-        if (o1.getDetectable() != null) {
-            detectableComparisonResult = o1.getDetectable().compareTo(o2.getDetectable());
-        } else {
-            detectableComparisonResult = o2.getDetectable() == null ? 0 : -1;
-        }
-        if (detectableComparisonResult != 0) {
-            return detectableComparisonResult;
-        }
-
-        // compare by type name
-        int typeNameComparisonResult = 0;
-        if (o1.getTypeName() != null) {
-            typeNameComparisonResult = o1.getTypeName().compareTo(o2.getTypeName());
-        } else {
-            typeNameComparisonResult = o2.getTypeName() == null ? 0 : -1;
-        }
-        if (typeNameComparisonResult != 0) {
-            return typeNameComparisonResult;
-        }
-
-        // compare by begin line numbers
-        int beginLineNumberComparisonResult = o2.getBeginningLineNumber() - o1.getBeginningLineNumber();
-        if (beginLineNumberComparisonResult != 0) {
-            return beginLineNumberComparisonResult;
-        }
-
-        // final comparison on ending line numbers
-        return o2.getEndingLineNumber() - o1.getEndingLineNumber();
+        return o1.compareTo(o2);
     }
 }

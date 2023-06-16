@@ -7,7 +7,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 

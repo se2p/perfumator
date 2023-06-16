@@ -4,10 +4,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.AtLeastXVarargsDetector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import test.dummy.AbstractDetectorTest;
+import test.AbstractDetectorTest;
 
 import java.nio.file.Path;
 import java.util.List;

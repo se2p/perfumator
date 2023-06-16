@@ -1,6 +1,7 @@
 package de.jsilbereisen.perfumator.i18n;
 
 import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.StringUtil;
 import io.github.classgraph.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class BundlesLoader {
     public static final String STANDARD_APPLICATION_PACKAGE = "application";
 
     /**
-     * Standard package of the bundles with {@link de.jsilbereisen.perfumator.model.Perfume} related
+     * Standard package of the bundles with {@link Perfume} related
      * internationalization resources, relative to the overall internationalization resources (e.g.
      * {@link #STANDARD_INTERNATIONALIZATION_PACKAGE}).
      */

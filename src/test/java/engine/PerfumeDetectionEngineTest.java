@@ -6,7 +6,7 @@ import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

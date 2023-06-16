@@ -3,7 +3,7 @@ package test.dummy;
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 

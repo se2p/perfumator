@@ -14,7 +14,7 @@ import de.jsilbereisen.perfumator.engine.visitor.BinaryExprVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.IfStmtVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.MethodDeclarationVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -120,7 +120,6 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
         ifStmt.accept(binaryExprVisitor, null);
         List<BinaryExpr> binaryExpressions = binaryExprVisitor.getBinaryExpressions();
 
-        // TODO: test case for !(varargs.length > 5) ... => check through parent node?
         // Go through all Binary expressions, see if they compare the Varargs length to an Integer
         for (BinaryExpr binaryExpr : binaryExpressions) {
             BinaryExpr.Operator operator = binaryExpr.getOperator();

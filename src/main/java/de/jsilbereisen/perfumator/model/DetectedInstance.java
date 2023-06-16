@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 @Setter
 @Accessors(chain = true)
 @EqualsAndHashCode
-public class DetectedInstance<T extends Detectable> {
+public class DetectedInstance<T extends Detectable> implements Comparable<DetectedInstance<T>> {
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass") // TODO
     private T detectable;
@@ -105,5 +105,38 @@ public class DetectedInstance<T extends Detectable> {
         return detectedInstance;
     }
 
-    // TODO: implement comparable
+    @Override
+    public int compareTo(@NotNull DetectedInstance<T> other) {
+
+        // compare first by Detectable
+        int detectableComparisonResult = 0;
+        if (detectable != null) {
+            detectableComparisonResult = detectable.compareTo(other.getDetectable());
+        } else {
+            detectableComparisonResult = other.getDetectable() == null ? 0 : -1;
+        }
+        if (detectableComparisonResult != 0) {
+            return detectableComparisonResult;
+        }
+
+        // compare by type name
+        int typeNameComparisonResult = 0;
+        if (typeName != null) {
+            typeNameComparisonResult = typeName.compareTo(other.getTypeName());
+        } else {
+            typeNameComparisonResult = other.getTypeName() == null ? 0 : -1;
+        }
+        if (typeNameComparisonResult != 0) {
+            return typeNameComparisonResult;
+        }
+
+        // compare by begin line numbers
+        int beginLineNumberComparisonResult = beginningLineNumber - other.getBeginningLineNumber();
+        if (beginLineNumberComparisonResult != 0) {
+            return beginLineNumberComparisonResult;
+        }
+
+        // final comparison on ending line numbers
+        return endingLineNumber - other.endingLineNumber;
+    }
 }

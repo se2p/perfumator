@@ -1,4 +1,4 @@
-package test.dummy;
+package test;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;

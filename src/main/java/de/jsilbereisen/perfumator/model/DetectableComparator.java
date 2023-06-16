@@ -16,6 +16,8 @@ public class DetectableComparator<T extends Detectable> implements Comparator<T>
     public int compare(@Nullable T o1, @Nullable T o2) {
         if (o1 == null) {
             return o2 == null ? 0 : -1;
+        } else if (o2 == null) {
+            return 1;
         }
 
         return o1.compareTo(o2);

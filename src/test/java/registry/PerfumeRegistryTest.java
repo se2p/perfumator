@@ -3,9 +3,9 @@ package registry;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import test.dummy.DummyDetector;
 import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.DetectableComparator;
-import de.jsilbereisen.perfumator.model.RelatedPatternType;
+import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ class PerfumeRegistryTest {
         assertThat(perfumeA.getDetectorClassSimpleName()).isEqualTo("DummyDetector");
         assertThat(perfumeA.getI18nBaseBundleName()).isNull();
         assertThat(perfumeA.getSource()).isEqualTo("My head");
-        assertThat(perfumeA.getRelatedPattern()).isEqualTo(RelatedPatternType.BUG);
+        assertThat(perfumeA.getRelatedPattern()).isEqualTo(RelatedPattern.BUG);
         assertThat(perfumeA.getAdditionalInformation()).isNull();
 
         // Check whether Perfume B has the correct values, as it should get internationalized
@@ -55,7 +55,7 @@ class PerfumeRegistryTest {
         assertThat(perfumeB.getDetectorClassSimpleName()).isEqualTo("DummyDetector");
         assertThat(perfumeB.getI18nBaseBundleName()).isEqualTo("TestResources");
         assertThat(perfumeB.getSource()).isEqualTo("Mein Kopf");
-        assertThat(perfumeB.getRelatedPattern()).isEqualTo(RelatedPatternType.BUG);
+        assertThat(perfumeB.getRelatedPattern()).isEqualTo(RelatedPattern.BUG);
         assertThat(perfumeB.getAdditionalInformation()).isEqualTo("More information.");
 
         Set<Detector<Perfume>> registeredDetectors = perfumeRegistry.getRegisteredDetectors();

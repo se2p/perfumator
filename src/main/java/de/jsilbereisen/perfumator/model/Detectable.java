@@ -43,7 +43,6 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      */
     protected Detectable() { }
 
-    // TODO: extend doc
     /**
      * Constructor for a {@link Detectable} with a name, description, {@link Detector} class name and bundle name for
      * internationalisation.
@@ -51,9 +50,8 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      *
      * @param name Name for the detectable.
      * @param description A description for this detectable
-     * @param detectorClassSimpleName Simple class name as string, not fully qualified. Another class, like a
-     *                                {@link de.jsilbereisen.perfumator.engine.registry.DetectableRegistry},
-     *                                should be responsible to take value from that name.
+     * @param detectorClassSimpleName Simple class name of the {@link Detector} that is responsible to detect this
+     *                                {@link Detectable}, not fully qualified.
      * @param i18nBaseBundleName The base name of the bundle that should be used for internationalization of this
      *                           detectable.
      */
@@ -127,11 +125,7 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      * <b>Note:</b> the ordering is inconsistent with {@link #equals}.
      */
     @Override
-    public int compareTo(@Nullable Detectable other) {
-        if (other == null) {
-            return 1;
-        }
-
+    public int compareTo(@NotNull Detectable other) {
         if (this.getName() == null) {
             if (other.getName() == null) {
                 return 0;

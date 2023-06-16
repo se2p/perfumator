@@ -12,7 +12,7 @@ import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import de.jsilbereisen.perfumator.io.LanguageTag;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.PathUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -96,7 +96,6 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                 dirWalk.filter(PathUtil::isJavaSourceFile)
                         .forEach(sourceFile -> detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile)));
             } catch (Exception e) {
-                // TODO exception
                 throw new RuntimeException(e);
             }
         } else {
@@ -122,7 +121,6 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                     + i18n.getApplicationResource("log.parseFailed.postPath"));
             return Collections.emptyList();
         } catch (IOException e) {
-            // TODO exception
             throw new RuntimeException(e);
         }
 

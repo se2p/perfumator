@@ -3,12 +3,12 @@ package detectors;
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.perfume.NoUtilityInitializationDetector;
 import de.jsilbereisen.perfumator.model.*;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import test.dummy.AbstractDetectorTest;
+import test.AbstractDetectorTest;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
