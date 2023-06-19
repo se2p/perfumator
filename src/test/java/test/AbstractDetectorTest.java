@@ -20,6 +20,8 @@ public abstract class AbstractDetectorTest {
 
     protected static final Path DEFAULT_DOT_DIR = Path.of("src", "test", "resources", "graphics", "dot");
 
+    protected static final Path DEFAULT_DETECTOR_TEST_FILES_DIR = Path.of("src", "test", "resources", "detectors");
+
     protected static final JavaParser PARSER = PerfumeDetectionEngine.getConfiguredJavaParser();
 
     protected static CompilationUnit parseAstForFile(@NotNull Path path) {
@@ -51,15 +53,17 @@ public abstract class AbstractDetectorTest {
 
     /**
      * Util method to quickly parse a Java Source file to an AST and save the AST as a ".dot" file.
+     * Returns the parsed AST.
      */
-    protected static void parseFileAndSaveDot(@NotNull Path javaSourceFile, @NotNull String fileName) {
-        parseFileAndSaveDot(javaSourceFile, DEFAULT_DOT_DIR, fileName);
+    protected static CompilationUnit parseFileAndSaveDot(@NotNull Path javaSourceFile, @NotNull String fileName) {
+        return parseFileAndSaveDot(javaSourceFile, DEFAULT_DOT_DIR, fileName);
     }
 
     /**
      * Util method to quickly parse a Java Source file to an AST and save the AST as a ".dot" file.
+     * Returns the parsed AST.
      */
-    protected static void parseFileAndSaveDot(@NotNull Path javaSourceFile, @NotNull Path saveDirectory,
+    protected static CompilationUnit parseFileAndSaveDot(@NotNull Path javaSourceFile, @NotNull Path saveDirectory,
                                               @NotNull String fileName) {
         if (!PathUtil.isJavaSourceFile(javaSourceFile)) {
             throw new IllegalArgumentException(javaSourceFile + " is not a single Java Source file.");
@@ -69,6 +73,8 @@ public abstract class AbstractDetectorTest {
         saveAstAsDot(ast, saveDirectory, fileName);
 
         log.info("Saved DOT-file for parsed AST of " + javaSourceFile);
+
+        return ast;
     }
 
     /**

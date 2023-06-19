@@ -1,6 +1,7 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.NoUtilityInitializationDetector;
 import de.jsilbereisen.perfumator.model.*;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -15,10 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
 
-    private static final NoUtilityInitializationDetector DETECTOR = new NoUtilityInitializationDetector();
+    private static final Detector<Perfume> DETECTOR = new NoUtilityInitializationDetector();
 
-    private static final Path TEST_FILES_DIR = Path.of("src", "test", "resources", "detectors",
-            "no_utility_initialization");
+    private static final Path TEST_FILES_DIR = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("no_utility_initialization");
 
     private static Perfume perfume;
 

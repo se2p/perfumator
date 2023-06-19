@@ -2,6 +2,7 @@ package de.jsilbereisen.perfumator.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import lombok.EqualsAndHashCode;
@@ -64,6 +65,25 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
                                                                   @NotNull CompilationUnit compilationUnit) {
         DetectedInstance<T> detectedInstance = from(node, detected);
         compilationUnit.getPrimaryTypeName().ifPresent(detectedInstance::setTypeName);
+
+        return detectedInstance;
+    }
+
+    /**
+     * Returns a {@link DetectedInstance<T>}, filled with information from the given
+     * parameters (if the information is present).
+     *
+     * @param node {@link NodeWithRange} to extract positional information.
+     * @param detected {@link T} that was detected by a {@link Detector <T>} and should be linked to the {@link DetectedInstance<T>}.
+     * @param typeDeclaration {@link TypeDeclaration} of the type in which the {@link T} was detected.
+     * @return A {@link DetectedInstance<T>} with the given information.
+     * @param <T> The concrete Subtype of {@link Detectable}.
+     */
+    @NotNull
+    public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @NotNull T detected,
+                                                                  @NotNull TypeDeclaration<?> typeDeclaration) {
+        DetectedInstance<T> detectedInstance = from(node, detected);
+        detectedInstance.setTypeName(typeDeclaration.getName().getIdentifier());
 
         return detectedInstance;
     }

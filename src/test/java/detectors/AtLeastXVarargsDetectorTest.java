@@ -18,7 +18,7 @@ class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
 
     private static final Detector<Perfume> DETECTOR = new AtLeastXVarargsDetector();
 
-    private static final Path TEST_FILE = Path.of("src", "test", "resources", "detectors", "VarargsPerfume.java");
+    private static final Path TEST_FILE = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("VarargsPerfume.java");
 
     private static Perfume perfume;
 

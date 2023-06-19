@@ -1,0 +1,9 @@
+{
+  "name": "Defensive null check",
+  "description": "When declaring a method public, one needs to keep in mind that the method can be called in code that is not under your control.\nThe danger of bugs and unexpected behaviour is especially present when the method has non-primitive parameter types, as one has to be careful of null-values being passed. To avoid unexpected NullPointerExceptions at runtime, checking the method's non-primitive parameters for being non-null or annotating the Parameters with an Annotation like \"@NotNull\" or \"@Nonnull\" when null-values are forbidden, can prevent surprises.\nAlternatively, if the method explicitly allows null-values for certain parameters, one should use an \"@Nullable\" annotation on those.\nUsage of these Annotations also has the benefit of clearly signaling other developers how your method treats null values.",
+  "detectorClassSimpleName": "DefensiveNullCheckDetector",
+  "i18nBaseBundleName": "defensiveNullCheck",
+  "source": "Inspired by: H. Osman, M. Lungu and O. Nierstrasz, \"Mining frequent bug-fix code changes,\" 2014 Software Evolution Week - IEEE Conference on Software Maintenance, Reengineering, and Reverse Engineering (CSMR-WCRE), Antwerp, Belgium, 2014, pp. 343-347, doi: 10.1109/CSMR-WCRE.2014.6747191",
+  "relatedPattern": "BUG",
+  "additionalInformation": "This perfume does not draw limitations on how the method actually continues when checking for null, in order to not infringe the developer's\npossibilities. A common way to respond is for example throwing an \"IllegalArgumentException\"."
+}

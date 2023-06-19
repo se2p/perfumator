@@ -43,4 +43,6 @@ public class DefensiveDefaultCase {
     }
 
     // TODO Test case: nested switch statements
+
+    // TODO: test again if JavaParser now captures the orphan comment
 }

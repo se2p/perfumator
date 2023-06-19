@@ -18,7 +18,7 @@ class DefensiveDefaultCaseDetectorTest extends AbstractDetectorTest {
 
     private static final Detector<Perfume> DETECTOR = new DefensiveDefaultCaseDetector();
 
-    private static final Path TEST_FILE = Path.of("src", "test", "resources", "detectors", "DefensiveDefaultCase.java");
+    private static final Path TEST_FILE = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("DefensiveDefaultCase.java");
 
     private static Perfume perfume;
 

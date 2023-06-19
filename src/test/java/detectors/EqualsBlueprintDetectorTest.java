@@ -1,6 +1,7 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.EqualsBlueprintDetector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
@@ -16,10 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EqualsBlueprintDetectorTest extends AbstractDetectorTest {
 
-    private static final EqualsBlueprintDetector DETECTOR = new EqualsBlueprintDetector();
+    private static final Detector<Perfume> DETECTOR = new EqualsBlueprintDetector();
 
-    private static final Path TEST_FILES_DIR = Path.of("src", "test", "resources", "detectors",
-            "equals_blueprint");
+    private static final Path TEST_FILES_DIR = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("equals_blueprint");
 
     private static Perfume perfume;
 
