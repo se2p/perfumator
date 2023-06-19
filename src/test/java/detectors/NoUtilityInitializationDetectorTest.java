@@ -23,7 +23,7 @@ class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
     private static Perfume perfume;
 
     @BeforeAll
-    static void getAst() {
+    static void setup() {
         perfume = new Perfume();
         perfume.setName("No utility initialization");
         DETECTOR.setConcreteDetectable(perfume);

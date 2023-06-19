@@ -1,9 +1,6 @@
 package de.jsilbereisen.perfumator.engine;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseProblemException;
-import com.github.javaparser.ParseResult;
-import com.github.javaparser.Problem;
+import com.github.javaparser.*;
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
@@ -14,6 +11,8 @@ import de.jsilbereisen.perfumator.io.LanguageTag;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.PathUtil;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +26,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
+/**
+ * Engine for detecting {@link Perfume}s. Uses the <i>JavaParser</i> library for parsing
+ * source files into an AST.<br/>
+ * Default language level for AST parsing is Java 17 (maximum possible for {@link JavaParser}).
+ * If you want to lower the language level/use another {@link ParserConfiguration},
+ * configure a {@link JavaParser} instance at you will and call the engine's setter <i>before</i>
+ * calling the {@link #detect} or the {@link #detectInSingleSourceFile} method.
+ */
 @Slf4j
 public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
@@ -34,14 +41,16 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
     private final Locale locale;
 
-    private final JavaParser astParser;
-
     private final Bundles i18n;
+
+    @Getter
+    @Setter
+    private JavaParser astParser;
 
     public PerfumeDetectionEngine() {
         this.perfumeRegistry = new PerfumeRegistry();
         this.locale = LanguageTag.getDefault().getRelatedLocale();
-        this.astParser = new JavaParser();
+        this.astParser = getConfiguredJavaParser();
         this.i18n = new Bundles();
 
         perfumeRegistry.loadRegistry(locale);
@@ -54,7 +63,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     public PerfumeDetectionEngine(@Nullable Locale locale) {
         this.perfumeRegistry = new PerfumeRegistry();
         this.locale = locale != null ? locale : LanguageTag.getDefault().getRelatedLocale();
-        this.astParser = new JavaParser();
+        this.astParser = getConfiguredJavaParser();
         this.i18n = new Bundles();
 
         perfumeRegistry.loadRegistry(this.locale);
@@ -67,7 +76,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     public PerfumeDetectionEngine(@NotNull DetectableRegistry<Perfume> perfumeRegistry, @Nullable Locale locale) {
         this.perfumeRegistry = perfumeRegistry;
         this.locale = locale != null ? locale : LanguageTag.getDefault().getRelatedLocale();
-        this.astParser = new JavaParser();
+        this.astParser = getConfiguredJavaParser();
         this.i18n = new Bundles();
 
         BundlesLoader bundlesLoader = new BundlesLoader(BundlesLoader.STANDARD_INTERNATIONALIZATION_PACKAGE,
@@ -79,7 +88,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                                   @NotNull Bundles bundles) {
         this.perfumeRegistry = perfumeRegistry;
         this.locale = locale != null ? locale : LanguageTag.getDefault().getRelatedLocale();
-        this.astParser = new JavaParser();
+        this.astParser = getConfiguredJavaParser();
         this.i18n = bundles;
     }
 
@@ -146,5 +155,26 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         }
 
         return detectedPerfumes;
+    }
+
+    /**
+     * Returns a new {@link JavaParser} instance with the {@link ParserConfiguration} configured
+     * as it is used by the <i><b>Perfumator</b></i> by default.<br/>
+     * List of settings that are changed, compared to the default {@link ParserConfiguration}:
+     * <ul>
+     *     <li>Language level: 11 (default) -&gt; 17</li>
+     *     <li>Do NOT Capture empty line comments: {@code true} -&gt; {@code false}</li>
+     * </ul>
+     *
+     * @return The new, configured {@link JavaParser} instance.
+     */
+    @NotNull
+    public static JavaParser getConfiguredJavaParser() {
+        ParserConfiguration config = new ParserConfiguration();
+
+        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+        config.setDoNotAssignCommentsPrecedingEmptyLines(false);
+
+        return new JavaParser(config);
     }
 }

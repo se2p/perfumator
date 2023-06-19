@@ -35,5 +35,5 @@ target/
 # Graph representations
 *.dot
 
-# Any pictures
+# Any pictures and dot files
 graphics/
