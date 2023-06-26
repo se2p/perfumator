@@ -4,8 +4,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class PathUtil {
+
+    public static final Path MAIN_RESOURCES = Path.of("src", "main", "resources");
+
+    public static final Path TEST_RESOURCES = Path.of("src", "test", "resources");
 
     private PathUtil() {
 
@@ -29,7 +35,7 @@ public class PathUtil {
      * @param path The path to check.
      * @return {@code true} if the given {@link Path} represents an existing, relevant Java source file.
      */
-    public static boolean isRelevantJavaFile(Path path) {
+    public static boolean isRelevantJavaFile(@NotNull Path path, @NotNull String analysisRootDirName) {
         boolean isJavaFile = isJavaSourceFile(path);
         if (!isJavaFile) {
             return false;
@@ -40,10 +46,45 @@ public class PathUtil {
             return false;
         }
 
-        boolean isResource = path.normalize().toString().contains(Path.of("src", "main",
-                "resources").toString())
-                || path.normalize().toString().contains(Path.of("src", "test",
-                "resources").toString());
-        return !isResource;
+        return !isResourceInAnalysisRoot(path, analysisRootDirName);
+    }
+
+    /**
+     * Checks whether the file (represented by the given {@link Path}) lies in a resource-directory
+     * (src/main/resources or src/test/resources) of the project/directory that is being analysed.
+     */
+    private static boolean isResourceInAnalysisRoot(@NotNull Path path, @NotNull String analysisRootDirName) {
+        Path normalizedPath = path.normalize();
+
+        Deque<String> previousTwo = new LinkedList<>();
+        boolean passedAnalysisRootDir = false;
+
+        // Iterate over all name elements of the path. Looks for resource-directory-structure
+        // AFTER the analysis root dir
+        for (Path current : normalizedPath) {
+            if (current.toString().equals(analysisRootDirName)) {
+                passedAnalysisRootDir = true;
+            }
+
+            // After passing the root dir, look if any 3 consecutive dirs together match a Resource path
+            if (passedAnalysisRootDir) {
+                if (previousTwo.size() == 2) {
+                    Path normalizedSubpath = Path.of(previousTwo.getLast(), previousTwo.getFirst(),
+                            current.toString()).normalize();
+
+                    if (normalizedSubpath.equals(MAIN_RESOURCES) || normalizedSubpath.equals(TEST_RESOURCES)) {
+                        return true;
+                    }
+                }
+
+                previousTwo.addFirst(current.toString());
+
+                if (previousTwo.size() > 2) {
+                    previousTwo.removeLast();
+                }
+            }
+        }
+
+        return false;
     }
 }

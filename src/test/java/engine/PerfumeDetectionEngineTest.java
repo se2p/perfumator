@@ -39,7 +39,7 @@ class PerfumeDetectionEngineTest {
     private static final Path DIR_EMPTY = Path.of("src", "test", "resources", "sources", "empty");
 
     private static final Path DIR_SMALL_PROJECT = Path.of("src", "test", "resources", "sources", "projects",
-            "small_project", "src");
+            "small_project");
 
     @BeforeAll
     static void setupMocks() {
