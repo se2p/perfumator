@@ -208,7 +208,6 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
                         e);
             }
 
-            // TODO: test with implicit constructor
             Detector<Perfume> detector = null;
             try {
                 detector = (Detector<Perfume>) detectorClass.getDeclaredConstructor().newInstance();

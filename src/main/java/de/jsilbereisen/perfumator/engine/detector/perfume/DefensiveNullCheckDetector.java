@@ -108,7 +108,7 @@ public class DefensiveNullCheckDetector implements Detector<Perfume> {
         ClassOrInterfaceDeclaration classOrInterfaceDeclaration = as(type, ClassOrInterfaceDeclaration.class);
 
         // Find all public methods that are not abstract/non-default in interface
-        List<MethodDeclaration> methodsToCheck = new ArrayList<>(type.getMethods()); // TODO: test other detectors whether they modify immutable getMethods() list
+        List<MethodDeclaration> methodsToCheck = new ArrayList<>(type.getMethods());
         methodsToCheck.removeIf(method -> !needsToBeChecked(method, classOrInterfaceDeclaration));
 
         for (MethodDeclaration method : methodsToCheck) {
@@ -137,10 +137,10 @@ public class DefensiveNullCheckDetector implements Detector<Perfume> {
     }
 
     private boolean isMethodPerfumed(@NotNull MethodDeclaration methodDeclaration) {
-        List<Parameter> parameters = new ArrayList<>(methodDeclaration.getParameters()); // TODO: check other detectors for accidentally manipulating the AST
+        List<Parameter> parameters = new ArrayList<>(methodDeclaration.getParameters());
 
         // See if there is a non-primitive, non Varargs param with one of the perfuming annotations
-        boolean anyParamRelevantWithAnnotation = parameters.stream().anyMatch(param -> isRelevantWithAnnotation(param));
+        boolean anyParamRelevantWithAnnotation = parameters.stream().anyMatch(this::isRelevantWithAnnotation);
 
         // Clear the list of parameters from all that do not need to be checked in the method's body
         parameters.removeIf(parameter -> !needsToBeChecked(parameter));

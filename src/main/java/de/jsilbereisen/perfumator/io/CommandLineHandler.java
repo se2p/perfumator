@@ -3,6 +3,7 @@ package de.jsilbereisen.perfumator.io;
 import de.jsilbereisen.perfumator.engine.EngineConfiguration;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.BundlesLoader;
+import de.jsilbereisen.perfumator.util.PathUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -123,8 +124,7 @@ public class CommandLineHandler {
         }
         assert path != null;
 
-        // TODO: Refactoring: Util class, Method isJavaFile?
-        if (!Files.isDirectory(path) && !path.getFileName().toString().endsWith(".java")) {
+        if (!Files.isDirectory(path) && !PathUtil.isJavaSourceFile(path)) {
             log.error(cliBundle.getString("log.error.invalidInputPath"));
             return false;
         }

@@ -102,7 +102,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
         if (Files.isDirectory(sources)) {
             try (Stream<Path> dirWalk = Files.walk(sources)) {
-                dirWalk.filter(PathUtil::isJavaSourceFile)
+                dirWalk.filter(PathUtil::isRelevantJavaFile)
                         .forEach(sourceFile -> detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile)));
             } catch (Exception e) {
                 throw new RuntimeException(e);

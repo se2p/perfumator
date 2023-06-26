@@ -68,8 +68,8 @@ public final class NodeUtil {
      * </p>
      *
      * @param node The {@link Node} to print.
-     * @return
-     * @param <T>
+     * @return The type name with all type parameters, if it has any.
+     * @param <T> A node that can have type parameters and that has a simple name.
      */
     @NotNull
     public static <T extends Node & NodeWithTypeParameters<T> & NodeWithSimpleName<T>> String getNameWithTypeParams(@NotNull T node) {
@@ -92,31 +92,4 @@ public final class NodeUtil {
         return builder.toString();
     }
 
-    /*
-    @NotNull
-    public static <T extends Node & NodeWithTypeArguments<T> & NodeWithSimpleName<T>> String getNameWithTypeParams(@NotNull T node) {
-        StringBuilder builder = new StringBuilder(node.getName().getIdentifier());
-
-        NodeList<Type> typeParameters = node.getTypeArguments().orElse(null);
-        if (typeParameters == null) {
-            return builder.toString();
-        }
-
-        if (typeParameters.isNonEmpty()) {
-            builder.append("<");
-
-            for (int i = 0; i < typeParameters.size(); i++) {
-                builder.append(typeParameters.get(i).toString()); // TODO: cast to NodeWithSimpleName if possible?
-                if (i < typeParameters.size() - 1) {
-                    builder.append(", ");
-                }
-            }
-
-            builder.append(">");
-        }
-
-        return builder.toString();
-    }
-
-     */
 }
