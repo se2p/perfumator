@@ -1,28 +1,29 @@
 package de.jsilbereisen.perfumator.model;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.file.Path;
 
 /**
  * {@link Detectable} instance that was detected in a source file.
  * Holds meta information on the detection location etc.
  */
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
-@EqualsAndHashCode
 public class DetectedInstance<T extends Detectable> implements Comparable<DetectedInstance<T>> {
 
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "detectableClass") // TODO
+    //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "detectableClass") // TODO
+    @JsonIncludeProperties({"name"})
+    @JsonUnwrapped(prefix = "detectable_")
     private T detectable;
 
     /**
@@ -36,18 +37,36 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
     private String concreteCode;
 
+    private Path sourceFile;
+
     public DetectedInstance() { }
 
     public DetectedInstance(@Nullable T detectable, @Nullable String typeName, int beginningLineNumber,
-                            int endingLineNumber, @Nullable String concreteCode) {
+                            int endingLineNumber, @Nullable String concreteCode, @NotNull Path sourceFile) {
         this.detectable = detectable;
         this.typeName = typeName;
         this.beginningLineNumber = beginningLineNumber;
         this.endingLineNumber = endingLineNumber;
         this.concreteCode = concreteCode;
+        this.sourceFile = sourceFile;
     }
 
-    // TODO: i18n
+    /**
+     * Copy constructor.
+     *
+     * @param detectedInstance The {@link DetectedInstance} to be copied.
+     */
+    @SuppressWarnings("unchecked")
+    public DetectedInstance(@NotNull DetectedInstance<T> detectedInstance) {
+        this.detectable = detectedInstance.detectable != null ? (T) detectedInstance.detectable.clone() : null;
+        this.typeName = detectedInstance.typeName;
+        this.beginningLineNumber = detectedInstance.beginningLineNumber;
+        this.endingLineNumber = detectedInstance.endingLineNumber;
+        this.concreteCode = detectedInstance.concreteCode;
+        this.sourceFile = detectedInstance.sourceFile;
+    }
+
+    // TODO: i18n? Wenn dann ist Detectable bereits i18n
     // TODO: toString
 
     /**
@@ -125,15 +144,43 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
         return detectedInstance;
     }
 
+    /**
+     * Compares two {@link DetectedInstance}s. The following (logical) order of comparison is applied:
+     * <ul>
+     *     <li>Compare the source-file-paths of the detections lexicographically. If only one of the paths is {@code null},
+     *     that instance is seen as "greater", to appear at the end of lists.</li>
+     *     <li>Compare the via their (override of the) {@link Detectable#compareTo} implementation.</li>
+     *     <li>Compare by type name lexicographically (=&gt; types are within the same source file).</li>
+     *     <li>Compare by starting line- and then starting column-number of the detection.
+     *     The detection that happened at a smaller line number is seen as "less", to appear earlier in listings.</li>
+     * </ul>
+     *
+     * @param other the object to be compared.
+     * @return The comparison result after applying the above described criteria.
+     */
     @Override
     public int compareTo(@NotNull DetectedInstance<T> other) {
+        // first compare by source file where it was detected
+        int sourceFileComparison = 0;
+        if (sourceFile != null) {
+            if (other.sourceFile != null) {
+                sourceFileComparison = sourceFile.compareTo(other.sourceFile);
+            } else {
+                sourceFileComparison = 1;
+            }
+        } else {
+            sourceFileComparison = other.sourceFile == null ? 0 : -1;
+        }
+        if (sourceFileComparison != 0) {
+            return sourceFileComparison;
+        }
 
-        // compare first by Detectable
+        // compare by Detectable
         int detectableComparisonResult = 0;
         if (detectable != null) {
-            detectableComparisonResult = detectable.compareTo(other.getDetectable());
+            detectableComparisonResult = detectable.compareTo(other.detectable);
         } else {
-            detectableComparisonResult = other.getDetectable() == null ? 0 : -1;
+            detectableComparisonResult = other.detectable == null ? 0 : -1;
         }
         if (detectableComparisonResult != 0) {
             return detectableComparisonResult;

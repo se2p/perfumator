@@ -154,6 +154,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             detectedPerfumes.addAll(detector.detect(ast));
         }
 
+        detectedPerfumes.forEach(det -> det.setSourceFile(javaSourceFilePath));
         return detectedPerfumes;
     }
 

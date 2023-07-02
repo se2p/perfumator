@@ -45,6 +45,19 @@ public class Perfume extends Detectable {
         this.additionalInformation = additionalInformation;
     }
 
+    /**
+     * Copy constructor.
+     *
+     * @param perfume The {@link Perfume} which should be copied.
+     */
+    public Perfume(@NotNull Perfume perfume) {
+        super(perfume);
+
+        this.source = perfume.source;
+        this.relatedPattern = perfume.relatedPattern;
+        this.additionalInformation = perfume.additionalInformation;
+    }
+
     // TODO: toString
 
     @Override
@@ -69,4 +82,10 @@ public class Perfume extends Detectable {
         // compare through super class
         return super.compareTo(other);
     }
+
+    @Override
+    public Perfume clone() {
+        return new Perfume(this);
+    }
+
 }

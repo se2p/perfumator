@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator.io;
 
+import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.kohsuke.args4j.Option;

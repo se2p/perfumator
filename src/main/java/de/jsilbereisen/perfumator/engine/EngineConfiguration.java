@@ -1,7 +1,7 @@
 package de.jsilbereisen.perfumator.engine;
 
 import de.jsilbereisen.perfumator.io.LanguageTag;
-import de.jsilbereisen.perfumator.io.OutputFormat;
+import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 

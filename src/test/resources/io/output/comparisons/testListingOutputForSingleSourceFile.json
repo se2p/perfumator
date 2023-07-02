@@ -1,0 +1,8 @@
+{
+  "detectable_name" : "Example",
+  "typeName" : "ExampleClass",
+  "beginningLineNumber" : 10,
+  "endingLineNumber" : 20,
+  "concreteCode" : "public class ExampleClass { }",
+  "sourceFile" : null
+}

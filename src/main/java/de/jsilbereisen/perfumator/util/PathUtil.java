@@ -2,6 +2,8 @@ package de.jsilbereisen.perfumator.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Deque;
@@ -12,6 +14,10 @@ public class PathUtil {
     public static final Path MAIN_RESOURCES = Path.of("src", "main", "resources");
 
     public static final Path TEST_RESOURCES = Path.of("src", "test", "resources");
+
+    public static final Path MAIN_JAVA = Path.of("src", "main", "java");
+
+    public static final Path TEST_JAVA = Path.of("src", "test", "java");
 
     private PathUtil() {
 
@@ -86,5 +92,50 @@ public class PathUtil {
         }
 
         return false;
+    }
+
+    /**
+     * Extracts the sub-path from the given {@link Path} which represents the Path that starts with the first package.
+     * In other words, removes everything before and including "src/main/java" or "src/test/java" and returns the subpath.
+     * If none of those Strings is found, just returns the given path.
+     * <br/>
+     * Example: From "some_dir/some_project/src/main/java/de/example/SomeClass.java" extracts "de/example/SomeClass.java".
+     */
+    public static Path toPackagePath(@NotNull Path path) {
+        String pathAsString = path.toString();
+        if (!pathAsString.contains(MAIN_JAVA.toString())
+                && !pathAsString.contains(TEST_JAVA.toString())) {
+            return path;
+        }
+
+        String separator = FileSystems.getDefault().getSeparator();
+
+        int indexOf = pathAsString.lastIndexOf(MAIN_JAVA.toString());
+        Path emptyPath = Path.of("");
+
+        if (indexOf != -1) {
+            int beginIndex = indexOf + MAIN_JAVA.toString().length() + separator.length();
+
+            if (beginIndex < pathAsString.length()) {
+                return Path.of(pathAsString.substring(beginIndex));
+            } else {
+                // If the given path has no package after the "src/.../java", return an empty path
+                return emptyPath;
+            }
+        }
+
+        indexOf = pathAsString.lastIndexOf(TEST_JAVA.toString());
+        if (indexOf != -1) {
+            int beginIndex = indexOf + TEST_JAVA.toString().length() + separator.length();
+
+            if (beginIndex < pathAsString.length()) {
+                return Path.of(pathAsString.substring(beginIndex));
+            } else {
+                // If the given path has no package after the "src/.../java", return an empty path
+                return emptyPath;
+            }
+        }
+
+        return path;
     }
 }

@@ -1,5 +1,6 @@
 package de.jsilbereisen.perfumator.model;
 
+import com.fasterxml.jackson.annotation.JsonKey;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.i18n.*;
 import de.jsilbereisen.perfumator.util.StringUtil;
@@ -26,8 +27,9 @@ import java.lang.reflect.Method;
 @Setter
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public abstract class Detectable implements Internationalizable, Comparable<Detectable> {
+public abstract class Detectable implements Internationalizable, Comparable<Detectable>, Cloneable {
 
+    @JsonKey
     private String name;
 
     private String description;
@@ -61,6 +63,18 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
          this.description = description;
          this.detectorClassSimpleName = detectorClassSimpleName;
          this.i18nBaseBundleName = i18nBaseBundleName;
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param detectable To be copied.
+     */
+    protected Detectable(@NotNull Detectable detectable) {
+         this.name = detectable.name;
+         this.description = detectable.description;
+         this.detectorClassSimpleName = detectable.detectorClassSimpleName;
+         this.i18nBaseBundleName = detectable.i18nBaseBundleName;
     }
 
     /**
@@ -136,6 +150,14 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
 
         return this.getName().compareTo(other.getName());
     }
+
+    /**
+     * Returns a deep clone of {@code this}.
+     *
+     * @return The clone.
+     */
+    @Override
+    public abstract Detectable clone();
 
     // TODO: useful toString
 }

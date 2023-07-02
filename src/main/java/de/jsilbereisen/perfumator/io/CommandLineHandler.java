@@ -148,6 +148,7 @@ public class CommandLineHandler {
             return false;
         }
 
+        // TODO: should output Dir be empty?
         return true;
     }
 

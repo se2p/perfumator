@@ -38,6 +38,11 @@ class InternationalizableTest {
                                 @Nullable String detectorClassSimpleName, @Nullable String i18nBundleBaseName) {
             super(name, description, detectorClassSimpleName, i18nBundleBaseName);
         }
+
+        @Override
+        public Detectable clone() {
+            return null;
+        }
     }
 
     private static final Bundles MOCKED_BUNDLES = Mockito.mock(Bundles.class);
