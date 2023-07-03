@@ -18,7 +18,8 @@ public class StringUtil {
      */
     public static final Pattern EMPTY_STRING = Pattern.compile("^\\s*$");
 
-    private StringUtil() { }
+    private StringUtil() {
+    }
 
     /**
      * Returns whether the given {@link String} is {@code null} or empty, in the sense

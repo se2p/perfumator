@@ -2,7 +2,6 @@ package de.jsilbereisen.perfumator.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;

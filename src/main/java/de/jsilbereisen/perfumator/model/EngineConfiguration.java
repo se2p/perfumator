@@ -1,9 +1,10 @@
-package de.jsilbereisen.perfumator.engine;
+package de.jsilbereisen.perfumator.model;
+
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
 
 import de.jsilbereisen.perfumator.io.LanguageTag;
 import de.jsilbereisen.perfumator.io.output.OutputFormat;
-import lombok.Value;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -28,7 +29,7 @@ public class EngineConfiguration {
      * {@link OutputFormat#getDefault()}.
      *
      * @param sourcesPath Path to directory with Java Sources to analyze, or to a single Java source file.
-     * @param outputDir Path where the output should be generated. Has to be a directory.
+     * @param outputDir   Path where the output should be generated. Has to be a directory.
      */
     public EngineConfiguration(@NotNull Path sourcesPath, @NotNull Path outputDir) {
         this.sourcesPath = sourcesPath;
@@ -40,10 +41,10 @@ public class EngineConfiguration {
     /**
      * Constructor with all possible configuration fields.
      *
-     * @param sourcesPath Path to directory with Java Sources to analyze, or to a single Java source file.
-     * @param outputDir Path where the output should be generated. Has to be a directory.
+     * @param sourcesPath     Path to directory with Java Sources to analyze, or to a single Java source file.
+     * @param outputDir       Path where the output should be generated. Has to be a directory.
      * @param resourcesLocale The locale the engine should use when resources are loaded.
-     * @param outputFormat The format for the generated output.
+     * @param outputFormat    The format for the generated output.
      */
     public EngineConfiguration(@NotNull Path sourcesPath, @NotNull Path outputDir,
                                @NotNull Locale resourcesLocale, @NotNull OutputFormat outputFormat) {

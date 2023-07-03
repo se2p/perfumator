@@ -1,20 +1,23 @@
 package de.jsilbereisen.perfumator.io;
 
-import de.jsilbereisen.perfumator.engine.EngineConfiguration;
-import de.jsilbereisen.perfumator.i18n.Bundles;
-import de.jsilbereisen.perfumator.i18n.BundlesLoader;
-import de.jsilbereisen.perfumator.util.PathUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
+import de.jsilbereisen.perfumator.model.EngineConfiguration;
+import de.jsilbereisen.perfumator.util.PathUtil;
+
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 
 /**
@@ -38,6 +41,7 @@ public class CommandLineHandler {
     }
 
     // TODO: refactor method
+
     /**
      * Handles the given application input according to the set options.
      */
@@ -63,7 +67,8 @@ public class CommandLineHandler {
         boolean isInputPathValid = checkInputPath(inputPath);
         boolean isOutputPathValid = checkOutputPath(outputPath);
         if (!isInputPathValid || !isOutputPathValid) {
-            log.error(cliBundle.getString("log.generic.terminate"));
+            printHelp();
+            log.error("\n" + cliBundle.getString("log.generic.terminate"));
             return null;
         }
 
@@ -89,8 +94,8 @@ public class CommandLineHandler {
         Locale locale = LanguageTag.getDefault().getRelatedLocale();
 
         for (int i = 0; i < args.length; i++) {
-            if ((args[i].equals("-l") || args[i].equals("--language")) && i+1 < args.length) {
-                locale = LanguageTag.of(args[i+1]).getRelatedLocale();
+            if ((args[i].equals("-l") || args[i].equals("--language")) && i + 1 < args.length) {
+                locale = LanguageTag.of(args[i + 1]).getRelatedLocale();
                 break;
             }
         }
@@ -146,9 +151,24 @@ public class CommandLineHandler {
         if (!Files.isDirectory(path)) {
             log.error(cliBundle.getString("log.error.invalidOutputPath"));
             return false;
+        } else {
+            boolean isNotEmpty = true;
+
+            try (Stream<Path> paths = Files.list(path)) {
+                isNotEmpty = paths.findFirst().isPresent();
+
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
+
+            if (isNotEmpty) {
+                log.error(cliBundle.getString("log.error.invalidOutputPath"));
+                return false;
+            }
         }
 
-        // TODO: should output Dir be empty?
         return true;
     }
 

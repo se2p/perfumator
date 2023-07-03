@@ -13,13 +13,14 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.BinaryExprVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,8 +128,8 @@ public class DefensiveNullCheckDetector implements Detector<Perfume> {
         // Check all public methods that are not in an interface; if in interface, only check those that are default and non-private, non-protected
         boolean checkBecauseOfAccess = (methodDeclaration.isPublic() && !isInterface)
                 || (isInterface && methodDeclaration.isDefault()
-                    && !(methodDeclaration.hasModifier(Modifier.Keyword.PRIVATE)
-                        || methodDeclaration.hasModifier(Modifier.Keyword.PROTECTED)));
+                && !(methodDeclaration.hasModifier(Modifier.Keyword.PRIVATE)
+                || methodDeclaration.hasModifier(Modifier.Keyword.PROTECTED)));
 
         boolean hasNonPrimitiveParameter = methodDeclaration.getParameters().isNonEmpty()
                 && methodDeclaration.getParameters().stream().anyMatch(parameter -> !parameter.getType().isPrimitiveType());

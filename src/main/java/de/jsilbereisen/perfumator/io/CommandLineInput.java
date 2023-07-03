@@ -1,9 +1,10 @@
 package de.jsilbereisen.perfumator.io;
 
-import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.kohsuke.args4j.Option;
+
+import de.jsilbereisen.perfumator.io.output.OutputFormat;
 
 import java.nio.file.Path;
 import java.util.Locale;
@@ -16,24 +17,24 @@ import java.util.Locale;
 @Setter
 public class CommandLineInput {
 
-    @Option(name = "-i", aliases = { "--input-dir" }, metaVar = "option.metaVar.path",
+    @Option(name = "-i", aliases = {"--input-dir"}, metaVar = "option.metaVar.path",
             usage = "option.usage.inputDir")
     private Path pathToSourceDir;
 
-    @Option(name = "-o", aliases = { "--output-dir" }, metaVar = "option.metaVar.path",
+    @Option(name = "-o", aliases = {"--output-dir"}, metaVar = "option.metaVar.path",
             usage = "option.usage.outputDir")
     private Path pathToOutputDir;
 
-    @Option(name = "-h", aliases = { "--help" },
+    @Option(name = "-h", aliases = {"--help"},
             usage = "option.usage.help",
             help = true)
     private boolean printHelp;
 
-    @Option(name = "-f", aliases = { "--format" }, metaVar = "option.metaVar.format",
+    @Option(name = "-f", aliases = {"--format"}, metaVar = "option.metaVar.format",
             usage = "option.usage.format")
     private OutputFormat outputFormat = OutputFormat.getDefault();
 
-    @Option(name = "-l", aliases = { "--language" },
+    @Option(name = "-l", aliases = {"--language"},
             usage = "option.usage.language",
             handler = LocaleOptionHandler.class)
     private Locale locale = LocaleOptionHandler.getDefault();

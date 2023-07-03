@@ -1,12 +1,17 @@
 package de.jsilbereisen.perfumator.i18n;
 
-import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import de.jsilbereisen.perfumator.util.StringUtil;
-import io.github.classgraph.*;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassGraphException;
+import io.github.classgraph.Resource;
+import io.github.classgraph.ResourceList;
+import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.io.LocaleOptionHandler;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import de.jsilbereisen.perfumator.util.StringUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +81,7 @@ public class BundlesLoader {
      * There are <b>NO CHECKS</b> in the constructor whether the given packages are valid or even exist!
      * </p>
      *
-     * @param i18nPackagePath Root package where the resources are located.
+     * @param i18nPackagePath                Root package where the resources are located.
      * @param detectableResourcesPackagePath Sub-package of the first parameter, where resources that should
      *                                       be auto-detected are located.
      * @throws IllegalArgumentException If any given package string is {@code null} or empty.
@@ -104,7 +109,7 @@ public class BundlesLoader {
      * There are <b>NO CHECKS</b> in the constructor whether the given packages are valid or even exist!
      * </p>
      *
-     * @param i18nPackagePath Root package where the resources are located.
+     * @param i18nPackagePath                Root package where the resources are located.
      * @param detectableResourcesPackagePath Sub-package of the first parameter, where resources that should
      *                                       be auto-detected are located.
      * @throws IllegalArgumentException If any given package string is {@code null} or empty.
@@ -135,7 +140,7 @@ public class BundlesLoader {
                 List.of(i18nPackage, applicationResourcesPackage, APPLICATION_BASE_BUNDLE_NAME), "/");
         ResourceBundle applicationBundle =
                 ResourceBundle.getBundle(applicationBundleFullQualified, useLocale,
-                ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
+                        ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
 
 
         bundlesHolder.addBundle(applicationBundle);

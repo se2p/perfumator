@@ -2,13 +2,6 @@ package de.jsilbereisen.perfumator.engine.registry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import de.jsilbereisen.perfumator.engine.detector.DetectorLoadException;
-import de.jsilbereisen.perfumator.i18n.Bundles;
-import de.jsilbereisen.perfumator.i18n.BundlesLoader;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import de.jsilbereisen.perfumator.model.perfume.PerfumeLoadException;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.util.StringUtil;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassGraphException;
 import io.github.classgraph.Resource;
@@ -17,6 +10,14 @@ import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.DetectorLoadException;
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.PerfumeLoadException;
+import de.jsilbereisen.perfumator.util.StringUtil;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO: i18n
+
 /**
  * {@link DetectableRegistry} implementation for {@link Perfume}s. Loads Perfume definitions that are
  * provided as JSONs under the {@link #STANDARD_PERFUME_DEFINITIONS_PACKAGE} under the resource directory.<br/>
@@ -59,7 +61,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
 
     private final Map<Perfume, Detector<Perfume>> registry;
 
-    private final  JsonMapper jsonMapper;
+    private final JsonMapper jsonMapper;
 
     public PerfumeRegistry() {
         perfumePackage = STANDARD_PERFUME_DEFINITIONS_PACKAGE;
@@ -86,6 +88,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
     }
 
     // TODO: i18n exception messages
+
     /**
      * Detects and loads all Perfumes that are in the {@link #perfumePackage} (non-recursive) from their JSONs into the
      * registry and links them with their respective {@link Detector<Perfume>}.
@@ -93,7 +96,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * if there are resources available.
      *
      * @param locale The locale to use for loading internationalized versions of the Perfumes.
-     * @throws PerfumeLoadException If any failures occur within the detection and loading process.
+     * @throws PerfumeLoadException  If any failures occur within the detection and loading process.
      * @throws DetectorLoadException When being unable to instantiate the {@link Detector<Perfume>} for a
      *                               {@link Perfume} or when simply no {@link Detector} is found for it.
      */
@@ -155,10 +158,10 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * Loads a single {@link Perfume} from its string-representation in JSON format with the <i>Jackson</i>
      * mapping library's API.
      *
-     * @param bundles Resources for internationalized exception messages.
+     * @param bundles  Resources for internationalized exception messages.
      * @param resource Resource with the {@link Perfume}'s JSON representation.
      * @return The loaded {@link Perfume} or {@code null} if some unknown failure, that does not trigger an
-     *         exception, occurred
+     * exception, occurred
      * @throws PerfumeLoadException If the given resource could not be read or if the mapping of the resource's
      *                              content to a {@link Perfume} instance failed notably.
      */
@@ -190,14 +193,14 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * The detector is loaded by the fully qualified class name, given by
      * {@link Perfume#getDetectorClassSimpleName()}, with the {@link #STANDARD_PERFUME_DETECTORS_PACKAGE} prepended.
      *
-     * @param bundles Resources for internationalized exception messages.
+     * @param bundles        Resources for internationalized exception messages.
      * @param loadedPerfumes The Perfumes for which the detectors should be instanced.
      * @throws DetectorLoadException When being unable to instantiate the {@link Detector} for a {@link Perfume}
      *                               or when simply no {@link Detector} is found for it.
      */
     @SuppressWarnings("unchecked")
     private void linkPerfumesToDetectors(@NotNull Bundles bundles, @NotNull List<Perfume> loadedPerfumes) {
-        for (Perfume perfume: loadedPerfumes) {
+        for (Perfume perfume : loadedPerfumes) {
             Class<?> detectorClass = null;
             try {
                 detectorClass = Class.forName(perfumeDetectorsPackage + "."

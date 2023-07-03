@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
 
 import java.nio.file.Path;
 
@@ -39,7 +40,8 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
     private Path sourceFile;
 
-    public DetectedInstance() { }
+    public DetectedInstance() {
+    }
 
     public DetectedInstance(@Nullable T detectable, @Nullable String typeName, int beginningLineNumber,
                             int endingLineNumber, @Nullable String concreteCode, @NotNull Path sourceFile) {
@@ -73,11 +75,11 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      * Returns a {@link DetectedInstance<T>}, filled with information from the given
      * parameters (if the information is present).
      *
-     * @param node {@link NodeWithRange} to extract positional information.
-     * @param detected {@link T} that was detected by a {@link Detector <T>} and should be linked to the {@link DetectedInstance<T>}.
+     * @param node            {@link NodeWithRange} to extract positional information.
+     * @param detected        {@link T} that was detected by a {@link Detector <T>} and should be linked to the {@link DetectedInstance<T>}.
      * @param compilationUnit AST as a {@link CompilationUnit} in which the {@link T} was detected.
+     * @param <T>             The concrete Subtype of {@link Detectable}.
      * @return A {@link DetectedInstance<T>} with the given information.
-     * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
     public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @NotNull T detected,
@@ -92,11 +94,11 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      * Returns a {@link DetectedInstance<T>}, filled with information from the given
      * parameters (if the information is present).
      *
-     * @param node {@link NodeWithRange} to extract positional information.
-     * @param detected {@link T} that was detected by a {@link Detector <T>} and should be linked to the {@link DetectedInstance<T>}.
+     * @param node            {@link NodeWithRange} to extract positional information.
+     * @param detected        {@link T} that was detected by a {@link Detector <T>} and should be linked to the {@link DetectedInstance<T>}.
      * @param typeDeclaration {@link TypeDeclaration} of the type in which the {@link T} was detected.
+     * @param <T>             The concrete Subtype of {@link Detectable}.
      * @return A {@link DetectedInstance<T>} with the given information.
-     * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
     public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @NotNull T detected,
@@ -111,11 +113,11 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      * Returns a {@link DetectedInstance<T>}, filled with information from the given
      * parameters (if the information is present).
      *
-     * @param node {@link NodeWithRange} to extract positional information.
-     * @param detected {@link T} that was detected by a {@link Detector<T>} and should be linked to the {@link DetectedInstance<T>}.
+     * @param node           {@link NodeWithRange} to extract positional information.
+     * @param detected       {@link T} that was detected by a {@link Detector<T>} and should be linked to the {@link DetectedInstance<T>}.
      * @param parentTypeName Name of the type (e.g. Class name) in which the {@link T} was detected.
+     * @param <T>            The concrete Subtype of {@link Detectable}.
      * @return A {@link DetectedInstance<T>} with the given information.
-     * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
     public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @Nullable T detected,
@@ -127,10 +129,10 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      * Returns a {@link DetectedInstance<T>}, filled with information from the given
      * parameters (if the information is present).
      *
-     * @param node {@link NodeWithRange} to extract positional information.
+     * @param node     {@link NodeWithRange} to extract positional information.
      * @param detected {@link T} that was detected by a {@link Detector<T>} and should be linked to the {@link DetectedInstance<T>}.
+     * @param <T>      The concrete Subtype of {@link Detectable}.
      * @return A {@link DetectedInstance<T>} with the given information.
-     * @param <T> The concrete Subtype of {@link Detectable}.
      */
     @NotNull
     public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @Nullable T detected) {

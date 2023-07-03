@@ -14,6 +14,7 @@ public class DetectedInstanceComparator<T extends Detectable> implements Compara
     /**
      * Compares two {@link DetectedInstance}s. If the comparison is non-trivial (both are non-null),
      * calls {@link DetectedInstance#compareTo}.
+     *
      * @param o1 the first object to be compared.
      * @param o2 the second object to be compared.
      * @return the comparison result, semantics are as describes in {@link Comparator}.

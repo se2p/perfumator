@@ -1,9 +1,10 @@
 package de.jsilbereisen.perfumator.engine.registry;
 
-import de.jsilbereisen.perfumator.model.Detectable;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.model.Detectable;
 
 import java.util.Locale;
 import java.util.Set;
@@ -35,6 +36,7 @@ public interface DetectableRegistry<T extends Detectable> {
      * @param locale {@link Locale} to use for internationalization.
      */
     void loadRegistry(@NotNull Locale locale);
+    // TODO: loadRegistry(bundles)
 
     /**
      * Returns a set of all {@link T} {@link Detectable}s that are currently loaded in the registry.

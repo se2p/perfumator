@@ -12,7 +12,8 @@ public class MutablePair<A, B> {
 
     private B second;
 
-    public MutablePair() { }
+    public MutablePair() {
+    }
 
     public MutablePair(@Nullable A first, @Nullable B second) {
         this.first = first;

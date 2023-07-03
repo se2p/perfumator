@@ -16,16 +16,17 @@ import java.util.function.Supplier;
  */
 public final class NodeUtil {
 
-    private NodeUtil() { }
+    private NodeUtil() {
+    }
 
     /**
      * Casts the given {@link Node} to the type given by the {@link Class} parameter, if possible.
      * Otherwise returns {@code null}.
      *
-     * @param node The {@link Node} of interest.
+     * @param node    The {@link Node} of interest.
      * @param asClass Class object of the desired type.
+     * @param <T>     The desired type.
      * @return The given {@link Node}, casted to type {@link T} if possible, or {@code null} otherwise.
-     * @param <T> The desired type.
      */
     @Nullable
     @SuppressWarnings("unchecked")
@@ -42,12 +43,12 @@ public final class NodeUtil {
      * and returns the cast result.
      * Otherwise, returns the result of {@link Supplier#get()}.
      *
-     * @param node The {@link Node} of interest.
+     * @param node    The {@link Node} of interest.
      * @param asClass Class object of the desired type.
-     * @param orElse {@link Supplier} that provides a {@link T} if the cast is not possible.
+     * @param orElse  {@link Supplier} that provides a {@link T} if the cast is not possible.
+     * @param <T>     The desired type.
      * @return The given {@link Node}, casted to type {@link T} if possible, or {@link Supplier#get()} otherwise,
      * which might be {@code null}.
-     * @param <T> The desired type.
      */
     @Nullable
     public static <T extends Node> T asOrElse(@NotNull Node node, @NotNull Class<T> asClass,
@@ -68,8 +69,8 @@ public final class NodeUtil {
      * </p>
      *
      * @param node The {@link Node} to print.
+     * @param <T>  A node that can have type parameters and that has a simple name.
      * @return The type name with all type parameters, if it has any.
-     * @param <T> A node that can have type parameters and that has a simple name.
      */
     @NotNull
     public static <T extends Node & NodeWithTypeParameters<T> & NodeWithSimpleName<T>> String getNameWithTypeParams(@NotNull T node) {

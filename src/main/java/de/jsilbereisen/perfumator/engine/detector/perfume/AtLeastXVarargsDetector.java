@@ -5,17 +5,24 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import org.jetbrains.annotations.NotNull;
+
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.BinaryExprVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.IfStmtVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.MethodDeclarationVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +75,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
      *
      * @param methodDeclaration The method to check.
      * @return An {@link Optional} with the {@link DetectedInstance<Perfume>} if the method is perfumed. Otherwise returns
-     *         an {@link Optional#empty()}
+     * an {@link Optional#empty()}
      */
     @NotNull
     private Optional<DetectedInstance<Perfume>> checkForPerfume(@NotNull MethodDeclaration methodDeclaration) {
@@ -111,7 +118,7 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
      * Checks whether the given {@link IfStmt} is not perfumed, meaning it checks for the length
      * of the Varargs-parameter and depending on that immediately quits the method.
      *
-     * @param ifStmt The {@link IfStmt} to check.
+     * @param ifStmt           The {@link IfStmt} to check.
      * @param varargsParamName The name of the Varargs-parameter of the method.
      * @return {@code true} if the {@link IfStmt} is not perfumed, as described above.
      */
@@ -159,13 +166,14 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
      *     doSomething();
      * }
      * </pre>
-     * @param ifStmt The {@link IfStmt} to check.
-     * @param binaryExpr The {@link BinaryExpr} that is looked at.
-     * @param operator The operator of the {@link BinaryExpr} that is looked at.
-     * @param fieldAccessExpr The part of the {@link BinaryExpr} that performs the field access on the varargs param.
+     *
+     * @param ifStmt              The {@link IfStmt} to check.
+     * @param binaryExpr          The {@link BinaryExpr} that is looked at.
+     * @param operator            The operator of the {@link BinaryExpr} that is looked at.
+     * @param fieldAccessExpr     The part of the {@link BinaryExpr} that performs the field access on the varargs param.
      * @param numberToCompareExpr The part of the {@link BinaryExpr} that is compared to the value obtained through the
      *                            field access. Usually an Integer.
-     * @param varargsParamName The name of the Varargs parameter of the method.
+     * @param varargsParamName    The name of the Varargs parameter of the method.
      * @return {@code true} if the {@link IfStmt} immediately quits the method in dependence of the length check of the Varargs.
      */
     private boolean doesCheckLengthAndEndMethod(@NotNull IfStmt ifStmt, @NotNull BinaryExpr binaryExpr,

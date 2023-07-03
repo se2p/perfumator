@@ -1,9 +1,6 @@
 package de.jsilbereisen.perfumator.model;
 
 import com.fasterxml.jackson.annotation.JsonKey;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.i18n.*;
-import de.jsilbereisen.perfumator.util.StringUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +8,14 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
+import de.jsilbereisen.perfumator.i18n.I18nIgnore;
+import de.jsilbereisen.perfumator.i18n.Internationalizable;
+import de.jsilbereisen.perfumator.i18n.InternationalizationException;
+import de.jsilbereisen.perfumator.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -43,26 +48,27 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
     /**
      * Default constructor to allow deserialization via the <b>Jackson</b> object mapper.
      */
-    protected Detectable() { }
+    protected Detectable() {
+    }
 
     /**
      * Constructor for a {@link Detectable} with a name, description, {@link Detector} class name and bundle name for
      * internationalisation.
      * No checks are performed whether a {@link Detector} class with the given name even exists.
      *
-     * @param name Name for the detectable.
-     * @param description A description for this detectable
+     * @param name                    Name for the detectable.
+     * @param description             A description for this detectable
      * @param detectorClassSimpleName Simple class name of the {@link Detector} that is responsible to detect this
      *                                {@link Detectable}, not fully qualified.
-     * @param i18nBaseBundleName The base name of the bundle that should be used for internationalization of this
-     *                           detectable.
+     * @param i18nBaseBundleName      The base name of the bundle that should be used for internationalization of this
+     *                                detectable.
      */
-     protected Detectable(@Nullable String name, @Nullable String description,
-                          @Nullable String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
-         this.name = name;
-         this.description = description;
-         this.detectorClassSimpleName = detectorClassSimpleName;
-         this.i18nBaseBundleName = i18nBaseBundleName;
+    protected Detectable(@Nullable String name, @Nullable String description,
+                         @Nullable String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
+        this.name = name;
+        this.description = description;
+        this.detectorClassSimpleName = detectorClassSimpleName;
+        this.i18nBaseBundleName = i18nBaseBundleName;
     }
 
     /**
@@ -71,10 +77,10 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      * @param detectable To be copied.
      */
     protected Detectable(@NotNull Detectable detectable) {
-         this.name = detectable.name;
-         this.description = detectable.description;
-         this.detectorClassSimpleName = detectable.detectorClassSimpleName;
-         this.i18nBaseBundleName = detectable.i18nBaseBundleName;
+        this.name = detectable.name;
+        this.description = detectable.description;
+        this.detectorClassSimpleName = detectable.detectorClassSimpleName;
+        this.i18nBaseBundleName = detectable.i18nBaseBundleName;
     }
 
     /**
@@ -92,8 +98,8 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      * </p>
      *
      * @param resourceHolder {@link Bundles} with resources for internationalization. Make sure to load resources
-     *                                      into this instance via {@link BundlesLoader#loadDetectableBundles} before,
-     *                                      otherwise the call to this method won't have any effect.
+     *                       into this instance via {@link BundlesLoader#loadDetectableBundles} before,
+     *                       otherwise the call to this method won't have any effect.
      * @throws InternationalizationException If a problem occurs when calling the detected Setters for the
      *                                       internationalizable fields.
      */
@@ -108,7 +114,7 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
         Field[] classFields = FieldUtils.getAllFields(getClass());
         Method[] classMethods = clazz.getMethods();
 
-        for (Field field: classFields) {
+        for (Field field : classFields) {
             if (field.getType().equals(String.class) && !field.isAnnotationPresent(I18nIgnore.class)) {
                 String fieldName = field.getName();
                 String internationalizedContent = resourceHolder.getResource(i18nBaseBundleName + "." + fieldName);
@@ -117,7 +123,7 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
                     String setterName = "set" + fieldName.substring(0, 1).toUpperCase()
                             + fieldName.substring(1);
 
-                    for (Method method: classMethods) {
+                    for (Method method : classMethods) {
                         if (method.getName().equals(setterName)) {
                             try {
                                 method.invoke(this, internationalizedContent);

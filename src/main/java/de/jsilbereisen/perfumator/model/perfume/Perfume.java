@@ -1,13 +1,14 @@
 package de.jsilbereisen.perfumator.model.perfume;
 
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.model.Detectable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.model.Detectable;
 
 /**
  * Data object for a Code Perfume definition.
@@ -28,7 +29,8 @@ public class Perfume extends Detectable {
     /**
      * Default constructor to allow deserialization via the <b>Jackson</b> object mapper.
      */
-    public Perfume() { }
+    public Perfume() {
+    }
 
     /**
      * Constructor containing all fields.

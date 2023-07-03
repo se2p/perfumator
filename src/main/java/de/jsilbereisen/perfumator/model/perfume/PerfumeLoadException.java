@@ -1,7 +1,5 @@
 package de.jsilbereisen.perfumator.model.perfume;
 
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-
 /**
  * Exception for failures when {@link Perfume}s are loaded from their JSON representation.
  */

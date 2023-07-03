@@ -50,18 +50,6 @@ public enum LanguageTag {
         this.relatedLocale = relatedLocale;
     }
 
-    public String getTagName() {
-        return tagName;
-    }
-
-    public String getFullLanguageName() {
-        return fullLanguageName;
-    }
-
-    public Locale getRelatedLocale() {
-        return relatedLocale;
-    }
-
     /**
      * Returns the language tag that is used as a default.
      */
@@ -70,19 +58,11 @@ public enum LanguageTag {
     }
 
     /**
-     * Returns {@code true} if the other String equals the language tag's name of {@code this} after
-     * trimming and ignoring case.
-     */
-    public boolean equalsTrimIgnoreCase(@Nullable String other) {
-        return other != null && other.trim().equalsIgnoreCase(tagName);
-    }
-
-    /**
      * Returns the matching {@link LanguageTag}, matched by {@link LanguageTag#getTagName()}, for the given
      * String. If no particular {@link LanguageTag} matches, {@link LanguageTag#EN} is returned.
      *
      * @param str String to match against the available tags. Can be {@code null}.
-     * @return    The matching {@link LanguageTag}, or {@link LanguageTag#EN} if no match was found.
+     * @return The matching {@link LanguageTag}, or {@link LanguageTag#EN} if no match was found.
      */
     public static @NotNull LanguageTag of(@Nullable String str) {
         return Arrays.stream(LanguageTag.values())
@@ -97,7 +77,7 @@ public enum LanguageTag {
      * If no particular {@link LanguageTag} matches, {@link LanguageTag#EN} is returned.
      *
      * @param locale {@link Locale} to match against the available tags. Can be {@code null}.
-     * @return       The matching {@link LanguageTag}, or {@link LanguageTag#EN} if no match was found.
+     * @return The matching {@link LanguageTag}, or {@link LanguageTag#EN} if no match was found.
      */
     public static @NotNull LanguageTag of(@Nullable Locale locale) {
         return Arrays.stream(LanguageTag.values())
@@ -113,5 +93,25 @@ public enum LanguageTag {
         return Arrays.stream(LanguageTag.values())
                 .map(LanguageTag::getTagName)
                 .toList();
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public String getFullLanguageName() {
+        return fullLanguageName;
+    }
+
+    public Locale getRelatedLocale() {
+        return relatedLocale;
+    }
+
+    /**
+     * Returns {@code true} if the other String equals the language tag's name of {@code this} after
+     * trimming and ignoring case.
+     */
+    public boolean equalsTrimIgnoreCase(@Nullable String other) {
+        return other != null && other.trim().equalsIgnoreCase(tagName);
     }
 }

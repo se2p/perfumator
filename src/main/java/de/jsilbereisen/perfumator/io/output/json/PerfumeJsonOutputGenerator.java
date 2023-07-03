@@ -2,6 +2,9 @@ package de.jsilbereisen.perfumator.io.output.json;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
@@ -10,19 +13,17 @@ import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.JsonDeserializationUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
 
-    private int lastListingNumber = 0;
-
     private final StatisticsSummary<Perfume> summary;
+    private int lastListingNumber = 0;
 
     public PerfumeJsonOutputGenerator(@NotNull OutputConfiguration config,
                                       @NotNull DetectableRegistry<Perfume> registry,
@@ -72,6 +73,9 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
 
     @Override
     public void complete() throws IOException {
+        // TODO: In the statistic, only files where an actual detection happened are captured! Need to expand engine
+        //  to capture a list of all files?
+
         Path summaryFileName = Path.of(SUMMARY_FILE_SUFFIX + outputFormat.getFileExtension());
         Path toCreate = config.getOutputDirectory().resolve(summaryFileName);
 
@@ -84,7 +88,8 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
     @NotNull
     private List<DetectedInstance<Perfume>> readAndDeleteIfNotFull(int listingNumber) throws IOException {
         Path file = config.getOutputDirectory().resolve(listingFileName(listingNumber));
-        List<DetectedInstance<Perfume>> deserialized = JsonDeserializationUtil.readList(mapper, new TypeReference<>() {}, file);
+        List<DetectedInstance<Perfume>> deserialized = JsonDeserializationUtil.readList(mapper, new TypeReference<>() {
+        }, file);
 
         if (deserialized.isEmpty() || deserialized.size() == config.getBatchSize()) {
             return Collections.emptyList();
@@ -110,7 +115,7 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
             Path toCreate = config.getOutputDirectory().resolve(listingFileName(i));
             Path created = Files.createFile(toCreate);
 
-            int low = (i-1) * config.getBatchSize();
+            int low = (i - 1) * config.getBatchSize();
             int high = Math.min(i * config.getBatchSize(), detectedInstances.size());
             mapper.writeValue(created.toFile(), detectedInstances.subList(low, high));
         }

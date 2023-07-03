@@ -1,10 +1,11 @@
 package de.jsilbereisen.perfumator.io.output;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.model.Detectable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract class for an output-generator.
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
  * concrete detections of {@link T}.
  *
  * @param <T> The type of {@link Detectable} for which this {@link AbstractOutputGenerator}
- *           can generate output.
+ *            can generate output.
  */
 public abstract class AbstractOutputGenerator<T extends Detectable> implements OutputGenerator<T> {
 
@@ -46,5 +47,10 @@ public abstract class AbstractOutputGenerator<T extends Detectable> implements O
     @Override
     public @NotNull OutputFormat getOutputFormat() {
         return outputFormat;
+    }
+
+    @Override
+    public @NotNull OutputConfiguration getConfig() {
+        return config;
     }
 }

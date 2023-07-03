@@ -1,8 +1,9 @@
 package de.jsilbereisen.perfumator.io.output;
 
+import org.jetbrains.annotations.NotNull;
+
 import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @param <T> The {@link Detectable}, for which the output of its {@link DetectedInstance}s is generated for.
  */
-public interface OutputGenerator<T extends Detectable> extends HasOutputFormat {
+public interface OutputGenerator<T extends Detectable> extends HasOutputFormat, HasOutputConfiguration {
 
     /**
      * Connects the file name and the suffix(es) applied to it.

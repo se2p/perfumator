@@ -37,3 +37,6 @@ target/
 
 # Any pictures and dot files
 graphics/
+
+# Folder I use for output of manual tests
+manual_test_results/

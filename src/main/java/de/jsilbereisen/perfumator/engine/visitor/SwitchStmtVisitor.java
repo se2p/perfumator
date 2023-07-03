@@ -1,6 +1,5 @@
 package de.jsilbereisen.perfumator.engine.visitor;
 
-import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import lombok.Getter;

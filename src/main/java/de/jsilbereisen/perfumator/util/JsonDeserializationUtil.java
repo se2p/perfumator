@@ -6,12 +6,13 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.jetbrains.annotations.NotNull;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,8 @@ import java.util.Optional;
 
 public class JsonDeserializationUtil {
 
-    private JsonDeserializationUtil() { }
+    private JsonDeserializationUtil() {
+    }
 
     @NotNull
     public static <T extends Detectable> List<DetectedInstance<T>> readList(
@@ -51,7 +53,7 @@ public class JsonDeserializationUtil {
 
     @NotNull
     private static <T> T read(@NotNull JsonMapper mapper, @NotNull TypeReference<T> typeReference,
-                                       @NotNull Path path) throws IOException {
+                              @NotNull Path path) throws IOException {
         if (!Files.isRegularFile(path) && !path.toString().endsWith(OutputFormat.JSON.getFileExtension())) {
             throw new IllegalArgumentException("Path must point to an existing " + OutputFormat.JSON.getAbbreviation()
                     + " file.");

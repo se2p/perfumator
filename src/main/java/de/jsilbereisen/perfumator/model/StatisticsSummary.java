@@ -1,14 +1,19 @@
 package de.jsilbereisen.perfumator.model;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
+
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An overview over statistics for an analysis run.

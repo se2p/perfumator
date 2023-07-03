@@ -1,8 +1,9 @@
 package de.jsilbereisen.perfumator.i18n;
 
-import de.jsilbereisen.perfumator.util.StringUtil;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
+
+import de.jsilbereisen.perfumator.util.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -27,8 +28,8 @@ public interface Internationalizable {
      * </p>
      *
      * @param resourceHolder {@link Bundles} with resources for internationalization. Make sure to load resources
-     *                                      into this instance via {@link BundlesLoader#loadDetectableBundles} before,
-     *                                      otherwise the call to this method won't have any effect.
+     *                       into this instance via {@link BundlesLoader#loadDetectableBundles} before,
+     *                       otherwise the call to this method won't have any effect.
      * @throws InternationalizationException If a problem occurs when calling the detected Setters for the
      *                                       internationalizable fields.
      */
@@ -37,7 +38,7 @@ public interface Internationalizable {
         Field[] classFields = FieldUtils.getAllFields(getClass());
         Method[] classMethods = clazz.getMethods();
 
-        for (Field field: classFields) {
+        for (Field field : classFields) {
             if (field.getType().equals(String.class) && !field.isAnnotationPresent(I18nIgnore.class)) {
                 String fieldName = field.getName();
                 String internationalizedContent = resourceHolder.getResource(fieldName, clazz);
@@ -46,7 +47,7 @@ public interface Internationalizable {
                     String setterName = "set" + fieldName.substring(0, 1).toUpperCase()
                             + fieldName.substring(1);
 
-                    for (Method method: classMethods) {
+                    for (Method method : classMethods) {
                         if (method.getName().equals(setterName)) {
                             try {
                                 method.invoke(this, internationalizedContent);

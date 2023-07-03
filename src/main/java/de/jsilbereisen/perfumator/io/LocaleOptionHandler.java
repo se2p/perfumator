@@ -1,12 +1,13 @@
 package de.jsilbereisen.perfumator.io;
 
-import de.jsilbereisen.perfumator.util.StringUtil;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
+
+import de.jsilbereisen.perfumator.util.StringUtil;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -19,6 +20,13 @@ public class LocaleOptionHandler extends OptionHandler<Locale> {
 
     public LocaleOptionHandler(CmdLineParser parser, OptionDef option, Setter<? super Locale> setter) {
         super(parser, option, setter);
+    }
+
+    /**
+     * Returns the default {@link Locale} for the application, determined by the default {@link LanguageTag}.
+     */
+    public static Locale getDefault() {
+        return LanguageTag.getDefault().getRelatedLocale();
     }
 
     @Override
@@ -46,12 +54,5 @@ public class LocaleOptionHandler extends OptionHandler<Locale> {
     @Override
     public String getMetaVariable(ResourceBundle rb) {
         return getDefaultMetaVariable();
-    }
-
-    /**
-     * Returns the default {@link Locale} for the application, determined by the default {@link LanguageTag}.
-     */
-    public static Locale getDefault() {
-        return LanguageTag.getDefault().getRelatedLocale();
     }
 }

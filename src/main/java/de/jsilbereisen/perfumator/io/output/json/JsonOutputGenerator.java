@@ -2,6 +2,9 @@ package de.jsilbereisen.perfumator.io.output.json;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.io.output.AbstractOutputGenerator;
@@ -10,8 +13,6 @@ import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import de.jsilbereisen.perfumator.io.output.OutputGenerator;
 import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 

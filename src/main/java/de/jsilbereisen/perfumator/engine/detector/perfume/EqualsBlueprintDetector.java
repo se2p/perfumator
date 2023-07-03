@@ -3,22 +3,32 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.*;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import org.jetbrains.annotations.NotNull;
+
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.util.MutablePair;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.jetbrains.annotations.NotNull;
+import de.jsilbereisen.perfumator.util.MutablePair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static de.jsilbereisen.perfumator.util.NodeUtil.*;
+import static de.jsilbereisen.perfumator.util.NodeUtil.as;
+import static de.jsilbereisen.perfumator.util.NodeUtil.asOrElse;
+import static de.jsilbereisen.perfumator.util.NodeUtil.getNameWithTypeParams;
 
 /**
  * Detects the "Equals blueprint" {@link Perfume}. The Perfume is inspired by the book
@@ -86,7 +96,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      *
      * @param type The type to analyse.
      * @return An {@link Optional} with the detected Perfume instance if one was found. Otherwise,
-     *         returns {@link Optional#empty()}.
+     * returns {@link Optional#empty()}.
      */
     private Optional<DetectedInstance<Perfume>> analyseType(@NotNull TypeDeclaration<?> type) {
         // Search for a method that overrides Object#equals
@@ -130,10 +140,10 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      * Analyses the body of the {@code equals} method. See the classes' JavaDoc for the steps that are checked.
      *
      * @param equalsMethodBody The {@link BlockStmt} that represents the {@code equals} method's body.
-     * @param paramName The identifier of the {@link Object} parameter of the method.
-     * @param typeName The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
+     * @param paramName        The identifier of the {@link Object} parameter of the method.
+     * @param typeName         The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
      * @return An {@link Optional} with the detected Perfume instance if one was found. Otherwise,
-     *         returns {@link Optional#empty()}.
+     * returns {@link Optional#empty()}.
      */
     private Optional<DetectedInstance<Perfume>> analyseEqualsMethod(@NotNull BlockStmt equalsMethodBody,
                                                                     @NotNull String paramName,
@@ -157,7 +167,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
         if (firstIfStmt.hasElseBranch()) {
             isCheckingType = isCheckingTypeInElseIf(firstIfStmt, paramName, typeName);
             indexOfCastStmt = 1;
-        } else if (bodyStatements.size() > 1){
+        } else if (bodyStatements.size() > 1) {
             isCheckingType = isCheckingType(bodyStatements.get(1), paramName, typeName);
             indexOfCastStmt = 2;
         }
@@ -193,7 +203,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      * "{@code this == other}" (or "{@code other == this}"), where "other" is the equals-method's parameter identifier.
      * Also, in the then-branch, {@code true} must be returned.
      *
-     * @param stmt The statement to check.
+     * @param stmt      The statement to check.
      * @param paramName The parameter name of the {@code equals} method.
      * @return {@code true} if all the steps described above are taken correctly.
      */
@@ -239,13 +249,13 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      * of the given if-statement. If that is the case, it is validated that the then-branch of this if-else returns
      * {@code false} immediately.
      *
-     * @param ifStmt The if-statement to check.
+     * @param ifStmt    The if-statement to check.
      * @param paramName The parameter name of the {@code equals} method.
-     * @param typeName The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
+     * @param typeName  The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
      * @return {@code true} if all the steps described above are taken correctly.
      */
     private MutablePair<Boolean, Boolean> isCheckingTypeInElseIf(@NotNull IfStmt ifStmt, @NotNull String paramName,
-                                           @NotNull String typeName) {
+                                                                 @NotNull String typeName) {
         Optional<Statement> elseBranch = ifStmt.getElseStmt();
 
         return elseBranch.map(statement -> isCheckingType(statement, paramName, typeName)).orElse(new MutablePair<>());
@@ -258,7 +268,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      *
      * @param statement The statement to check.
      * @param paramName The {@code equals} method's parameter name.
-     * @param typeName The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
+     * @param typeName  The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
      * @return A {@link MutablePair} of booleans, with the semantics as described above.
      */
     @NotNull
@@ -318,7 +328,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      *
      * @param statement The statement to check.
      * @param paramName The {@code equals} method's parameter name.
-     * @param typeName The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
+     * @param typeName  The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
      * @return {@code true} if the statement performs a correct cast.
      */
     private boolean isCorrectCast(Statement statement, String paramName, String typeName) {
@@ -375,7 +385,7 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      * Checks whether the if-statement immediately performs a "return <i>boolean</i>" in the then-branch,
      * with the given expected boolean value being returned.
      *
-     * @param ifStmt The if-statement to check.
+     * @param ifStmt              The if-statement to check.
      * @param expectedReturnValue The expected boolean value to be returned.
      * @return {@code true} if the steps described above can be validated.
      */
