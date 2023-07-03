@@ -267,6 +267,7 @@
     <profiles>
         <profile>
             <id>it</id>
+            <activation><activeByDefault>true</activeByDefault></activation>
             <build>
                 <testResources>
                     <testResource>
