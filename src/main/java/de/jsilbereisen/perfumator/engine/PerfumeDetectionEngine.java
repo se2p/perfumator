@@ -24,6 +24,7 @@ import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import de.jsilbereisen.perfumator.io.output.OutputGenerator;
 import de.jsilbereisen.perfumator.io.output.json.PerfumeJsonOutputGenerator;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.PathUtil;
 
@@ -122,7 +123,8 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
         if (Files.isDirectory(sources)) {
             try (Stream<Path> dirWalk = Files.walk(sources)) {
-                dirWalk.filter(path -> PathUtil.isRelevantJavaFile(path, sources.getFileName().toString())).forEach(sourceFile -> detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile)));
+                dirWalk.filter(path -> PathUtil.isRelevantJavaFile(path, sources.getFileName().toString()))
+                        .forEach(sourceFile -> detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile)));
 
             } catch (Exception e) {
                 log.error(i18n.getApplicationResource("log.error.analysis.unknown"));
@@ -147,12 +149,20 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         checkOutputConfig(config);
         OutputGenerator<Perfume> outputGenerator = getOutputGenerator(config, format);
 
+        StatisticsSummary<Perfume> summary = StatisticsSummary.from(perfumeRegistry);
+
         if (Files.isDirectory(sources)) {
             List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
 
             try (Stream<Path> dirWalk = Files.walk(sources)) {
                 dirWalk.filter(path -> PathUtil.isRelevantJavaFile(path, sources.getFileName().toString())).forEach(sourceFile -> {
-                    detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile));
+                    List<DetectedInstance<Perfume>> detections = detectInSingleSourceFile(sourceFile);
+
+                    // Keep statistics
+                    summary.addToStatistics(sourceFile);
+                    summary.addToStatistics(detections);
+
+                    detectedPerfumes.addAll(detections);
 
                     // Generate Listing if batch size has already been reached, clear list
                     if (detectedPerfumes.size() >= outputGenerator.getConfig().getBatchSize()) {
@@ -171,12 +181,16 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
         } else {
             List<DetectedInstance<Perfume>> detections = detectInSingleSourceFile(sources);
+
+            summary.addToStatistics(sources);
+            summary.addToStatistics(detections);
+
             generateListing(detections, outputGenerator);
         }
 
         // Generate Summary
         try {
-            outputGenerator.complete();
+            outputGenerator.complete(summary);
 
         } catch (IOException e) {
             log.error(i18n.getApplicationResource("log.error.serialization.complete"));
@@ -236,6 +250,12 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         return perfumeRegistry;
     }
 
+    /**
+     * Checks the output path of the given {@link OutputConfiguration}.
+     * Path is only valid if it points to an empty (except ".gitkeep" files) directory.
+     *
+     * @param config The config with the output path.
+     */
     private void checkOutputConfig(@NotNull OutputConfiguration config) {
         if (!Files.isDirectory(config.getOutputDirectory())) {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.output.dirNotExists"));
@@ -243,7 +263,9 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             boolean isNotEmpty = false;
 
             try (Stream<Path> paths = Files.list(config.getOutputDirectory())) {
-                isNotEmpty = paths.findFirst().isPresent();
+                isNotEmpty
+                        = paths.filter(path -> !path.getFileName().toString().endsWith(".gitkeep"))
+                                .findFirst().isPresent();
 
             } catch (IOException e) {
                 log.error(i18n.getApplicationResource("log.error.analysis.unknown"));
@@ -261,7 +283,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             throw new UnsupportedOperationException(i18n.getApplicationResource("exception.output.unsupportedFormat")
                     + " " + format.getAbbreviation());
         } else {
-            return new PerfumeJsonOutputGenerator(config, perfumeRegistry, i18n);
+            return new PerfumeJsonOutputGenerator(config, i18n);
         }
     }
 

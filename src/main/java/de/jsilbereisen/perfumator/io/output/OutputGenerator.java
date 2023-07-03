@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.StatisticsSummary;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,16 +41,15 @@ public interface OutputGenerator<T extends Detectable> extends HasOutputFormat, 
             + DETECTIONS_FILE_SUFFIX + "(" + SUFFIX_CONNECTOR + "\\d+)?";
 
     /**
-     * Handles the given list of {@link DetectedInstance}s of {@link T}.
+     * Handles, which means serializes, maybe with additional steps, the given list of {@link DetectedInstance}s of
+     * {@link T}.
      *
      * @param detectedInstances The list of detections to handle.
      */
     void handle(@NotNull List<DetectedInstance<T>> detectedInstances) throws IOException;
 
     /**
-     * Completes the output by generating all missing statistical summaries or overviews.<br/>
-     * If there is no change of state between multiple calls to this method, the operation
-     * must be idempotent.
+     * Completes the output by generating all missing statistical summaries or overviews.
      */
-    void complete() throws IOException;
+    void complete(@NotNull StatisticsSummary<T> summary) throws IOException;
 }

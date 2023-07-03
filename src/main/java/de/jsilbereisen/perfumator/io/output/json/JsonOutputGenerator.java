@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.io.output.AbstractOutputGenerator;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
@@ -35,9 +34,8 @@ public abstract class JsonOutputGenerator<T extends Detectable> extends Abstract
      */
     protected final JsonMapper mapper;
 
-    protected JsonOutputGenerator(@NotNull OutputConfiguration config, @NotNull DetectableRegistry<T> registry,
-                                  @Nullable Bundles bundles) {
-        super(config, registry, bundles, OutputFormat.JSON);
+    protected JsonOutputGenerator(@NotNull OutputConfiguration config, @Nullable Bundles bundles) {
+        super(config, bundles, OutputFormat.JSON);
 
         mapper = new JsonMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);

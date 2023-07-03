@@ -24,10 +24,9 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void listingSerializationAndDeserialization() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
         DetectedInstance<Perfume> detectedInstance = PerfumeTestUtil.singleExampleDetectedInstance();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         outputGenerator.handle(new ArrayList<>(List.of(detectedInstance)));
 
@@ -46,9 +45,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void listingOutputBatchIntoMultipleFiles() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(100);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(100);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
@@ -70,9 +68,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void listingOutputBatchUnevenDivision() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(100);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(100);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
         for (int i = 0; i < 199; i++) {
@@ -95,9 +92,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void listingOutputMaxBatchSize() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(OutputConfiguration.MAX_BATCH_SIZE);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR).setBatchSize(OutputConfiguration.MAX_BATCH_SIZE);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
         for (int i = 0; i < config.getBatchSize(); i++) {
@@ -118,9 +114,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void listingNoOutput() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
 
@@ -132,10 +127,9 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void multipleHandleCalls() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR)
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR)
                 .setBatchSize(100);
-        DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithExamplePerfume();
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         List<DetectedInstance<Perfume>> detectionsFirstCall = new ArrayList<>();
         List<DetectedInstance<Perfume>> detectionsSecondCall = new ArrayList<>();
@@ -164,14 +158,14 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
 
     @Test
     void generateStatistics() throws IOException {
-        OutputConfiguration config = OutputConfiguration.get(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
+        OutputConfiguration config = OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR);
 
         Perfume perf1 = PerfumeTestUtil.singleExamplePerfume();
         Perfume perf2 = PerfumeTestUtil.singleExamplePerfume();
         perf2.setName("Another");
 
         DetectableRegistry<Perfume> registry = PerfumeTestUtil.mockedRegistryWithPerfumes(perf1, perf2);
-        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, registry, null);
+        OutputGenerator<Perfume> outputGenerator = new PerfumeJsonOutputGenerator(config, null);
 
         Path here = Path.of(".");
         DetectedInstance<Perfume> det1 = new DetectedInstance<Perfume>().setDetectable(perf1).setSourceFile(here)
@@ -184,25 +178,25 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         DetectedInstance<Perfume> det4 = new DetectedInstance<Perfume>().setDetectable(perf2)
                 .setSourceFile(Path.of("elsewhere")).setTypeName("SomeOtherClass");
 
-        List<DetectedInstance<Perfume>> detections = new ArrayList<>(List.of(det1, det2, det3, det4));
+        StatisticsSummary<Perfume> summary = StatisticsSummary.from(registry);
+        summary.addToStatistics(List.of(det1, det2, det3, det4));
+        summary.addToStatistics(Path.of(".."));
 
-        outputGenerator.handle(detections);
-        outputGenerator.complete();
-        outputGenerator.complete();
+        outputGenerator.complete(summary);
 
         Path summaryFile = OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve(Path.of("summary.json"));
         assertThat(Files.exists(summaryFile)).isTrue();
 
-        StatisticsSummary<Perfume> summary = readStatistics(new TypeReference<>() {}, summaryFile, registry,
+        StatisticsSummary<Perfume> deserializedSummary = readStatistics(new TypeReference<>() {}, summaryFile, registry,
                 Perfume.class);
 
-        assertThat(summary).isNotNull();
-        assertThat(summary.getAnalyzedFiles()).hasSize(3);
-        assertThat(summary.getTotalAnalysedFiles()).isEqualTo(3);
-        assertThat(summary.getTotalDetections()).isEqualTo(4);
+        assertThat(deserializedSummary).isNotNull();
+        assertThat(deserializedSummary.getAnalyzedFiles()).hasSize(4);
+        assertThat(deserializedSummary.getTotalAnalysedFiles()).isEqualTo(4);
+        assertThat(deserializedSummary.getTotalDetections()).isEqualTo(4);
 
-        StatisticsSummary.Statistics<Perfume> perf1Stats = summary.getDetectableStatistics().get(perf1);
-        StatisticsSummary.Statistics<Perfume> perf2Stats = summary.getDetectableStatistics().get(perf2);
+        StatisticsSummary.Statistics<Perfume> perf1Stats = deserializedSummary.getDetectableStatistics().get(perf1);
+        StatisticsSummary.Statistics<Perfume> perf2Stats = deserializedSummary.getDetectableStatistics().get(perf2);
 
         assertThat(perf1Stats).isNotNull();
         assertThat(perf1Stats.getDetectable()).isEqualTo(perf1);

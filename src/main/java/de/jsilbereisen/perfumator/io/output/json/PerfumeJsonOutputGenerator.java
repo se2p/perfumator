@@ -1,11 +1,9 @@
 package de.jsilbereisen.perfumator.io.output.json;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -22,20 +20,10 @@ import java.util.List;
 
 public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
 
-    private final StatisticsSummary<Perfume> summary;
     private int lastListingNumber = 0;
 
-    public PerfumeJsonOutputGenerator(@NotNull OutputConfiguration config,
-                                      @NotNull DetectableRegistry<Perfume> registry,
-                                      @Nullable Bundles bundles) {
-        super(config, registry, bundles);
-
-        SimpleModule module = new SimpleModule();
-        module.addKeyDeserializer(Perfume.class,
-                new JsonDeserializationUtil.StatisticsSummaryDeserializer<>(registry));
-        mapper.registerModule(module);
-
-        summary = StatisticsSummary.from(registry);
+    public PerfumeJsonOutputGenerator(@NotNull OutputConfiguration config, @Nullable Bundles bundles) {
+        super(config, bundles);
     }
 
     @Override
@@ -43,8 +31,6 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
         if (!Files.isDirectory(config.getOutputDirectory())) {
             throw new IllegalStateException("Mal-configured instance. Output path must be an existing directory!");
         }
-
-        summary.addToStatistics(detectedInstances);
 
         if (lastListingNumber == 1) {
             renameLonelyListing();
@@ -72,10 +58,7 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
     }
 
     @Override
-    public void complete() throws IOException {
-        // TODO: In the statistic, only files where an actual detection happened are captured! Need to expand engine
-        //  to capture a list of all files?
-
+    public void complete(@NotNull StatisticsSummary<Perfume> summary) throws IOException {
         Path summaryFileName = Path.of(SUMMARY_FILE_SUFFIX + outputFormat.getFileExtension());
         Path toCreate = config.getOutputDirectory().resolve(summaryFileName);
 
@@ -88,8 +71,8 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
     @NotNull
     private List<DetectedInstance<Perfume>> readAndDeleteIfNotFull(int listingNumber) throws IOException {
         Path file = config.getOutputDirectory().resolve(listingFileName(listingNumber));
-        List<DetectedInstance<Perfume>> deserialized = JsonDeserializationUtil.readList(mapper, new TypeReference<>() {
-        }, file);
+        List<DetectedInstance<Perfume>> deserialized = JsonDeserializationUtil.readList(mapper, new TypeReference<>() {},
+                file);
 
         if (deserialized.isEmpty() || deserialized.size() == config.getBatchSize()) {
             return Collections.emptyList();

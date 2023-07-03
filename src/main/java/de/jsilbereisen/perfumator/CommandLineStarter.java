@@ -41,7 +41,7 @@ public class CommandLineStarter {
         }
 
         DetectionEngine<Perfume> engine = new PerfumeDetectionEngine(config.getResourcesLocale());
-        engine.detectAndSerialize(config.getSourcesPath(), OutputConfiguration.get(config.getOutputDir()),
+        engine.detectAndSerialize(config.getSourcesPath(), OutputConfiguration.from(config.getOutputDir()),
                 config.getOutputFormat());
     }
 }

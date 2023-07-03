@@ -24,9 +24,6 @@ public abstract class AbstractOutputGenerator<T extends Detectable> implements O
     protected final OutputConfiguration config;
 
     @NotNull
-    protected final DetectableRegistry<T> registry;
-
-    @NotNull
     protected final Bundles i18nResources;
 
     @NotNull
@@ -36,10 +33,9 @@ public abstract class AbstractOutputGenerator<T extends Detectable> implements O
      * Depending on the {@link OutputConfiguration},
      * generates a listing of all the detections, or only adds them to the overall statistics.
      */
-    protected AbstractOutputGenerator(@NotNull OutputConfiguration config, @NotNull DetectableRegistry<T> registry,
-                                      @Nullable Bundles i18nResources, @NotNull OutputFormat outputFormat) {
+    protected AbstractOutputGenerator(@NotNull OutputConfiguration config, @Nullable Bundles i18nResources,
+                                      @NotNull OutputFormat outputFormat) {
         this.config = config;
-        this.registry = registry;
         this.i18nResources = i18nResources == null ? new Bundles() : i18nResources;
         this.outputFormat = outputFormat;
     }

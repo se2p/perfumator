@@ -6,6 +6,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,6 @@ import java.nio.file.Path;
 @Accessors(chain = true)
 public class DetectedInstance<T extends Detectable> implements Comparable<DetectedInstance<T>> {
 
-    //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "detectableClass") // TODO
     @JsonIncludeProperties({"name"})
     @JsonUnwrapped(prefix = "detectable_")
     private T detectable;
@@ -36,6 +36,7 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
     private int endingLineNumber;
 
+    @ToString.Exclude
     private String concreteCode;
 
     private Path sourceFile;

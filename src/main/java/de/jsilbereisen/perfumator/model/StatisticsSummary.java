@@ -81,6 +81,16 @@ public class StatisticsSummary<T extends Detectable> {
         stats.addDetection(detection.getSourceFile());
     }
 
+    /**
+     * Adds the path to the statistics of total analysed files without any detection.
+     *
+     * @param path The path to add.
+     */
+    public void addToStatistics(@NotNull Path path) {
+        analyzedFiles.add(path);
+        totalAnalysedFiles = analyzedFiles.size();
+    }
+
     private void addDetection(@Nullable Path path) {
         ++totalDetections;
 

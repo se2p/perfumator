@@ -75,6 +75,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.asOrElse;
  */
 public class DefensiveNullCheckDetector implements Detector<Perfume> {
 
+    // TODO: Detection should work if Param is @Nullable but checked in the method body
     private static final List<String> ANNOTATION_NAMES = List.of("NotNull", "Nonnull", "Nullable");
 
     private Perfume perfume;

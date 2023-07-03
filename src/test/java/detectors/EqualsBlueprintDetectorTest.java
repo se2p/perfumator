@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// TODO: test case when Annotation, p.e. @Nullable is used in Equals signature "equals(@Nullable Object other)"
 class EqualsBlueprintDetectorTest extends AbstractDetectorTest {
 
     private static final Detector<Perfume> DETECTOR = new EqualsBlueprintDetector();

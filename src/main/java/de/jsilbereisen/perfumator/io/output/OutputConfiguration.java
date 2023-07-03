@@ -52,7 +52,7 @@ public class OutputConfiguration {
     }
 
     @NotNull
-    public static OutputConfiguration get(@NotNull Path targetDirectory) {
+    public static OutputConfiguration from(@NotNull Path targetDirectory) {
         return new OutputConfiguration(targetDirectory);
     }
 
