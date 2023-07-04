@@ -4,6 +4,8 @@ import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.I18nIgnore;
 import de.jsilbereisen.perfumator.i18n.Internationalizable;
 import de.jsilbereisen.perfumator.model.Detectable;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
+
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -97,5 +101,24 @@ class InternationalizableTest {
         assertThat(i18nMeDetectable.getDescription()).isEqualTo("description");
         assertThat(i18nMeDetectable.getDetectorClassSimpleName()).isEqualTo("ignored");
         assertThat(i18nMeDetectable.getI18nBaseBundleName()).isNull();
+    }
+
+    @Test
+    void testPerfumeI18n() {
+        Perfume perfume = new Perfume();
+        perfume.setI18nBaseBundleName("Just not be empty");
+
+        Bundles bundles = mock(Bundles.class);
+        when(bundles.getResource(anyString())).thenReturn("x");
+
+        perfume.internationalize(bundles);
+
+        assertThat(perfume.getName()).isEqualTo("x");
+        assertThat(perfume.getDescription()).isEqualTo("x");
+        assertThat(perfume.getDetectorClassSimpleName()).isNull();
+        assertThat(perfume.getI18nBaseBundleName()).isEqualTo("Just not be empty");
+        assertThat(perfume.getSource()).isEqualTo("x");
+        assertThat(perfume.getRelatedPattern()).isNull();
+        assertThat(perfume.getAdditionalInformation()).isEqualTo("x");
     }
 }
