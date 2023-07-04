@@ -38,7 +38,8 @@ public class DefensiveNullCheckPerfume {
     }
 
     // Should be detected, the API clearly signals the handling of null-values for all Params through annotations
-    public void methodWithAnnotations(int nonNullNumber, @Nullable Object a, @NotNull String b, @Nonnull List<String> l) {
+    public void methodWithAnnotations(int nonNullNumber, @Nullable Object a, @NotNull String b,
+                                      @Nonnull List<String> l, @NonNull Integer i) {
         doSomething();
     }
 
