@@ -28,7 +28,7 @@
         <!-- no submodules yet, placeholder for future modularization -->
 
         <!-- Dependency versions -->
-        <javaparser.version>3.25.3</javaparser.version>
+        <javaparser.version>3.25.4</javaparser.version>
         <args4j.version>2.33</args4j.version>
         <jackson.version>2.15.0</jackson.version>
         <lombok.version>1.18.26</lombok.version>
@@ -54,11 +54,13 @@
             <version>24.0.1</version>
         </dependency>
 
-        <!-- Parsing source files to an AST, providing AST API -->
+        <!-- Parsing source files to an AST, providing AST API, symbol resolving -->
+        <!-- https://mvnrepository.com/artifact/com.github.javaparser/javaparser-symbol-solver-core -->
+        <!-- this also includes the AST parsing core: -->
         <!-- https://mvnrepository.com/artifact/com.github.javaparser/javaparser-core -->
         <dependency>
             <groupId>com.github.javaparser</groupId>
-            <artifactId>javaparser-core</artifactId>
+            <artifactId>javaparser-symbol-solver-core</artifactId>
             <version>${javaparser.version}</version>
         </dependency>
 

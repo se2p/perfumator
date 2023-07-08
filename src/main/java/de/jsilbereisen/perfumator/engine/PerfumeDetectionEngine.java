@@ -6,10 +6,16 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationException;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,15 +54,24 @@ import java.util.stream.Stream;
 @Slf4j
 public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
+    @NotNull
     private final DetectableRegistry<Perfume> perfumeRegistry;
 
+    @NotNull
     private final Locale locale;
 
+    @NotNull
     private final Bundles i18n;
 
     @Getter
     @Setter
+    @Nullable
     private JavaParser astParser;
+
+    @Getter
+    @Setter
+    @Nullable
+    private JavaParserFacade analysisContext;
 
     public PerfumeDetectionEngine() {
         this(LanguageTag.getDefault().getRelatedLocale());
@@ -114,12 +129,14 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     }
 
     @Override
-    public List<DetectedInstance<Perfume>> detect(@NotNull Path sources) {
+    public List<DetectedInstance<Perfume>> detect(@NotNull Path sources, @NotNull Path... dependencies) {
         if (!(Files.isDirectory(sources) || PathUtil.isJavaSourceFile(sources))) {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.invalidSourcesPath"));
         }
 
         List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
+
+        analysisContext = createAnalysisContext(sources, dependencies);
 
         if (Files.isDirectory(sources)) {
             try (Stream<Path> dirWalk = Files.walk(sources)) {
@@ -140,7 +157,8 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
     @Override
     public void detectAndSerialize(@NotNull Path sources, @NotNull OutputConfiguration config,
-                                   @NotNull OutputFormat format) throws SerializationException {
+                                   @NotNull OutputFormat format, @NotNull Path... dependencies)
+            throws SerializationException {
         if (!(Files.isDirectory(sources) || PathUtil.isJavaSourceFile(sources))) {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.invalidSourcesPath"));
         }
@@ -150,6 +168,8 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         OutputGenerator<Perfume> outputGenerator = getOutputGenerator(config, format);
 
         StatisticsSummary<Perfume> summary = StatisticsSummary.from(perfumeRegistry);
+
+        analysisContext = createAnalysisContext(sources, dependencies);
 
         if (Files.isDirectory(sources)) {
             List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
@@ -204,6 +224,10 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.notJavaSourceFile"));
         }
 
+        if (astParser == null) {
+            astParser = getConfiguredJavaParser();
+        }
+
         List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
 
         // Parse source file to AST
@@ -235,6 +259,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
         // Apply all Detectors on the AST
         for (Detector<Perfume> detector : perfumeRegistry.getRegisteredDetectors()) {
+            detector.setAnalysisContext(analysisContext);
             List<DetectedInstance<Perfume>> detections = detector.detect(ast);
             detections.forEach(det -> det.setSourceFile(javaSourceFilePath));
 
@@ -263,9 +288,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             boolean isNotEmpty = false;
 
             try (Stream<Path> paths = Files.list(config.getOutputDirectory())) {
-                isNotEmpty
-                        = paths.filter(path -> !path.getFileName().toString().endsWith(".gitkeep"))
-                                .findFirst().isPresent();
+                isNotEmpty = paths.anyMatch(path -> !path.getFileName().toString().endsWith(".gitkeep"));
 
             } catch (IOException e) {
                 log.error(i18n.getApplicationResource("log.error.analysis.unknown"));
@@ -294,5 +317,53 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             log.error(i18n.getApplicationResource("log.error.serialization.handle"));
             throw new SerializationException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Creates a context for resolving symbols from the provided source file/directory and the provided dependencies.
+     * A dependency must either be a JAR Archive or the root package of Java Source files - but be careful, the
+     * latter is not validated!
+     */
+    @NotNull
+    private JavaParserFacade createAnalysisContext(@NotNull Path sources, @NotNull Path... dependencies) {
+        if (astParser == null) {
+            astParser = getConfiguredJavaParser();
+        }
+
+        SymbolSolverCollectionStrategy strategy = new SymbolSolverCollectionStrategy(astParser.getParserConfiguration());
+        strategy.collect(sources);
+
+        // Very very ugly, but i don't see any other way to get the created TypeSolver at the moment
+        CombinedTypeSolver typeSolver;
+        try {
+            typeSolver = (CombinedTypeSolver) FieldUtils.readField(strategy, "typeSolver", true);
+        } catch (IllegalAccessException e) {
+            log.error(i18n.getApplicationResource("log.error.analysis.unknown"));
+            throw new AnalysisException(e.getMessage(), e);
+        }
+
+        for (Path dependency : dependencies) {
+            if (!Files.exists(dependency)) {
+                log.error(i18n.getApplicationResource("log.error.analysis.nonExistentDependency"));
+            }
+
+            if (dependency.endsWith(".jar")) {
+                JarTypeSolver jarSolver;
+                try {
+                    jarSolver = new JarTypeSolver(dependency);
+                } catch (Exception e) {
+                    log.error(i18n.getApplicationResource("log.error.analysis.dependencyUnresolvable"), dependency);
+                    continue;
+                }
+                typeSolver.add(jarSolver);
+
+            } else {
+                // TODO Cache limit ?
+                JavaParserTypeSolver jpTypeSolver = new JavaParserTypeSolver(dependency, astParser.getParserConfiguration());
+                typeSolver.add(jpTypeSolver);
+            }
+        }
+
+        return JavaParserFacade.get(typeSolver);
     }
 }

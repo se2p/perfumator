@@ -13,6 +13,7 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,6 +80,8 @@ public class DefensiveNullCheckDetector implements Detector<Perfume> {
 
     private Perfume perfume;
 
+    private JavaParserFacade analysisContext;
+
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedInstances = new ArrayList<>();
@@ -100,6 +103,11 @@ public class DefensiveNullCheckDetector implements Detector<Perfume> {
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
         perfume = concreteDetectable;
+    }
+
+    @Override
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+        this.analysisContext = analysisContext;
     }
 
     @NotNull

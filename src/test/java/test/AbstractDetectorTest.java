@@ -6,10 +6,19 @@ import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.DotPrinter;
-import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
-import de.jsilbereisen.perfumator.util.PathUtil;
+import com.github.javaparser.resolution.TypeSolver;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+
+import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
+import de.jsilbereisen.perfumator.util.PathUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,15 +31,26 @@ public abstract class AbstractDetectorTest {
 
     protected static final Path DEFAULT_DETECTOR_TEST_FILES_DIR = Path.of("src", "test", "resources", "detectors");
 
-    protected static final JavaParser PARSER = PerfumeDetectionEngine.getConfiguredJavaParser();
+    protected JavaParser parser;
+
+    @BeforeEach
+    void initParser() {
+        parser = PerfumeDetectionEngine.getConfiguredJavaParser();
+    }
 
     protected static CompilationUnit parseAstForFile(@NotNull Path path) {
+        final JavaParser parser = PerfumeDetectionEngine.getConfiguredJavaParser();
+
+        return parseAstForFile(parser, path);
+    }
+
+    protected static CompilationUnit parseAstForFile(@NotNull JavaParser parser, @NotNull Path path) {
         assert PathUtil.isJavaSourceFile(path) : "Path does not point to an existing single Java Source file.";
 
         ParseResult<CompilationUnit> result;
 
         try {
-            result = PARSER.parse(path);
+            result = parser.parse(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +84,7 @@ public abstract class AbstractDetectorTest {
      * Returns the parsed AST.
      */
     protected static CompilationUnit parseFileAndSaveDot(@NotNull Path javaSourceFile, @NotNull Path saveDirectory,
-                                              @NotNull String fileName) {
+                                                         @NotNull String fileName) {
         if (!PathUtil.isJavaSourceFile(javaSourceFile)) {
             throw new IllegalArgumentException(javaSourceFile + " is not a single Java Source file.");
         }
@@ -106,5 +126,53 @@ public abstract class AbstractDetectorTest {
         }
 
         log.info("Saved DOT-file");
+    }
+
+    /**
+     * Sets up the given parser for symbol resolution with the given dependencies.<br/>
+     * <b>CAUTION:</b> you need to create the analysis context <b>BEFORE</b> parsing the source file, in order for
+     * the {@link CompilationUnit} being able to find the resolver. So, first call this method, and then call
+     * {@link #parseAstForFile(JavaParser, Path)} with the <b>SAME</b> {@link JavaParser} instance.
+     *
+     * @param parser The parser.
+     * @param dependencies A list of all dependencies that are relevant. A dependency can be a JAR or a root package of
+     *                     Java source files. Otherwise, will probably throw an Exception or simply not work at runtime.
+     * @return The {@link JavaParserFacade} context, with the configured {@link TypeSolver}.
+     */
+    @NotNull
+    protected static JavaParserFacade getAnalysisContext(@NotNull JavaParser parser, @NotNull Path... dependencies) {
+        // Very very ugly, but i don't see any other way to get the created TypeSolver at the moment
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver());
+        /*
+        try {
+            typeSolver = (CombinedTypeSolver) FieldUtils.readField(strategy, "typeSolver", true);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+         */
+
+        for (Path dependency : dependencies) {
+            if (!Files.exists(dependency)) {
+                throw new IllegalArgumentException("Dependency \"" + dependency + "\" does not exist.");
+            }
+
+            if (dependency.endsWith(".jar")) {
+                JarTypeSolver jarSolver;
+                try {
+                    jarSolver = new JarTypeSolver(dependency);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Dependency \"" + dependency + "\" failed to be loaded by the " +
+                            "JarTypeSolver.", e);
+                }
+                typeSolver.add(jarSolver);
+
+            } else {
+                JavaParserTypeSolver jpTypeSolver = new JavaParserTypeSolver(dependency, parser.getParserConfiguration());
+                typeSolver.add(jpTypeSolver);
+            }
+        }
+
+        parser.getParserConfiguration().setSymbolResolver(new JavaSymbolSolver(typeSolver));
+        return JavaParserFacade.get(typeSolver);
     }
 }

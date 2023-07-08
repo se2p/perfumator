@@ -4,8 +4,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
@@ -20,6 +22,8 @@ import java.util.Optional;
 public class NoUtilityInitializationDetector implements Detector<Perfume> {
 
     private Perfume perfume;
+
+    private JavaParserFacade analysisContext;
 
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -44,6 +48,11 @@ public class NoUtilityInitializationDetector implements Detector<Perfume> {
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
         perfume = concreteDetectable;
+    }
+
+    @Override
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+        this.analysisContext = analysisContext;
     }
 
     private Optional<DetectedInstance<Perfume>> analyseType(ClassOrInterfaceDeclaration type) {

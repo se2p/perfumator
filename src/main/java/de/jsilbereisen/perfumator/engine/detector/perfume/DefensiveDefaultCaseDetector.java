@@ -3,7 +3,9 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.SwitchEntry;
 import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.SwitchStmtVisitor;
@@ -23,6 +25,8 @@ import java.util.Optional;
 public class DefensiveDefaultCaseDetector implements Detector<Perfume> {
 
     private Perfume perfume;
+
+    private JavaParserFacade analysisContext;
 
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -45,5 +49,10 @@ public class DefensiveDefaultCaseDetector implements Detector<Perfume> {
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
         perfume = concreteDetectable;
+    }
+
+    @Override
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+        this.analysisContext = analysisContext;
     }
 }

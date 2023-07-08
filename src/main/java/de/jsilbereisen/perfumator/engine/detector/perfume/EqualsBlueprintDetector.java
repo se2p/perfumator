@@ -14,7 +14,9 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
@@ -56,6 +58,8 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
 
     private Perfume perfume;
 
+    private JavaParserFacade analysisContext;
+
     /**
      * Starting point for detecting the {@link Perfume}.
      * For the checked steps, see the classes' JavaDoc comment.
@@ -89,6 +93,11 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
         perfume = concreteDetectable;
+    }
+
+    @Override
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+        this.analysisContext = analysisContext;
     }
 
     /**

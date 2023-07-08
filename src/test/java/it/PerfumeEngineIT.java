@@ -109,4 +109,5 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
         assertThat(summary.getAnalyzedFiles()).hasSize(5);
         assertThat(summary.getTotalDetections()).isEqualTo(6);
     }
+
 }

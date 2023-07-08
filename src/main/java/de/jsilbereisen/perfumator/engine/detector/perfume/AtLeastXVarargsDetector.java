@@ -15,7 +15,9 @@ import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.BinaryExprVisitor;
@@ -37,6 +39,8 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
             BinaryExpr.Operator.LESS_EQUALS, BinaryExpr.Operator.GREATER, BinaryExpr.Operator.GREATER_EQUALS);
 
     private Perfume perfume;
+
+    private JavaParserFacade analysisContext;
 
     /**
      * Searches for the "At least X Varargs" {@link Perfume} instances in the given AST by
@@ -68,6 +72,11 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
     @Override
     public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
         perfume = concreteDetectable;
+    }
+
+    @Override
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+        this.analysisContext = analysisContext;
     }
 
     /**

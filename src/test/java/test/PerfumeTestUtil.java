@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Set;
 
 import static org.mockito.Mockito.when;
