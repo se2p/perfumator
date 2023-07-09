@@ -70,17 +70,7 @@ public class TryWithResourcesDetector implements Detector<Perfume> {
 
         for (TryStmt tryStmt : tryStmts) {
             if (isPerfumed(tryStmt)) {
-                DetectedInstance<Perfume> detection = new DetectedInstance<>();
-                detection.setDetectable(perfume);
-                detection.setTypeName(type.getNameAsString());
-                detection.setConcreteCode(tryStmt.toString());
-
-                tryStmt.getRange().ifPresent(range -> {
-                    detection.setBeginningLineNumber(range.begin.line);
-                    detection.setEndingLineNumber(range.end.line);
-                });
-
-                detections.add(detection);
+                detections.add(DetectedInstance.from(tryStmt, perfume, type));
             }
         }
 

@@ -28,6 +28,7 @@ class TryWithResourcesDetectorTest extends AbstractDetectorTest {
     @BeforeAll
     static void init() {
         perfume = new Perfume();
+        perfume.setName("Use try-with-resources");
         DETECTOR.setConcreteDetectable(perfume);
         ast = parseAstForFile(TEST_FILE);
     }

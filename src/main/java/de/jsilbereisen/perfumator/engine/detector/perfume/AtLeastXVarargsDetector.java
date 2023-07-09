@@ -16,6 +16,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ import java.util.Set;
 /**
  * {@link Detector<Perfume>} for the "At least X Varargs" perfume.
  */
+@EqualsAndHashCode
 public class AtLeastXVarargsDetector implements Detector<Perfume> {
     private static final Set<BinaryExpr.Operator> OPERATORS_FOR_LENGTH_CHECK = Set.of(BinaryExpr.Operator.LESS,
             BinaryExpr.Operator.LESS_EQUALS, BinaryExpr.Operator.GREATER, BinaryExpr.Operator.GREATER_EQUALS);

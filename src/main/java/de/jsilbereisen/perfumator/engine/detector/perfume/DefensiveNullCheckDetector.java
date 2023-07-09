@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,6 +75,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.asOrElse;
  *     IEEE Conference on Software Maintenance, Reengineering, and Reverse Engineering (CSMR-WCRE), Antwerp, Belgium, 2014, pp. 343-347, doi: 10.1109/CSMR-WCRE.2014.6747191
  * </p>
  */
+@EqualsAndHashCode
 public class DefensiveNullCheckDetector implements Detector<Perfume> {
 
     private static final List<String> ANNOTATION_NAMES = List.of("NotNull", "Nonnull", "NonNull", "Nullable");

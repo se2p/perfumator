@@ -15,6 +15,7 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +53,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.getNameWithTypeParams;
  *     <li>Last: check for a correct cast, if no pattern-matching was used in the instanceof-check.</li>
  * </ul>
  */
+@EqualsAndHashCode
 public class EqualsBlueprintDetector implements Detector<Perfume> {
 
     private static final String EQUALS_SIGNATURE = "public boolean equals(Object)";

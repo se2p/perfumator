@@ -5,6 +5,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Detector for the 'No utility initialization' {@link Perfume}. Detects a Perfume when all of a classes' methods are
+ * static and the class has only private constructors.
+ */
 @Slf4j
+@EqualsAndHashCode
 public class NoUtilityInitializationDetector implements Detector<Perfume> {
 
     private Perfume perfume;
