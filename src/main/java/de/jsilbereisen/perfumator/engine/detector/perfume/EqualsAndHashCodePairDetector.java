@@ -81,9 +81,8 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
 
         for (MethodDeclaration method : type.getMethods()) {
             String methodName = method.getNameAsString();
-            AccessSpecifier accessSpecifier = method.getAccessSpecifier();
 
-            if (!AccessSpecifier.PUBLIC.equals(accessSpecifier)) {
+            if (!method.isPublic()) {
                 continue;
             }
 

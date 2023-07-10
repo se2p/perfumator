@@ -1,0 +1,9 @@
+{
+  "name": "Iterator next() follows the contract",
+  "description": "An object of a class which implements the \"Iterator\" interface allows iterating over a certain data structure, for example a list. The advantage of an \"Iterator\" is, that it can offer a \"remove()\" method that allows for safely removing the current data element from the data structure, when iterating over it. The methods used for iterating are called \"hasNext()\" and \"next()\". The latter has to fulfill a certain \"contract\" one could say, precisely, it must throw a \"NoSuchElementException\" when it is called without a remaining element in the iteration. This is behaviour is expected by developers using iterators, so missing this part can lead to unexpected errors. This Perfume checks whether a class that implements the \"java.util.Iterator\" interface takes this necessary step. The Perfume is inspired by the rule '\"Iterator.next()\" methods should throw \"NoSuchElementException\"' from SonarSource, which classifies not-fulfilling this rule as a bug.",
+  "detectorClassSimpleName": "IteratorNextContractDetector",
+  "i18nBaseBundleName": "iteratorNextContract",
+  "source": "https://rules.sonarsource.com/java/RSPEC-2272/",
+  "relatedPattern": "BUG",
+  "additionalInformation": null
+}

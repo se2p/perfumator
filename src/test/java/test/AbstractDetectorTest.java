@@ -44,6 +44,10 @@ public abstract class AbstractDetectorTest {
         return parseAstForFile(parser, path);
     }
 
+    /**
+     * Use this method when you set up an analysis context (e.g. via {@link #getAnalysisContext}) with a certain parser
+     * before you parse the AST, so that the resulting {@link CompilationUnit} knows the parser's resolver.
+     */
     protected static CompilationUnit parseAstForFile(@NotNull JavaParser parser, @NotNull Path path) {
         assert PathUtil.isJavaSourceFile(path) : "Path does not point to an existing single Java Source file.";
 
@@ -129,10 +133,17 @@ public abstract class AbstractDetectorTest {
     }
 
     /**
-     * Sets up the given parser for symbol resolution with the given dependencies.<br/>
+     * <p>
+     * Sets up the given parser for symbol resolution with the given dependencies.
+     * No matter if any dependencies are given, returns a context for at least symbol resolution via Reflection,
+     * allowing for resolving symbols of the Java standard library. If no dependencies are given, then JDK classes/symbols
+     * can be resolved + symbols that are defined within the AST that is analysed.
+     * </p>
+     * <p>
      * <b>CAUTION:</b> you need to create the analysis context <b>BEFORE</b> parsing the source file, in order for
      * the {@link CompilationUnit} being able to find the resolver. So, first call this method, and then call
      * {@link #parseAstForFile(JavaParser, Path)} with the <b>SAME</b> {@link JavaParser} instance.
+     * </p>
      *
      * @param parser The parser.
      * @param dependencies A list of all dependencies that are relevant. A dependency can be a JAR or a root package of
