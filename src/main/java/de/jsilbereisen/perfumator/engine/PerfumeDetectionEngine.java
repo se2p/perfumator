@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
+import static de.jsilbereisen.perfumator.util.PathUtil.toRealPath;
+
 /**
  * Engine for detecting {@link Perfume}s. Uses the <i>JavaParser</i> library for parsing
  * source files into an AST.<br/>
@@ -179,7 +181,10 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                     List<DetectedInstance<Perfume>> detections = detectInSingleSourceFile(sourceFile);
 
                     // Keep statistics
-                    summary.addToStatistics(sourceFile);
+                    toRealPath(sourceFile).ifPresentOrElse(
+                            summary::addToStatistics,
+                            () -> summary.addToStatistics(sourceFile)
+                    );
                     summary.addToStatistics(detections);
 
                     detectedPerfumes.addAll(detections);
@@ -261,7 +266,11 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         for (Detector<Perfume> detector : perfumeRegistry.getRegisteredDetectors()) {
             detector.setAnalysisContext(analysisContext);
             List<DetectedInstance<Perfume>> detections = detector.detect(ast);
-            detections.forEach(det -> det.setSourceFile(javaSourceFilePath));
+
+            detections.forEach(det -> toRealPath(javaSourceFilePath).ifPresentOrElse(
+                    det::setSourceFile,
+                    () -> det.setSourceFile(javaSourceFilePath)
+            ));
 
             detectedPerfumes.addAll(detections);
         }

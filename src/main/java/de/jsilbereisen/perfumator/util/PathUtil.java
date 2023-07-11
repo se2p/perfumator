@@ -2,11 +2,14 @@ package de.jsilbereisen.perfumator.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class PathUtil {
 
@@ -136,5 +139,26 @@ public class PathUtil {
         }
 
         return path;
+    }
+
+    /**
+     * Converts the given {@link Path} to a "real", unique {@link Path} by calling {@link Path#toRealPath}
+     * without any {@link LinkOption}s.
+     *
+     * @param path The {@link Path} to convert.
+     * @return An {@link Optional} with the converted, real {@link Path} if successful and {@link Optional#empty()}
+     *         otherwise.
+     */
+    @NotNull
+    public static Optional<Path> toRealPath(@NotNull Path path) {
+        if (!Files.exists(path)) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(path.toRealPath());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 }

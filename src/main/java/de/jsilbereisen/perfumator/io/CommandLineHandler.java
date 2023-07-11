@@ -19,6 +19,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
+import static de.jsilbereisen.perfumator.util.PathUtil.toRealPath;
+
 
 /**
  * Handles the command line on application start and invokes the appropriate actions, depending on the arguments and
@@ -53,7 +55,7 @@ public class CommandLineHandler {
         ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
         assert cliBundle != null;
 
-        log.info(cliBundle.getString("log.generic.locale") + " " + applicationLanguageName);
+        log.info(cliBundle.getString("log.generic.locale"), applicationLanguageName);
 
         if (cliInput.isPrintHelp()) {
             printHelp();
@@ -72,12 +74,11 @@ public class CommandLineHandler {
             return null;
         }
 
-        log.info(cliBundle.getString("log.generic.inputPath") + " "
-                + inputPath.toAbsolutePath());
-        log.info(cliBundle.getString("log.generic.outputPath") + " "
-                + outputPath.toAbsolutePath());
-        log.info(cliBundle.getString("log.generic.outputFormat") + " "
-                + cliInput.getOutputFormat().getAbbreviation());
+        toRealPath(inputPath).ifPresentOrElse(path -> log.info(cliBundle.getString("log.generic.inputPath"), path),
+                () -> log.info(cliBundle.getString("log.generic.inputPath"), inputPath.toAbsolutePath()));
+        toRealPath(outputPath).ifPresentOrElse(path -> log.info(cliBundle.getString("log.generic.outputPath"), path),
+                () -> log.info(cliBundle.getString("log.generic.outputPath"), outputPath.toAbsolutePath()));
+        log.info(cliBundle.getString("log.generic.outputFormat"), cliInput.getOutputFormat().getAbbreviation());
 
         return new EngineConfiguration(inputPath, outputPath, applicationLocale, cliInput.getOutputFormat());
     }
