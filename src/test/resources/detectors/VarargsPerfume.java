@@ -8,6 +8,14 @@ public class VarargsPerfume {
         return;
     }
 
+    static class Inner {
+
+        void perfumedInner(int first, int... remaining) {
+            doSomething();
+            return;
+        }
+    }
+
     // Not Perfumed: checks length + returns immediately
     void notPerfumed(int number, int... numbers) {
         if (numbers.length < 1) {

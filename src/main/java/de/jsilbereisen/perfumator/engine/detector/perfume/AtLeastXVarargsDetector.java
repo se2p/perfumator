@@ -5,6 +5,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.BinaryExprVisitor;
 import de.jsilbereisen.perfumator.engine.visitor.IfStmtVisitor;
-import de.jsilbereisen.perfumator.engine.visitor.MethodDeclarationVisitor;
+import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -56,16 +57,12 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
 
-        MethodDeclarationVisitor methodDeclarationVisitor = new MethodDeclarationVisitor();
-        astRoot.accept(methodDeclarationVisitor, null);
-        List<MethodDeclaration> methodDeclarations = methodDeclarationVisitor.getMethodDeclarations();
+        TypeVisitor typeVisitor = new TypeVisitor();
+        astRoot.accept(typeVisitor, null);
+        List<TypeDeclaration<?>> types = typeVisitor.getAllTypeDeclarations();
 
-        for (MethodDeclaration methodDeclaration : methodDeclarations) {
-            Optional<DetectedInstance<Perfume>> detected = checkForPerfume(methodDeclaration);
-            detected.ifPresent(det -> {
-                astRoot.getPrimaryTypeName().ifPresent(det::setTypeName);
-                detectedPerfumes.add(det);
-            });
+        for (TypeDeclaration<?> type : types) {
+            detectedPerfumes.addAll(analyseType(type));
         }
 
         return detectedPerfumes;
@@ -79,6 +76,26 @@ public class AtLeastXVarargsDetector implements Detector<Perfume> {
     @Override
     public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
         this.analysisContext = analysisContext;
+    }
+
+    /**
+     * Analyses the methods of a certain type.
+     *
+     * @param type The type's node in the AST.
+     * @return The list with all detections in the analysed type.
+     */
+    private List<DetectedInstance<Perfume>> analyseType(TypeDeclaration<?> type) {
+        List<DetectedInstance<Perfume>> detections = new ArrayList<>();
+        List<MethodDeclaration> methodDeclarations = type.getMethods();
+
+        for (MethodDeclaration methodDeclaration : methodDeclarations) {
+            checkForPerfume(methodDeclaration).ifPresent(det -> {
+                det.setTypeName(type.getNameAsString());
+                detections.add(det);
+            });
+        }
+
+        return detections;
     }
 
     /**

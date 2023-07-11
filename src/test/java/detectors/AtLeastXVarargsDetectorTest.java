@@ -35,14 +35,24 @@ class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectPerfume() {
-        List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
+        List<DetectedInstance<Perfume>> detections = DETECTOR.detect(ast);
 
-        assertThat(detected).hasSize(1);
-        assertThat(detected.get(0).getDetectable()).isEqualTo(perfume);
-        assertThat(detected.get(0).getBeginningLineNumber()).isEqualTo(6);
-        assertThat(detected.get(0).getEndingLineNumber()).isEqualTo(9);
-        assertThat(detected.get(0).getTypeName()).isEqualTo("VarargsPerfume");
-        assertThat(detected.get(0).getConcreteCode()).isNotEmpty();
+        assertThat(detections).hasSize(2);
+        detections.sort(DetectedInstance::compareTo);
+
+        DetectedInstance<Perfume> detected = detections.get(0);
+        assertThat(detected.getDetectable()).isEqualTo(perfume);
+        assertThat(detected.getTypeName()).isEqualTo("Inner");
+        assertThat(detected.getBeginningLineNumber()).isEqualTo(13);
+        assertThat(detected.getEndingLineNumber()).isEqualTo(16);
+        assertThat(detected.getConcreteCode()).isNotEmpty();
+
+        detected = detections.get(1);
+        assertThat(detected.getDetectable()).isEqualTo(perfume);
+        assertThat(detected.getTypeName()).isEqualTo("VarargsPerfume");
+        assertThat(detected.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(detected.getEndingLineNumber()).isEqualTo(9);
+        assertThat(detected.getConcreteCode()).isNotEmpty();
     }
 
 }
