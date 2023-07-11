@@ -1,9 +1,10 @@
 package i18n;
 
-import de.jsilbereisen.perfumator.i18n.Bundles;
-import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 
 import java.util.Locale;
 
@@ -14,14 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BundlesLoaderTest {
 
-    private static class TestA { }
-
-    private static class TestB { }
-
-    private Bundles resourceHolder;
-
     private static final BundlesLoader testBundlesLoader = new BundlesLoader("i18n",
             BundlesLoader.STANDARD_PERFUMES_PACKAGE);
+    private Bundles resourceHolder;
 
     @BeforeEach
     void resetLoadedResources() {
@@ -83,5 +79,11 @@ class BundlesLoaderTest {
 
         assertThat(resourceHolder.getCliBundle()).isNotNull();
         assertThat(resourceHolder.getCliBundle().getString("hello.world")).isEqualTo("Hello world");
+    }
+
+    private static class TestA {
+    }
+
+    private static class TestB {
     }
 }

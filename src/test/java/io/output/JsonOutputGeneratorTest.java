@@ -1,6 +1,10 @@
 package io.output;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.junit.jupiter.api.Test;
+import test.AbstractJsonOutputTest;
+import test.PerfumeTestUtil;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
 import de.jsilbereisen.perfumator.io.output.OutputGenerator;
@@ -8,9 +12,6 @@ import de.jsilbereisen.perfumator.io.output.json.PerfumeJsonOutputGenerator;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.junit.jupiter.api.Test;
-import test.AbstractJsonOutputTest;
-import test.PerfumeTestUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,11 +34,13 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         Path pathToExpectedOutput = OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("detections.json");
         assertThat(Files.exists(pathToExpectedOutput)).isTrue();
 
-        List<DetectedInstance<Perfume>> output = readList(new TypeReference<>() {}, pathToExpectedOutput);
+        List<DetectedInstance<Perfume>> output = readList(new TypeReference<>() {
+        }, pathToExpectedOutput);
         assertThat(output).hasSize(1);
 
         DetectedInstance<Perfume> outputPerfume = output.get(0);
-        DetectedInstance<Perfume> comparison = readSingle(new TypeReference<>() {},
+        DetectedInstance<Perfume> comparison = readSingle(new TypeReference<>() {
+                                                          },
                 OUTPUT_TEST_COMPARISON_RESOURCES_ROOT_DIR.resolve("testListingOutputForSingleSourceFile.json"));
 
         assertThat(outputPerfume).isEqualTo(comparison);
@@ -58,7 +61,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         List<Path> outputFiles = getDetectionsOutputPaths(LISTINGS_FILE_PATTERN);
         assertThat(outputFiles).hasSize(10);
 
-        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {};
+        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {
+        };
         outputFiles.forEach(path -> {
             List<DetectedInstance<Perfume>> deserialized = readList(typeRef, path);
 
@@ -82,7 +86,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         outputFiles.sort(Path::compareTo);
         assertThat(outputFiles).hasSize(2);
 
-        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {};
+        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {
+        };
         List<DetectedInstance<Perfume>> first = readList(typeRef, outputFiles.get(0));
         List<DetectedInstance<Perfume>> second = readList(typeRef, outputFiles.get(1));
 
@@ -106,7 +111,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         outputFiles.sort(Path::compareTo);
         assertThat(outputFiles).hasSize(1);
 
-        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {};
+        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {
+        };
         List<DetectedInstance<Perfume>> deserialized = readList(typeRef, outputFiles.get(0));
 
         assertThat(deserialized).hasSize(OutputConfiguration.MAX_BATCH_SIZE);
@@ -148,7 +154,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         assertThat(outputFiles.get(1).toString()).endsWith("detections_2.json");
         assertThat(outputFiles).hasSize(2);
 
-        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {};
+        TypeReference<List<DetectedInstance<Perfume>>> typeRef = new TypeReference<>() {
+        };
         List<DetectedInstance<Perfume>> deserialized = readList(typeRef, outputFiles.get(0));
         assertThat(deserialized).hasSize(100); // batch size
 
@@ -187,7 +194,8 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         Path summaryFile = OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve(Path.of("summary.json"));
         assertThat(Files.exists(summaryFile)).isTrue();
 
-        StatisticsSummary<Perfume> deserializedSummary = readStatistics(new TypeReference<>() {}, summaryFile, registry,
+        StatisticsSummary<Perfume> deserializedSummary = readStatistics(new TypeReference<>() {
+                                                                        }, summaryFile, registry,
                 Perfume.class);
 
         assertThat(deserializedSummary).isNotNull();

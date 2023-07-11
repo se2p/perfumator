@@ -1,9 +1,12 @@
 package util;
 
-import de.jsilbereisen.perfumator.model.*;
+import org.junit.jupiter.api.Test;
+
+import de.jsilbereisen.perfumator.model.DetectableComparator;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

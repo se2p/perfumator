@@ -1,16 +1,16 @@
 package i18n;
 
-import de.jsilbereisen.perfumator.i18n.Bundles;
-import de.jsilbereisen.perfumator.i18n.I18nIgnore;
-import de.jsilbereisen.perfumator.i18n.Internationalizable;
-import de.jsilbereisen.perfumator.model.Detectable;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import de.jsilbereisen.perfumator.i18n.Bundles;
+import de.jsilbereisen.perfumator.i18n.I18nIgnore;
+import de.jsilbereisen.perfumator.i18n.Internationalizable;
+import de.jsilbereisen.perfumator.model.Detectable;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,33 +21,6 @@ import static org.mockito.Mockito.when;
  * Tests for {@link Internationalizable}.
  */
 class InternationalizableTest {
-
-    @Setter
-    public static class I18nMe implements Internationalizable {
-
-        private String name = "foo";
-
-        private String missingResource = "missing";
-
-        @I18nIgnore
-        private String ignored = "ignored";
-
-        private int notAString;
-    }
-
-    @Setter
-    public static class I18nMeDetectable extends Detectable {
-
-        public I18nMeDetectable(@Nullable String name, @Nullable String description,
-                                @Nullable String detectorClassSimpleName, @Nullable String i18nBundleBaseName) {
-            super(name, description, detectorClassSimpleName, i18nBundleBaseName);
-        }
-
-        @Override
-        public Detectable clone() {
-            return null;
-        }
-    }
 
     private static final Bundles MOCKED_BUNDLES = Mockito.mock(Bundles.class);
 
@@ -120,5 +93,32 @@ class InternationalizableTest {
         assertThat(perfume.getSource()).isEqualTo("x");
         assertThat(perfume.getRelatedPattern()).isNull();
         assertThat(perfume.getAdditionalInformation()).isEqualTo("x");
+    }
+
+    @Setter
+    public static class I18nMe implements Internationalizable {
+
+        private String name = "foo";
+
+        private String missingResource = "missing";
+
+        @I18nIgnore
+        private String ignored = "ignored";
+
+        private int notAString;
+    }
+
+    @Setter
+    public static class I18nMeDetectable extends Detectable {
+
+        public I18nMeDetectable(@Nullable String name, @Nullable String description,
+                                @Nullable String detectorClassSimpleName, @Nullable String i18nBundleBaseName) {
+            super(name, description, detectorClassSimpleName, i18nBundleBaseName);
+        }
+
+        @Override
+        public Detectable clone() {
+            return null;
+        }
     }
 }

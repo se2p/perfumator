@@ -1,14 +1,14 @@
 package test.dummy;
 
 import com.github.javaparser.ast.CompilationUnit;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -33,8 +33,10 @@ public class DummyDetector implements Detector<Perfume> {
     }
 
     @Override
-    public void setConcreteDetectable(@NotNull Perfume concreteDetectable) { }
+    public void setConcreteDetectable(@NotNull Perfume concreteDetectable) {
+    }
 
     @Override
-    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) { }
+    public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
+    }
 }

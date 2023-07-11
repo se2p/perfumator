@@ -16,5 +16,7 @@ public class ConstructorDeclarationVisitor extends VoidVisitorAdapter<Object> {
     @Override
     public void visit(ConstructorDeclaration constructorDeclaration, Object o) {
         constructors.add(constructorDeclaration);
+
+        super.visit(constructorDeclaration, o);
     }
 }

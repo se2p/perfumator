@@ -1,12 +1,13 @@
 package test;
 
+import org.jetbrains.annotations.NotNull;
+import org.mockito.Mockito;
+
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
-import org.jetbrains.annotations.NotNull;
-import org.mockito.Mockito;
 
 import java.nio.file.Path;
 import java.util.Set;
@@ -24,7 +25,8 @@ public final class PerfumeTestUtil {
             "ExampleClass", 10, 20, "public class ExampleClass { }",
             Path.of("")).setSourceFile(null);
 
-    private PerfumeTestUtil() { }
+    private PerfumeTestUtil() {
+    }
 
     @NotNull
     public static Perfume singleExamplePerfume() {

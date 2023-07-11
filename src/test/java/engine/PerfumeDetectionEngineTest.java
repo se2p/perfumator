@@ -1,15 +1,16 @@
 package engine;
 
-import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import test.dummy.DummyDetector;
+
+import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
 import de.jsilbereisen.perfumator.engine.registry.DetectableRegistry;
 import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -23,23 +24,17 @@ import static org.mockito.Mockito.when;
 
 class PerfumeDetectionEngineTest {
 
-    private static DetectableRegistry<Perfume> registryMock;
-
-    private static Bundles bundlesMock;
-
     private static final Path SINGLE_JAVA_SOURCE = Path.of("src", "test", "resources", "sources", "java",
             "SomeJavaSourceFile.java");
-
     private static final Path SINGLE_MALFORMED_JAVA_SOURCE = Path.of("src", "test", "resources", "sources", "java",
             "MalformedJavaFile.java");
-
     private static final Path SINGLE_NON_JAVA = Path.of("src", "test", "resources", "sources", "other",
             "some_other_file.txt");
-
     private static final Path DIR_EMPTY = Path.of("src", "test", "resources", "sources", "empty");
-
     private static final Path DIR_SMALL_PROJECT = Path.of("src", "test", "resources", "sources", "projects",
             "small_project");
+    private static DetectableRegistry<Perfume> registryMock;
+    private static Bundles bundlesMock;
 
     @BeforeAll
     static void setupMocks() {

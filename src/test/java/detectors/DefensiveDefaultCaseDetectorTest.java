@@ -1,13 +1,14 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import test.AbstractDetectorTest;
+
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.DefensiveDefaultCaseDetector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import test.AbstractDetectorTest;
 
 import java.nio.file.Path;
 import java.util.List;

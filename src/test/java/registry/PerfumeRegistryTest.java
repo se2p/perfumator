@@ -1,12 +1,13 @@
 package registry;
 
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import test.dummy.DummyDetector;
-import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import de.jsilbereisen.perfumator.model.DetectableComparator;
-import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
 import org.junit.jupiter.api.Test;
+import test.dummy.DummyDetector;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.registry.PerfumeRegistry;
+import de.jsilbereisen.perfumator.model.DetectableComparator;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
 
 import java.util.ArrayList;
 import java.util.List;

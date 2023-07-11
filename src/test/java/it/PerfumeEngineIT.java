@@ -21,7 +21,7 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
 
     private static final Path IT_TEST_PROJECT = Path.of("src", "additional-integration-test-resources",
             "it-project");
-    
+
     @Test
     void analyseSourceDirectoryWithoutSerialization() {
         DetectionEngine<Perfume> engine = new PerfumeDetectionEngine();
@@ -70,7 +70,8 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
                 OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR), OutputFormat.JSON);
 
         // Check listing of detections
-        List<DetectedInstance<Perfume>> detections = readList(new TypeReference<>() {},
+        List<DetectedInstance<Perfume>> detections = readList(new TypeReference<>() {
+                                                              },
                 OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("detections.json"));
         detections.sort(DetectedInstance::compareTo);
 
@@ -101,7 +102,8 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
         assertThat(perf6.getBeginningLineNumber()).isEqualTo(6);
 
         // Check summary
-        StatisticsSummary<Perfume> summary = readStatistics(new TypeReference<>() {},
+        StatisticsSummary<Perfume> summary = readStatistics(new TypeReference<>() {
+                                                            },
                 OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("summary.json"), engine.getRegistry(),
                 Perfume.class);
 

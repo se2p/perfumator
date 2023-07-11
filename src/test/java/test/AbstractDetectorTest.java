@@ -33,11 +33,6 @@ public abstract class AbstractDetectorTest {
 
     protected JavaParser parser;
 
-    @BeforeEach
-    void initParser() {
-        parser = PerfumeDetectionEngine.getConfiguredJavaParser();
-    }
-
     protected static CompilationUnit parseAstForFile(@NotNull Path path) {
         final JavaParser parser = PerfumeDetectionEngine.getConfiguredJavaParser();
 
@@ -145,7 +140,7 @@ public abstract class AbstractDetectorTest {
      * {@link #parseAstForFile(JavaParser, Path)} with the <b>SAME</b> {@link JavaParser} instance.
      * </p>
      *
-     * @param parser The parser.
+     * @param parser       The parser.
      * @param dependencies A list of all dependencies that are relevant. A dependency can be a JAR or a root package of
      *                     Java source files. Otherwise, will probably throw an Exception or simply not work at runtime.
      * @return The {@link JavaParserFacade} context, with the configured {@link TypeSolver}.
@@ -185,5 +180,10 @@ public abstract class AbstractDetectorTest {
 
         parser.getParserConfiguration().setSymbolResolver(new JavaSymbolSolver(typeSolver));
         return JavaParserFacade.get(typeSolver);
+    }
+
+    @BeforeEach
+    void initParser() {
+        parser = PerfumeDetectionEngine.getConfiguredJavaParser();
     }
 }

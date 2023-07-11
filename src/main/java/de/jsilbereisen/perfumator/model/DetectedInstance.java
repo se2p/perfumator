@@ -2,7 +2,9 @@ package de.jsilbereisen.perfumator.model;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.github.javaparser.HasParentNode;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import lombok.Data;
@@ -14,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * {@link Detectable} instance that was detected in a source file.
@@ -127,8 +130,8 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
     }
 
     /**
-     * Returns a {@link DetectedInstance<T>}, filled with information from the given
-     * parameters (if the information is present).
+     * Returns a {@link DetectedInstance<T>}, filled with the position from the given node and the concrete code.
+     * No type information is set.
      *
      * @param node     {@link NodeWithRange} to extract positional information.
      * @param detected {@link T} that was detected by a {@link Detector<T>} and should be linked to the {@link DetectedInstance<T>}.
@@ -145,6 +148,36 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
         detectedInstance.setConcreteCode(node.toString());
 
         return detectedInstance;
+    }
+
+    /**
+     * Returns a {@link DetectedInstance} filled with positional information, the given {@link T} detectable,
+     * and the name of the Type (e.g. Class) that contains the node, extracted from the given AST.<br/>
+     * <b>CAUTION:</b><br/>
+     * ONLY {@link ClassOrInterfaceDeclaration}s will be detected as the direct parent type of the node,
+     * the returned {@link DetectedInstance} will likely have incorrect information if the real parent type is
+     * something else! So, only use this method if you are <b>sure</b> that the parent type is a
+     * {@link ClassOrInterfaceDeclaration}, or if you don't care about the set type name.
+     *
+     * @param detectable The {@link Detectable} to set for the {@link DetectedInstance}.
+     * @param node An AST node that has a parent, and a range.
+     * @param ast The AST where we will search the parent type ((abstract) class/interface) for the node.
+     * @return The crafted {@link DetectedInstance}.
+     * @param <T> The type of {@link Detectable} to be set.
+     * @param <S> Some type of AST node with a range and parent.
+     */
+    @SuppressWarnings("rawtype")
+    public static  <T extends Detectable, S extends NodeWithRange<?> & HasParentNode<?>> DetectedInstance<T> from(
+            @NotNull T detectable, @NotNull S node, @NotNull CompilationUnit ast) {
+        DetectedInstance<T> detection = DetectedInstance.from(node, detectable);
+
+        Optional<ClassOrInterfaceDeclaration> parentType = node.findAncestor(ClassOrInterfaceDeclaration.class);
+        parentType.ifPresentOrElse(
+                type -> detection.setTypeName(type.getNameAsString()),
+                () -> detection.setTypeName(ast.getPrimaryTypeName().orElse("UNKNOWN"))
+        );
+
+        return detection;
     }
 
     /**

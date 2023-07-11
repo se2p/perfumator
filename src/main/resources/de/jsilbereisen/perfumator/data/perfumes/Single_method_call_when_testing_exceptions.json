@@ -1,0 +1,9 @@
+{
+  "name": "Single Method call when testing for runtime exceptions",
+  "description": "Testing code for certain expected RuntimeExceptions is important to insure the expected behaviour. The test frameworks \"JUnit\" (since version 4.13) and \"AssertJ\" offer elegant solutions for this regular testing task, with the \"assertThrows\" or \"assertThatThrownBy\" methods, respectively. For clean usage of these methods though, one should not chain multiple method calls in order to provoke throwing of the expected exception, as it is not immediately clear WHICH of the chained method calls actually threw - or did not throw - the expected exception. So one should definitely only use a single method call in these framework-methods, for the sake of code-clarity and consistency. This Perfume is inspired by the rule \"Only one method invocation is expected when testing runtime exceptions\" from SonarSource, which classifies the method-chaining as a major Code Smell.",
+  "detectorClassSimpleName": "MethodCallRteTestingDetector",
+  "i18nBaseBundleName": "singleMethodCallExceptionTesting",
+  "source": "https://rules.sonarsource.com/java/RSPEC-5778/",
+  "relatedPattern": "SMELL",
+  "additionalInformation": "This Perfume supports the exception-testing methods from the frameworks \"JUnit\" (since version 4.13) and \"AssertJ\", as well as the try-catch-idiom, which was the proper exception-testing idiom with \"JUnit\" before version 4.13. The try-catch idiom is only seen as Perfumed though, if none of the framework methods are imported, as these should be preferred."
+}

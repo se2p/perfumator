@@ -23,6 +23,18 @@ public abstract class AbstractOutputTest {
     protected static final Path OUTPUT_TEST_COMPARISON_RESOURCES_ROOT_DIR = Path.of("src", "test", "resources",
             "io", "output", "comparisons");
 
+    protected static @NotNull List<Path> getDetectionsOutputPaths(@NotNull Pattern fileNamePattern) throws IOException {
+        List<Path> outputFiles;
+        try (Stream<Path> dirStream = Files.list(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR)) {
+            outputFiles = dirStream
+                    .filter(path -> Files.isRegularFile(path)
+                            && fileNamePattern.matcher(path.getFileName().toString()).matches()
+                            && !path.toString().endsWith(".gitkeep"))
+                    .collect(Collectors.toList());
+        }
+        return outputFiles;
+    }
+
     @BeforeEach
     @AfterEach
     void cleanTestDir() throws IOException {
@@ -37,18 +49,6 @@ public abstract class AbstractOutputTest {
                 }
             });
         }
-    }
-
-    protected static @NotNull List<Path> getDetectionsOutputPaths(@NotNull Pattern fileNamePattern) throws IOException {
-        List<Path> outputFiles;
-        try (Stream<Path> dirStream = Files.list(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR)) {
-            outputFiles = dirStream
-                    .filter(path -> Files.isRegularFile(path)
-                            && fileNamePattern.matcher(path.getFileName().toString()).matches()
-                            && !path.toString().endsWith(".gitkeep"))
-                    .collect(Collectors.toList());
-        }
-        return outputFiles;
     }
 
 }

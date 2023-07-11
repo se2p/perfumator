@@ -1,10 +1,11 @@
 package io;
 
-import de.jsilbereisen.perfumator.io.LanguageTag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import de.jsilbereisen.perfumator.io.LanguageTag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,13 +16,13 @@ class LanguageTagTest {
 
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = { "", "enen", "ENEN", " NE " })
+    @ValueSource(strings = {"", "enen", "ENEN", " NE "})
     void equalsIgnoreCaseUnhappy(String other) {
         assertThat(LanguageTag.EN.equalsTrimIgnoreCase(other)).isFalse();
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "en", "EN", " eN  "})
+    @ValueSource(strings = {"en", "EN", " eN  "})
     void equalsIgnoreCaseHappy(String other) {
         assertThat(LanguageTag.EN.equalsTrimIgnoreCase(other)).isTrue();
     }
@@ -40,7 +41,7 @@ class LanguageTagTest {
 
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = { "", "unknown"})
+    @ValueSource(strings = {"", "unknown"})
     void languageTagOfFallback(String str) {
         assertThat(LanguageTag.of(str)).isEqualTo(LanguageTag.EN);
     }
