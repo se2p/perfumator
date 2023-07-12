@@ -1,0 +1,9 @@
+{
+  "name": "JUnit 5 tests can be package-private",
+  "description": "Operating on the least required privileges is a well known coding principle. As Java lets us restrict the visibility of classes and their methods and fields, one should try to choose the most narrow scope possible for the desired use case. This also applies to unit tests, as they are just regular classes. Before JUnit 5, one had to make the tests as well as the test classes public, but now, this is no longer necessary - making them package-private is enough for JUnit to detect and execute them. Having those still public with JUnit 5 might just be a minor Code Smell, but it is generally important to always have the question in mind: \"Do I really need this accessibility, or can I reduce the scope?\". Even for unit tests. This Perfume is inspired by the Code Smell \"JUnit5 test classes and methods should have default package visibility\" from SonarSource.",
+  "detectorClassSimpleName": "PackagePrivateTestsDetector",
+  "i18nBaseBundleName": "packagePrivateTests",
+  "source": "https://rules.sonarsource.com/java/RSPEC-5786/",
+  "relatedPattern": "SMELL",
+  "additionalInformation": "Only compatible with JUnit version > 5. The Perfume will only be searched for if the JUnit 5 annotation \"org.junit.jupiter.api.Test\" or \"junit.jupiter.params.ParameterizedTest\" is imported. The test class is only seen as perfumed then, if EVERY method that is annotated with \"@Test\" or \"@ParameterizedTest\" has set its visibility to be package-private. Also, as mentioned in the description, one should choose the least privilege which does the job. In this case, we can not make the tests private, as JUnit then just silently ignores them - but package-private does the job."
+}

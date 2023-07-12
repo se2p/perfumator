@@ -33,6 +33,22 @@ public abstract class AbstractDetectorTest {
 
     protected JavaParser parser;
 
+    /**
+     * Create a new AST-parser for every test, so that every test can configure a symbol resolution context
+     * independently.
+     *
+     * @see #getAnalysisContext(JavaParser, Path...)
+     */
+    @BeforeEach
+    void initParser() {
+        parser = PerfumeDetectionEngine.getConfiguredJavaParser();
+    }
+
+    /**
+     * Parses the Java source file that is represented by the given {@link Path} to an AST and returns the
+     * resulting {@link CompilationUnit}. Uses a new {@link JavaParser} instance, created by the
+     * {@link PerfumeDetectionEngine#getConfiguredJavaParser()} method.
+     */
     protected static CompilationUnit parseAstForFile(@NotNull Path path) {
         final JavaParser parser = PerfumeDetectionEngine.getConfiguredJavaParser();
 
@@ -97,14 +113,14 @@ public abstract class AbstractDetectorTest {
     }
 
     /**
-     * Util method to quickly save an AST as a ".dot" file.
+     * Util method to quickly save an AST as a ".dot" file in the {@link #DEFAULT_DOT_DIR}.
      */
     protected static void saveAstAsDot(@NotNull Node node, @NotNull String fileName) {
         saveAstAsDot(node, DEFAULT_DOT_DIR, fileName);
     }
 
     /**
-     * Util method to quickly save an AST as a ".dot" file.
+     * Util method to quickly save an AST as a ".dot" file in the given save directory.
      */
     protected static void saveAstAsDot(@NotNull Node node, @NotNull Path saveDirectory, @NotNull String fileName) {
         DotPrinter printer = new DotPrinter(true);
@@ -182,8 +198,4 @@ public abstract class AbstractDetectorTest {
         return JavaParserFacade.get(typeSolver);
     }
 
-    @BeforeEach
-    void initParser() {
-        parser = PerfumeDetectionEngine.getConfiguredJavaParser();
-    }
 }
