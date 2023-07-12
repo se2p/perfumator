@@ -45,11 +45,23 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.as;
  */
 public class MethodCallRteTestingDetector implements Detector<Perfume> {
 
+    /**
+     * Mapping from method name to possible static imports of the classes that contain it. Might be multiple
+     * possible imports, because of different framework versions.
+     */
     public static final Map<String, Set<String>> EXCEPTION_TEST_METHOD_TO_CLASS = Map.of(
-            "assertThrows", Set.of("org.junit.jupiter.api.Assertions", "org.junit.Assert"), // Present in JUnit 5, 4.13
-            "assertThrowsExactly", Set.of("org.junit.jupiter.api.Assertions"), // Present only in JUnit 5
-            "assertThatThrownBy", Set.of("org.assertj.core.api.Assertions"));
+            // Present in JUnit 5, 4.13
+            "assertThrows", Set.of("org.junit.jupiter.api.Assertions", "org.junit.Assert"),
+            // Present only in JUnit 5
+            "assertThrowsExactly", Set.of("org.junit.jupiter.api.Assertions"),
+            // AssertJ
+            "assertThatThrownBy", Set.of("org.assertj.core.api.Assertions"),
+            // Fail method from JUnit 4 - do not support newer ones, the other methods should be prefered
+            "fail", Set.of("org.junit.Assert"));
 
+    /**
+     * Maps a framework method to an {@link ExceptionAssertionArgumentChecker} for the method.
+     */
     public static final Map<String, ExceptionAssertionArgumentChecker> EXCEPTION_TEST_METHOD_TO_ARGUMENT_CHECKER = Map.of(
             "assertThrows", new JUnitArgumentChecker(),
             "assertThrowsExactly", new JUnitArgumentChecker(),
@@ -60,6 +72,15 @@ public class MethodCallRteTestingDetector implements Detector<Perfume> {
 
     private JavaParserFacade analysisContext;
 
+    /**
+     * Detects the {@link Perfume} in the given AST. First analyses whether any interesting framework method/the
+     * class which contains it is statically imported, if so, searches for method calls to those and checks them for
+     * being perfumed. If none of the methods are imported, checks for the try-catch-idiom for {@link RuntimeException}
+     * testing and whether occurrences of it are perfumed.
+     *
+     * @param astRoot The root node of the AST in which the {@link Perfume} should be searched for.
+     * @return The list of detections of the {@link Perfume}.
+     */
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
@@ -67,27 +88,38 @@ public class MethodCallRteTestingDetector implements Detector<Perfume> {
         // If none of our known test-methods or the classes that contain them are imported, no reason to search
         Map<String, Boolean> frameworkMethodToNeedsClassNameOnCall = analyseImports(astRoot);
 
-        if (frameworkMethodToNeedsClassNameOnCall.isEmpty()) {
-            // look for the try-catch-idiom, if none of the known methods is imported
+        List<DetectedInstance<Perfume>> perfumedTryCatchIdioms = new ArrayList<>();
+        if (frameworkMethodToNeedsClassNameOnCall.containsKey("fail")) {
+            // look for the try-catch-idiom first
             TryStmtVisitor tryStmtVisitor = new TryStmtVisitor();
             astRoot.accept(tryStmtVisitor, null);
             List<TryStmt> tryStmts = tryStmtVisitor.getTryStmts();
 
             for (TryStmt tryStmt : tryStmts) {
                 if (isPerfumed(tryStmt)) {
-                    detections.add(from(perfume, tryStmt, astRoot));
+                    perfumedTryCatchIdioms.add(from(perfume, tryStmt, astRoot));
                 }
             }
 
-        } else {
-            // First, analyse all calls to the known methods from the frameworks
+            frameworkMethodToNeedsClassNameOnCall.remove("fail");
+        }
+
+        if (!frameworkMethodToNeedsClassNameOnCall.isEmpty()) {
+            // look for calls to the known methods from the frameworks (except "fail" calls)
             MethodCallByNameVisitor visitor = new MethodCallByNameVisitor();
             astRoot.accept(visitor, frameworkMethodToNeedsClassNameOnCall.keySet());
             List<MethodCallExpr> callsToCheck = visitor.getMethodCalls();
 
-            for (MethodCallExpr call : callsToCheck) {
-                if (isPerfumed(call, frameworkMethodToNeedsClassNameOnCall)) {
-                    detections.add(from(perfume, call, astRoot));
+            if (callsToCheck.isEmpty()) {
+                // If no framework methods are called, we accept the try-catch-idiom
+                detections.addAll(perfumedTryCatchIdioms);
+
+            } else {
+                // if we have method calls to check, ignore try-catch-idioms and analyse all the method calls
+                for (MethodCallExpr call : callsToCheck) {
+                    if (isPerfumed(call, frameworkMethodToNeedsClassNameOnCall)) {
+                        detections.add(from(perfume, call, astRoot));
+                    }
                 }
             }
         }

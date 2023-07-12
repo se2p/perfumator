@@ -38,22 +38,29 @@ class MethodCallRteTestingDetectorTest extends AbstractDetectorTest {
 
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
-        assertThat(detections).hasSize(2);
+        assertThat(detections).hasSize(3);
         detections.sort(DetectedInstance::compareTo);
 
         // JUnit method
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(13);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(13);
+        assertThat(detection.getBeginningLineNumber()).isEqualTo(14);
+        assertThat(detection.getEndingLineNumber()).isEqualTo(14);
 
         // AssertJ method
         detection = detections.get(1);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(19);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(19);
+        assertThat(detection.getBeginningLineNumber()).isEqualTo(20);
+        assertThat(detection.getEndingLineNumber()).isEqualTo(20);
+
+        // Other JUnit method
+        detection = detections.get(2);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
+        assertThat(detection.getBeginningLineNumber()).isEqualTo(26);
+        assertThat(detection.getEndingLineNumber()).isEqualTo(26);
     }
 
     @Test
@@ -67,7 +74,34 @@ class MethodCallRteTestingDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallTryCatch");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(10);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(15);
+        assertThat(detection.getBeginningLineNumber()).isEqualTo(12);
+        assertThat(detection.getEndingLineNumber()).isEqualTo(17);
+    }
+
+    @Test
+    void missingImports() {
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallMissingImports.java"));
+
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).isEmpty();
+    }
+
+    @Test
+    void notPerfumedFrameworkMethodCalls() {
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallNotPerfumed.java"));
+
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).isEmpty();
+    }
+
+    @Test
+    void notPerfumedTryCatch() {
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallTryCatchNotPerfumed.java"));
+
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).isEmpty();
     }
 }

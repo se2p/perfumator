@@ -2,11 +2,12 @@ package de.jsilbereisen.test;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert;
-import static org.junit.jupiter.api.Assertions;
-
-public class SingleMethodCallPerfume {
+/**
+ * All calls here are perfumed, but none should be detected, because the import is missing.
+ * This is an optimization to avoid unnecessary walking of ASTs, searching for method calls that would not
+ * even compile.
+ */
+public class SingleMethodCallMissingImports {
 
     @Test
     void singleMethodCallJUnit() {
@@ -24,5 +25,16 @@ public class SingleMethodCallPerfume {
     void singleMethodCallJUnit() {
         Object test = new Object();
         Assertions.assertThrowsExactly(IllegalStateException.class, () -> test.toString());
+    }
+
+    @Test
+    void singleMethodCallJUnitTryCatchIdiom() {
+        Object test = new Object();
+        try {
+            test.toString();
+            Assert.fail("Should have thrown IllegalStateException.");
+        } catch (IllegalStateException e) {
+            // Ignore here
+        }
     }
 }
