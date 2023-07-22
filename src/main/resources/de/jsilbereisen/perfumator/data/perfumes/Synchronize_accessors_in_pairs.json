@@ -1,0 +1,9 @@
+{
+  "name": "Synchronize accessors in pairs",
+  "description": "Parallelization is a difficult topic, which has to be handled carefully, as race conditions in parallel running code can be extremely hard to find. When writing code that uses parallelization, one can use the \"synchronized\" keyword to synchronize certain parts of the execution flow, to ensure consistent behaviour. A good example are accessor methods to fields of a class, the classic \"getters\" and \"setters\". If both exist but only one is synchronized, this is very likely a bug, and is labeled as one by a SonarSource. This Perfume then rewards avoiding parallelization bugs in this scenario, namely, when both accessors are synchronized.",
+  "detectorClassSimpleName": "SynchronizedAccessorsDetector",
+  "i18nBaseBundleName": "synchronizeAccessors",
+  "source": "https://rules.sonarsource.com/java/RSPEC-2886/",
+  "relatedPattern": "BUG",
+  "additionalInformation": null
+}
