@@ -1,12 +1,16 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.MethodCallRteTestingDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -45,22 +49,19 @@ class MethodCallRteTestingDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(14);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(14);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(14, 9, 14, 79));
 
         // AssertJ method
         detection = detections.get(1);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(20);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(20);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(20, 9, 20, 49));
 
         // Other JUnit method
         detection = detections.get(2);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(26);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(26);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(26, 9, 26, 90));
     }
 
     @Test
@@ -74,31 +75,14 @@ class MethodCallRteTestingDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SingleMethodCallTryCatch");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(12);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(17);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(12, 9, 17, 9));
     }
 
-    @Test
-    void missingImports() {
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallMissingImports.java"));
-
-        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
-
-        assertThat(detections).isEmpty();
-    }
-
-    @Test
-    void notPerfumedFrameworkMethodCalls() {
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallNotPerfumed.java"));
-
-        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
-
-        assertThat(detections).isEmpty();
-    }
-
-    @Test
-    void notPerfumedTryCatch() {
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SingleMethodCallTryCatchNotPerfumed.java"));
+    @ParameterizedTest
+    @ValueSource(strings = {"SingleMethodCallMissingImports.java", "SingleMethodCallNotPerfumed.java",
+            "SingleMethodCallTryCatchNotPerfumed.java"})
+    void notPerfumed(@NotNull String testFileName) {
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve(testFileName));
 
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 

@@ -34,13 +34,11 @@ class JsonOutputGeneratorTest extends AbstractJsonOutputTest {
         Path pathToExpectedOutput = OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("detections.json");
         assertThat(Files.exists(pathToExpectedOutput)).isTrue();
 
-        List<DetectedInstance<Perfume>> output = readList(new TypeReference<>() {
-        }, pathToExpectedOutput);
+        List<DetectedInstance<Perfume>> output = readList(new TypeReference<>() {}, pathToExpectedOutput);
         assertThat(output).hasSize(1);
 
         DetectedInstance<Perfume> outputPerfume = output.get(0);
-        DetectedInstance<Perfume> comparison = readSingle(new TypeReference<>() {
-                                                          },
+        DetectedInstance<Perfume> comparison = readSingle(new TypeReference<>() {},
                 OUTPUT_TEST_COMPARISON_RESOURCES_ROOT_DIR.resolve("testListingOutputForSingleSourceFile.json"));
 
         assertThat(outputPerfume).isEqualTo(comparison);

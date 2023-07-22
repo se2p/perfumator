@@ -8,6 +8,7 @@ import de.jsilbereisen.perfumator.engine.DetectionEngine;
 import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
 import de.jsilbereisen.perfumator.io.output.OutputFormat;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -33,32 +34,32 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
 
         DetectedInstance<Perfume> perf1 = detections.get(0);
         assertThat(perf1.getTypeName()).isEqualTo("HasPerfumes1");
-        assertThat(perf1.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf1.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 9, 5));
         assertThat(perf1.getDetectable().getDetectorClassSimpleName()).isEqualTo("AtLeastXVarargsDetector");
 
         DetectedInstance<Perfume> perf2 = detections.get(1);
         assertThat(perf2.getTypeName()).isEqualTo("HasPerfumes1");
-        assertThat(perf2.getBeginningLineNumber()).isEqualTo(13);
+        assertThat(perf2.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 22, 9));
         assertThat(perf2.getDetectable().getDetectorClassSimpleName()).isEqualTo("DefensiveDefaultCaseDetector");
 
         DetectedInstance<Perfume> perf3 = detections.get(2);
         assertThat(perf3.getTypeName()).isEqualTo("HasPerfumes2");
-        assertThat(perf3.getBeginningLineNumber()).isEqualTo(9);
+        assertThat(perf3.getCodeRanges()).containsExactly(CodeRange.of(9, 5, 11, 5));
         assertThat(perf3.getDetectable().getDetectorClassSimpleName()).isEqualTo("AtLeastXVarargsDetector");
 
         DetectedInstance<Perfume> perf4 = detections.get(3);
         assertThat(perf4.getTypeName()).isEqualTo("HasPerfumes2");
-        assertThat(perf4.getBeginningLineNumber()).isEqualTo(4);
+        assertThat(perf4.getCodeRanges()).containsExactly(CodeRange.of(4, 1, 12, 1));
         assertThat(perf4.getDetectable().getDetectorClassSimpleName()).isEqualTo("NoUtilityInitializationDetector");
 
         DetectedInstance<Perfume> perf5 = detections.get(4);
         assertThat(perf5.getTypeName()).isEqualTo("HasPerfumes4");
-        assertThat(perf5.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf5.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 14, 5));
         assertThat(perf5.getDetectable().getDetectorClassSimpleName()).isEqualTo("EqualsBlueprintDetector");
 
         DetectedInstance<Perfume> perf6 = detections.get(5);
         assertThat(perf6.getTypeName()).isEqualTo("HasPerfumes3");
-        assertThat(perf6.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf6.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 8, 5));
         assertThat(perf6.getDetectable().getDetectorClassSimpleName()).isEqualTo("DefensiveNullCheckDetector");
     }
 
@@ -70,8 +71,7 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
                 OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR), OutputFormat.JSON);
 
         // Check listing of detections
-        List<DetectedInstance<Perfume>> detections = readList(new TypeReference<>() {
-                                                              },
+        List<DetectedInstance<Perfume>> detections = readList(new TypeReference<>() {},
                 OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("detections.json"));
         detections.sort(DetectedInstance::compareTo);
 
@@ -79,31 +79,30 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
 
         DetectedInstance<Perfume> perf1 = detections.get(0);
         assertThat(perf1.getTypeName()).isEqualTo("HasPerfumes1");
-        assertThat(perf1.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf1.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 9, 5));
 
         DetectedInstance<Perfume> perf2 = detections.get(1);
         assertThat(perf2.getTypeName()).isEqualTo("HasPerfumes1");
-        assertThat(perf2.getBeginningLineNumber()).isEqualTo(13);
+        assertThat(perf2.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 22, 9));
 
         DetectedInstance<Perfume> perf3 = detections.get(2);
         assertThat(perf3.getTypeName()).isEqualTo("HasPerfumes2");
-        assertThat(perf3.getBeginningLineNumber()).isEqualTo(9);
+        assertThat(perf3.getCodeRanges()).containsExactly(CodeRange.of(9, 5, 11, 5));
 
         DetectedInstance<Perfume> perf4 = detections.get(3);
         assertThat(perf4.getTypeName()).isEqualTo("HasPerfumes2");
-        assertThat(perf4.getBeginningLineNumber()).isEqualTo(4);
+        assertThat(perf4.getCodeRanges()).containsExactly(CodeRange.of(4, 1, 12, 1));
 
         DetectedInstance<Perfume> perf5 = detections.get(4);
         assertThat(perf5.getTypeName()).isEqualTo("HasPerfumes4");
-        assertThat(perf5.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf5.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 14, 5));
 
         DetectedInstance<Perfume> perf6 = detections.get(5);
         assertThat(perf6.getTypeName()).isEqualTo("HasPerfumes3");
-        assertThat(perf6.getBeginningLineNumber()).isEqualTo(6);
+        assertThat(perf6.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 8, 5));
 
         // Check summary
-        StatisticsSummary<Perfume> summary = readStatistics(new TypeReference<>() {
-                                                            },
+        StatisticsSummary<Perfume> summary = readStatistics(new TypeReference<>() {},
                 OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR.resolve("summary.json"), engine.getRegistry(),
                 Perfume.class);
 

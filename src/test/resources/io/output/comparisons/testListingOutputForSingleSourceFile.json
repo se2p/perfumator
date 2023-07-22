@@ -1,8 +1,12 @@
 {
+  "codeRanges" : [ {
+    "beginLine" : 10,
+    "endLine" : 20,
+    "beginColumn" : 0,
+    "endColumn" : 0
+  } ],
   "detectable_name" : "Example",
   "typeName" : "ExampleClass",
-  "beginningLineNumber" : 10,
-  "endingLineNumber" : 20,
-  "concreteCode" : "public class ExampleClass { }",
+  "codeSnippets" : [ "public class ExampleClass { }" ],
   "sourceFile" : null
 }

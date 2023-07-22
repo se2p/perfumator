@@ -2,11 +2,14 @@ package util;
 
 import org.junit.jupiter.api.Test;
 
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectableComparator;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,18 +107,16 @@ class ComparatorsAndComparablesTest {
 
         // Fields of the DetectedInstance itself
         p1.setTypeName("SomeClass");
-        p1.setBeginningLineNumber(0);
-        p1.setEndingLineNumber(1);
+        p1.getCodeRanges().add(CodeRange.of(0, 1));
 
         p2.setTypeName("SomeClass");
-        p2.setBeginningLineNumber(0);
-        p2.setEndingLineNumber(1);
+        p2.getCodeRanges().add(CodeRange.of(0, 1));
 
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isZero();
 
         // Other fields are irrelevant to the comparison
-        p1.setConcreteCode("bli");
-        p2.setConcreteCode("bla");
+        p1.getCodeSnippets().add("bli");
+        p2.getCodeSnippets().add("bla");
 
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isZero();
     }
@@ -133,13 +134,15 @@ class ComparatorsAndComparablesTest {
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isNegative();
 
         p2.setTypeName("ClassA");
-        p1.setBeginningLineNumber(0);
-        p2.setBeginningLineNumber(10);
+        p1.getCodeRanges().add(CodeRange.of(0, 10));
+        p2.getCodeRanges().add(CodeRange.of(10, 10));
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isNegative();
 
-        p2.setBeginningLineNumber(0);
-        p1.setEndingLineNumber(0);
-        p2.setEndingLineNumber(10);
+        p1.getCodeRanges().clear();
+        p1.getCodeRanges().add(CodeRange.of(0, 0));
+
+        p2.getCodeRanges().clear();
+        p2.getCodeRanges().add(CodeRange.of(0, 10));
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isNegative();
     }
 }

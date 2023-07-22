@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.AtLeastXVarargsDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -44,16 +45,14 @@ class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detected = detections.get(0);
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("Inner");
-        assertThat(detected.getBeginningLineNumber()).isEqualTo(13);
-        assertThat(detected.getEndingLineNumber()).isEqualTo(16);
-        assertThat(detected.getConcreteCode()).isNotEmpty();
+        assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 16, 9));
+        assertThat(detected.getCodeSnippets()).isNotEmpty();
 
         detected = detections.get(1);
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("VarargsPerfume");
-        assertThat(detected.getBeginningLineNumber()).isEqualTo(6);
-        assertThat(detected.getEndingLineNumber()).isEqualTo(9);
-        assertThat(detected.getConcreteCode()).isNotEmpty();
+        assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 9, 5));
+        assertThat(detected.getCodeSnippets()).isNotEmpty();
     }
 
 }

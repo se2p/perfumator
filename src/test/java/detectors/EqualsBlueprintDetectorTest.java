@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.EqualsBlueprintDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -44,14 +45,12 @@ class EqualsBlueprintDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> first = detected.get(0);
         assertThat(first.getDetectable()).isEqualTo(perfume);
         assertThat(first.getTypeName()).isEqualTo("EqualsBlueprintPerfume");
-        assertThat(first.getBeginningLineNumber()).isEqualTo(16);
-        assertThat(first.getEndingLineNumber()).isEqualTo(26);
+        assertThat(first.getCodeRanges()).containsExactly(CodeRange.of(16, 5, 26, 5));
 
         DetectedInstance<Perfume> second = detected.get(1);
         assertThat(second.getDetectable()).isEqualTo(perfume);
         assertThat(second.getTypeName()).isEqualTo("ShouldBeDetected");
-        assertThat(second.getBeginningLineNumber()).isEqualTo(30);
-        assertThat(second.getEndingLineNumber()).isEqualTo(41);
+        assertThat(second.getCodeRanges()).containsExactly(CodeRange.of(30, 9, 41, 9));
     }
 
     @Test
@@ -65,8 +64,7 @@ class EqualsBlueprintDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> ret = detected.get(0);
         assertThat(ret.getDetectable()).isEqualTo(perfume);
         assertThat(ret.getTypeName()).isEqualTo("EqualsBlueprintWithPatternMatching");
-        assertThat(ret.getBeginningLineNumber()).isEqualTo(9);
-        assertThat(ret.getEndingLineNumber()).isEqualTo(18);
+        assertThat(ret.getCodeRanges()).containsExactly(CodeRange.of(9, 5, 18, 5));
     }
 
     @Test
@@ -80,7 +78,6 @@ class EqualsBlueprintDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> ret = detected.get(0);
         assertThat(ret.getDetectable()).isEqualTo(perfume);
         assertThat(ret.getTypeName()).isEqualTo("EqualsBlueprintWithGenerics");
-        assertThat(ret.getBeginningLineNumber()).isEqualTo(9);
-        assertThat(ret.getEndingLineNumber()).isEqualTo(17);
+        assertThat(ret.getCodeRanges()).containsExactly(CodeRange.of(9, 5, 17, 5));
     }
 }

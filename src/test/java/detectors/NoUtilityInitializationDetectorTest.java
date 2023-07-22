@@ -1,12 +1,16 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.NoUtilityInitializationDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -42,40 +46,14 @@ class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detectedInstance = detected.get(0);
         assertThat(detectedInstance.getDetectable()).isEqualTo(perfume);
         assertThat(detectedInstance.getTypeName()).isEqualTo("NoUtilityInitializationPerfume");
-        assertThat(detectedInstance.getBeginningLineNumber()).isEqualTo(8);
-        assertThat(detectedInstance.getEndingLineNumber()).isEqualTo(19);
+        assertThat(detectedInstance.getCodeRanges()).containsExactly(CodeRange.of(8, 1, 19, 1));
     }
 
-    @Test
-    void notPerfumedWhenHasNoDeclaredMethods() {
-        Path testFile = TEST_FILES_DIR.resolve("NoMethods.java");
-        CompilationUnit ast = parseAstForFile(testFile);
-        List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
-
-        assertThat(detected).isEmpty();
-    }
-
-    @Test
-    void notPerfumedImplicitConstructor() {
-        Path testFile = TEST_FILES_DIR.resolve("ImplicitConstructor.java");
-        CompilationUnit ast = parseAstForFile(testFile);
-        List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
-
-        assertThat(detected).isEmpty();
-    }
-
-    @Test
-    void notPerfumedExplicitPublicConstructor() {
-        Path testFile = TEST_FILES_DIR.resolve("ExplicitPublicConstructor.java");
-        CompilationUnit ast = parseAstForFile(testFile);
-        List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
-
-        assertThat(detected).isEmpty();
-    }
-
-    @Test
-    void notPerfumedNonStaticMethod() {
-        Path testFile = TEST_FILES_DIR.resolve("NonStaticMethod.java");
+    @ParameterizedTest
+    @ValueSource(strings = {"NoMethods.java", "ImplicitConstructor.java", "ExplicitPublicConstructor.java",
+            "NonStaticMethod.java"})
+    void notPerfumed(@NotNull String testFileName) {
+        Path testFile = TEST_FILES_DIR.resolve(testFileName);
         CompilationUnit ast = parseAstForFile(testFile);
         List<DetectedInstance<Perfume>> detected = DETECTOR.detect(ast);
 
@@ -93,8 +71,7 @@ class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detectedInstance = detected.get(0);
         assertThat(detectedInstance.getDetectable()).isEqualTo(perfume);
         assertThat(detectedInstance.getTypeName()).isEqualTo("WithInnerClass");
-        assertThat(detectedInstance.getBeginningLineNumber()).isEqualTo(9);
-        assertThat(detectedInstance.getEndingLineNumber()).isEqualTo(22);
+        assertThat(detectedInstance.getCodeRanges()).containsExactly(CodeRange.of(9, 1, 22, 1));
     }
 
     @Test
@@ -113,12 +90,10 @@ class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
 
         assertThat(perfumedInnerClass.getDetectable()).isEqualTo(perfume);
         assertThat(perfumedInnerClass.getTypeName()).isEqualTo("PerfumedInnerClass");
-        assertThat(perfumedInnerClass.getBeginningLineNumber()).isEqualTo(10);
-        assertThat(perfumedInnerClass.getEndingLineNumber()).isEqualTo(16);
+        assertThat(perfumedInnerClass.getCodeRanges()).containsExactly(CodeRange.of(10, 5, 16, 5));
 
         assertThat(perfumedStaticInnerClass.getDetectable()).isEqualTo(perfume);
         assertThat(perfumedStaticInnerClass.getTypeName()).isEqualTo("PerfumedStaticInnerClass");
-        assertThat(perfumedStaticInnerClass.getBeginningLineNumber()).isEqualTo(18);
-        assertThat(perfumedStaticInnerClass.getEndingLineNumber()).isEqualTo(23);
+        assertThat(perfumedStaticInnerClass.getCodeRanges()).containsExactly(CodeRange.of(18, 5, 23, 5));
     }
 }

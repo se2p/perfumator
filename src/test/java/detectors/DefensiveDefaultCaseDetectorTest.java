@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.DefensiveDefaultCaseDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -43,7 +44,6 @@ class DefensiveDefaultCaseDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> first = detected.get(0);
         assertThat(first.getDetectable()).isEqualTo(perfume);
         assertThat(first.getTypeName()).isEqualTo("DefensiveDefaultCase");
-        assertThat(first.getBeginningLineNumber()).isEqualTo(11);
-        assertThat(first.getEndingLineNumber()).isEqualTo(20);
+        assertThat(first.getCodeRanges()).containsExactly(CodeRange.of(11, 9, 20, 9));
     }
 }

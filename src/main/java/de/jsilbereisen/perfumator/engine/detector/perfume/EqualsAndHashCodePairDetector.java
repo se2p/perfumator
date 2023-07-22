@@ -1,6 +1,5 @@
 package de.jsilbereisen.perfumator.engine.detector.perfume;
 
-import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -17,6 +16,7 @@ import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.as;
 
@@ -52,9 +52,7 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
         types.addAll(typeVisitor.getRecordDeclarations());
 
         for (TypeDeclaration<?> type : types) {
-            if (isPerfumed(type)) {
-                detections.add(DetectedInstance.from(type, perfume, type));
-            }
+            analyseType(type).ifPresent(detections::add);
         }
 
         return detections;
@@ -70,14 +68,14 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
         this.analysisContext = analysisContext;
     }
 
-    private boolean isPerfumed(TypeDeclaration<?> type) {
+    private Optional<DetectedInstance<Perfume>> analyseType(TypeDeclaration<?> type) {
         ClassOrInterfaceDeclaration decl = as(type, ClassOrInterfaceDeclaration.class);
         if (decl != null && decl.isInterface()) {
-            return false;
+            return Optional.empty();
         }
 
-        boolean overridesEquals = false;
-        boolean overridesHashCode = false;
+        MethodDeclaration equals = null;
+        MethodDeclaration hashCode = null;
 
         for (MethodDeclaration method : type.getMethods()) {
             String methodName = method.getNameAsString();
@@ -94,7 +92,7 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
                         .count() == 1;
 
                 if (returnsBoolean && hasSingleObjectParameter) {
-                    overridesEquals = true;
+                    equals = method;
                 }
 
             } else if (HASHCODE_NAME.equals(methodName)) {
@@ -102,12 +100,14 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
                 boolean hasNoParameters = method.getParameters().isEmpty();
 
                 if (returnsInt && hasNoParameters) {
-                    overridesHashCode = true;
+                    hashCode = method;
                 }
             }
         }
 
-        return overridesEquals && overridesHashCode;
+        return equals != null && hashCode != null
+                ? Optional.of(DetectedInstance.from(perfume, type, equals, hashCode))
+                : Optional.empty();
     }
 
 }

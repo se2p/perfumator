@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,11 @@ import org.jetbrains.annotations.Nullable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 /**
  * {@link Detectable} instance that was detected in a source file.
@@ -35,12 +40,11 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      */
     private String typeName;
 
-    private int beginningLineNumber;
-
-    private int endingLineNumber;
+    private final TreeSet<CodeRange> codeRanges = new TreeSet<>();
 
     @ToString.Exclude
-    private String concreteCode;
+    @EqualsAndHashCode.Exclude
+    private final List<String> codeSnippets = new ArrayList<>();
 
     private Path sourceFile;
 
@@ -48,13 +52,15 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
     }
 
     public DetectedInstance(@Nullable T detectable, @Nullable String typeName, int beginningLineNumber,
-                            int endingLineNumber, @Nullable String concreteCode, @NotNull Path sourceFile) {
+                            int endingLineNumber, @Nullable String codeSnippet, @NotNull Path sourceFile) {
+        this.codeRanges.add(CodeRange.of(beginningLineNumber, endingLineNumber));
         this.detectable = detectable;
         this.typeName = typeName;
-        this.beginningLineNumber = beginningLineNumber;
-        this.endingLineNumber = endingLineNumber;
-        this.concreteCode = concreteCode;
         this.sourceFile = sourceFile;
+
+        if (codeSnippet != null) {
+            this.codeSnippets.add(codeSnippet);
+        }
     }
 
     /**
@@ -66,9 +72,8 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
     public DetectedInstance(@NotNull DetectedInstance<T> detectedInstance) {
         this.detectable = detectedInstance.detectable != null ? (T) detectedInstance.detectable.clone() : null;
         this.typeName = detectedInstance.typeName;
-        this.beginningLineNumber = detectedInstance.beginningLineNumber;
-        this.endingLineNumber = detectedInstance.endingLineNumber;
-        this.concreteCode = detectedInstance.concreteCode;
+        this.codeRanges.addAll(detectedInstance.codeRanges);
+        this.codeSnippets.addAll(detectedInstance.codeSnippets);
         this.sourceFile = detectedInstance.sourceFile;
     }
 
@@ -142,10 +147,26 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
     public static <T extends Detectable> DetectedInstance<T> from(@NotNull NodeWithRange<?> node, @Nullable T detected) {
         DetectedInstance<T> detectedInstance = new DetectedInstance<>();
 
+        detectedInstance.detectable = detected;
+        CodeRange.of(node).ifPresent(detectedInstance.codeRanges::add);
+        detectedInstance.codeSnippets.add(node.toString());
+
+        return detectedInstance;
+    }
+
+    @NotNull
+    public static <T extends Detectable> DetectedInstance<T> from(@NotNull T detected,
+                                                                  @NotNull TypeDeclaration<?> typeDeclaration,
+                                                                  @NotNull NodeWithRange<?>... perfumedCodeParts) {
+        DetectedInstance<T> detectedInstance = new DetectedInstance<>();
+
         detectedInstance.setDetectable(detected);
-        node.getBegin().ifPresent(pos -> detectedInstance.setBeginningLineNumber(pos.line));
-        node.getEnd().ifPresent(pos -> detectedInstance.setEndingLineNumber(pos.line));
-        detectedInstance.setConcreteCode(node.toString());
+        detectedInstance.setTypeName(typeDeclaration.getName().getIdentifier());
+
+        for (NodeWithRange<?> node : perfumedCodeParts) {
+            CodeRange.of(node).ifPresent(detectedInstance.codeRanges::add);
+            detectedInstance.codeSnippets.add(node.toString());
+        }
 
         return detectedInstance;
     }
@@ -166,7 +187,7 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      * @param <T> The type of {@link Detectable} to be set.
      * @param <S> Some type of AST node with a range and parent.
      */
-    @SuppressWarnings("rawtype")
+    @SuppressWarnings("unchecked")
     public static  <T extends Detectable, S extends NodeWithRange<?> & HasParentNode<?>> DetectedInstance<T> from(
             @NotNull T detectable, @NotNull S node, @NotNull CompilationUnit ast) {
         DetectedInstance<T> detection = DetectedInstance.from(node, detectable);
@@ -233,13 +254,19 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
             return typeNameComparisonResult;
         }
 
-        // compare by begin line numbers
-        int beginLineNumberComparisonResult = beginningLineNumber - other.getBeginningLineNumber();
-        if (beginLineNumberComparisonResult != 0) {
-            return beginLineNumberComparisonResult;
+        // Compare by code ranges
+        Iterator<CodeRange> thisIterator = codeRanges.iterator();
+        Iterator<CodeRange> otherIterator = other.codeRanges.iterator();
+
+        while (thisIterator.hasNext() && otherIterator.hasNext()) {
+            int comparison = thisIterator.next().compareTo(otherIterator.next());
+
+            if (comparison != 0) {
+                return comparison;
+            }
         }
 
-        // final comparison on ending line numbers
-        return endingLineNumber - other.endingLineNumber;
+        // If all elements are equal until one has no more code ranges, prefer the one with more code ranges
+        return other.codeRanges.size() - codeRanges.size();
     }
 }

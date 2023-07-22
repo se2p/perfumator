@@ -9,6 +9,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.PackagePrivateTestsDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -45,14 +46,13 @@ class PackagePrivateTestsDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("PackagePrivateTestsPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(6);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(18);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(6, 1, 18, 1));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"PackagePrivateTestsClassPublic",
             "PackagePrivateTestsNoImports", "PackagePrivateTestsMethodPublic"})
-    void noImports(String testFileName) {
+    void notPerfumed(String testFileName) {
         CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve(testFileName + ".java"));
 
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);

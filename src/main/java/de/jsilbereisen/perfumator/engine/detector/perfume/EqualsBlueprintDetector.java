@@ -141,10 +141,9 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
         }
 
         // Analyse the found equals-method
-        Optional<DetectedInstance<Perfume>> detectedInstance = analyseEqualsMethod(methodBody.get(), paramName, typeNameWithGenerics);
-        detectedInstance.ifPresent(det -> det.setTypeName(type.getNameAsString())); // Dont want generics params here
+        boolean isPerfumed = analyseEqualsMethod(methodBody.get(), paramName, typeNameWithGenerics);
 
-        return detectedInstance;
+        return isPerfumed ? Optional.of(DetectedInstance.from(equalsMethod.get(), perfume, type)) : Optional.empty();
     }
 
     /**
@@ -153,21 +152,19 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
      * @param equalsMethodBody The {@link BlockStmt} that represents the {@code equals} method's body.
      * @param paramName        The identifier of the {@link Object} parameter of the method.
      * @param typeName         The name of the type <b>with generic parameters</b> that contains this {@code equals} method.
-     * @return An {@link Optional} with the detected Perfume instance if one was found. Otherwise,
-     * returns {@link Optional#empty()}.
+     * @return {@code true} if the equals-method is perfumed.
      */
-    private Optional<DetectedInstance<Perfume>> analyseEqualsMethod(@NotNull BlockStmt equalsMethodBody,
-                                                                    @NotNull String paramName,
-                                                                    @NotNull String typeName) {
+    private boolean analyseEqualsMethod(@NotNull BlockStmt equalsMethodBody, @NotNull String paramName,
+                                        @NotNull String typeName) {
         NodeList<Statement> bodyStatements = equalsMethodBody.getStatements();
 
         if (bodyStatements.isEmpty()) {
-            return Optional.empty();
+            return false;
         }
 
         Statement first = bodyStatements.get(0);
         if (!isCheckingReferenceEquality(first, paramName)) {
-            return Optional.empty();
+            return false;
         }
 
         IfStmt firstIfStmt = first.asIfStmt();
@@ -187,25 +184,19 @@ public class EqualsBlueprintDetector implements Detector<Perfume> {
         boolean isCheckingTypeCorrectly = isCheckingType.getFirst();
         boolean usesPatternMatching = isCheckingType.getSecond();
         if (!isCheckingTypeCorrectly) {
-            return Optional.empty();
+            return false;
         } else if (usesPatternMatching) {
-            return Optional.of(DetectedInstance.from(equalsMethodBody, perfume, typeName));
+            return true;
         }
 
         // If no pattern-matching is used, we need to look for a cast
         // No statement at the position where the cast is expected => no perfume
         if (indexOfCastStmt < 0 || bodyStatements.size() <= indexOfCastStmt) {
-            return Optional.empty();
+            return false;
         }
 
         Statement statement = bodyStatements.get(indexOfCastStmt);
-        boolean isCorrectCast = isCorrectCast(statement, paramName, typeName);
-
-        if (!isCorrectCast) {
-            return Optional.empty();
-        }
-
-        return Optional.of(DetectedInstance.from(equalsMethodBody, perfume, typeName));
+        return isCorrectCast(statement, paramName, typeName);
     }
 
     /**

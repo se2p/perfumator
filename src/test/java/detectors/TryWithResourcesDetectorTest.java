@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.TryWithResourcesDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -42,7 +43,6 @@ class TryWithResourcesDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("UseTryWithResources");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(6);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(10);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(6, 9, 10, 9));
     }
 }

@@ -9,6 +9,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.IteratorNextContractDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -50,8 +51,7 @@ class IteratorNextContractDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("IteratorNextContractPerfume");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(11);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(19);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(11, 5, 19, 5));
     }
 
     @Test
@@ -67,8 +67,7 @@ class IteratorNextContractDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("IteratorNextContractWithVariable");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(13);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(21);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(13, 5, 21, 5));
     }
 
     @Test
@@ -85,26 +84,22 @@ class IteratorNextContractDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("MethodCallElseBranch");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(12);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(19);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(12, 9, 19, 9));
 
         detection = detections.get(1);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("MethodCallLastStmt");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(26);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(33);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(26, 9, 33, 9));
 
         detection = detections.get(2);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("VariableElseBranch");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(43);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(48);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(43, 9, 48, 9));
 
         detection = detections.get(3);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("VariableLastStmt");
-        assertThat(detection.getBeginningLineNumber()).isEqualTo(58);
-        assertThat(detection.getEndingLineNumber()).isEqualTo(65);
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(58, 9, 65, 9));
     }
 
     @Test

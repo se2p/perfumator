@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.DefensiveNullCheckDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -44,8 +45,7 @@ class DefensiveNullCheckDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> first = detectedInstances.get(0);
         assertThat(first.getDetectable()).isEqualTo(perfume);
         assertThat(first.getTypeName()).isEqualTo("DefensiveNullCheckPerfume");
-        assertThat(first.getBeginningLineNumber()).isEqualTo(12);
-        assertThat(first.getEndingLineNumber()).isEqualTo(17);
+        assertThat(first.getCodeRanges()).containsExactly(CodeRange.of(12, 5, 17, 5));
     }
 
     @Test

@@ -7,6 +7,7 @@ import test.AbstractDetectorTest;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.EqualsAndHashCodePairDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
@@ -42,14 +43,14 @@ class EqualsAndHashCodePairDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detected = detections.get(0);
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("PairEqualsAndHashCode");
-        assertThat(detected.getBeginningLineNumber()).isEqualTo(3);
-        assertThat(detected.getEndingLineNumber()).isEqualTo(34);
+        assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(32, 5, 32, 54),
+                CodeRange.of(33, 5, 33, 40));
 
         // Check second
         detected = detections.get(1);
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("Perfumed");
-        assertThat(detected.getBeginningLineNumber()).isEqualTo(5);
-        assertThat(detected.getEndingLineNumber()).isEqualTo(8);
+        assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(6, 9, 6, 58),
+                CodeRange.of(7, 9, 7, 41));
     }
 }
