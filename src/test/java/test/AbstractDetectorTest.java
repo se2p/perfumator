@@ -27,7 +27,7 @@ import java.nio.file.Path;
 @Slf4j
 public abstract class AbstractDetectorTest {
 
-    protected static final Path DEFAULT_DOT_DIR = Path.of("src", "test", "resources", "graphics", "dot");
+    protected static final Path DEFAULT_DOT_DIR = Path.of("graphics", "dot");
 
     protected static final Path DEFAULT_DETECTOR_TEST_FILES_DIR = Path.of("src", "test", "resources", "detectors");
 
@@ -123,6 +123,11 @@ public abstract class AbstractDetectorTest {
      * Util method to quickly save an AST as a ".dot" file in the given save directory.
      */
     protected static void saveAstAsDot(@NotNull Node node, @NotNull Path saveDirectory, @NotNull String fileName) {
+        if (!Files.isDirectory(saveDirectory)) {
+            throw new IllegalArgumentException("The directory where the \".dot\" file to generate should be saved " +
+                    "does not exist.");
+        }
+
         DotPrinter printer = new DotPrinter(true);
         String dotString = printer.output(node);
 

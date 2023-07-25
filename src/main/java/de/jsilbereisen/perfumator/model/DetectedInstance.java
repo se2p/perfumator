@@ -17,11 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * {@link Detectable} instance that was detected in a source file.
@@ -40,7 +36,7 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      */
     private String typeName;
 
-    private final TreeSet<CodeRange> codeRanges = new TreeSet<>();
+    private final Set<CodeRange> codeRanges = new TreeSet<>();
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
