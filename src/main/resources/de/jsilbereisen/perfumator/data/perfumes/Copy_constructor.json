@@ -1,0 +1,9 @@
+{
+  "name": "Copy constructor",
+  "description": "There are several solutions to implement making copies of an object in Java. The standard library offers the \"Cloneable\" interface, which classes can implement in order to be able to copy instances of themselves. But as Joshua Bloch explains in his book \"Effective Java\" (Chapter 3.4), one has to be very careful when implementing this interface, there are several dangers hidden regarding inheritance. Instead, a cleaner way that he proposes for making copies of an object is a copy-constructor: a constructor that takes an object of the same class as its parameter and deep-copies all of its fields (meaning also making a deep copy of all mutable, non-primitive fields). This approach ensures the desired runtime type of the desired object and is not as susceptible to errors as implementing \"Cloneable\". Even though there is no specific rule for it, the IntelliJ IDEA plugin \"SonarLint\" from SonarSource also marks implementing the \"Cloneable\" interface as a Code Smell, for the reasons described before.",
+  "detectorClassSimpleName": "CopyConstructorDetector",
+  "i18nBaseBundleName": "copyConstructor",
+  "source": "J. Bloch: Effective Java, Chap. 3.4",
+  "relatedPattern": "SMELL",
+  "additionalInformation": "Another option for avoiding \"Cloneable\" for copying objects could be to define (static) copy methods or a custom interface, that has a copy method."
+}

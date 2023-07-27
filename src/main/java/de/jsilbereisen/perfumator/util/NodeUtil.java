@@ -14,10 +14,11 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
-import de.jsilbereisen.perfumator.engine.detector.Detector;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import de.jsilbereisen.perfumator.engine.detector.Detector;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -184,5 +185,72 @@ public final class NodeUtil {
         }
 
         return Optional.ofNullable(resolved);
+    }
+
+    /*
+    public static <TO extends Node & Resolvable<ResolvedValueDeclaration>,
+            WHAT extends Node & NodeWithSimpleName<WHAT> & Resolvable<ResolvedReferenceTypeDeclaration>>
+    boolean safeCanBeAssignedTo(@NotNull TO potentialSuperType, @NotNull WHAT base, @NotNull Detector<?> detector) {
+
+        Optional<ResolvedValueDeclaration> resolvedValueDecl = resolveSafely(potentialSuperType, detector,
+                potentialSuperType.toString());
+        if (resolvedValueDecl.isEmpty()) {
+            return false;
+        }
+
+        ResolvedType resolvedValueDeclType = resolvedValueDecl.get().getType();
+        if (!resolvedValueDeclType.isReferenceType()) {
+            return false;
+        }
+
+        ResolvedReferenceType resolvedRefType = resolvedValueDeclType.asReferenceType();
+        Optional<ResolvedReferenceTypeDeclaration> resolvedValueDeclTypeDecl = resolvedRefType.getTypeDeclaration();
+        if (resolvedValueDeclTypeDecl.isEmpty()) {
+            return false;
+        }
+
+        Optional<ResolvedReferenceTypeDeclaration> resolvedBaseTypeDecl = resolveSafely(base, detector,
+                base.getNameAsString());
+        if (resolvedBaseTypeDecl.isEmpty()) {
+            return false;
+        }
+
+        return safeCheckAssignableBy(resolvedValueDeclTypeDecl.get(), resolvedBaseTypeDecl.get());
+    }
+    */
+
+    /**
+     * Safely checks whether the given base type could be assigned to the given potential super type.
+     *
+     * @param potentialSuperType The potential super type.
+     * @param baseType           The base type, from which we want to check if it is assignable to the potential super type.
+     * @return {@code true} if the base type could be assigned to the potential super type.
+     */
+    public static boolean safeCheckAssignableBy(@NotNull ResolvedReferenceTypeDeclaration potentialSuperType,
+                                                @NotNull ResolvedReferenceTypeDeclaration baseType) {
+        try {
+            return potentialSuperType.isAssignableBy(baseType);
+        } catch (Exception e) {
+            log.debug("Unable to check whether " + baseType.getQualifiedName() + " is a subtype of "
+                    + potentialSuperType.getQualifiedName() + ".", e);
+            return false;
+        }
+    }
+
+    /**
+     * Runs the given {@link Supplier}, but wraps it in a try-catch-block that catches {@link UnsolvedSymbolException}.
+     *
+     * @param actionWithResolution {@link Supplier} that results in some {@link T}, using <i>JavaParsers</i> symbol
+     *                                             resolutions mechanisms.
+     * @return An {@link Optional} with the supplier's result, if no {@link UnsolvedSymbolException} occurred.
+     * Returns {@link Optional#empty()} otherwise.
+     * @param <T> The return-type of the given supplier.
+     */
+    public static <T> Optional<T> safeResolutionAction(@NotNull Supplier<T> actionWithResolution) {
+        try {
+            return Optional.of(actionWithResolution.get());
+        } catch (UnsolvedSymbolException e) {
+            return Optional.empty();
+        }
     }
 }

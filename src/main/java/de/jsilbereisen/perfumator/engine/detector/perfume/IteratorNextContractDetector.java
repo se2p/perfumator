@@ -131,13 +131,7 @@ public class IteratorNextContractDetector implements Detector<Perfume> {
                         + "the correctverion.");
 
         // Check whether the given type or one of its ancestors implements the Iterator interface
-        boolean implementsIterator = false;
-        try {
-            implementsIterator = iteratorDecl.isAssignableBy(resolvedTypeDecl.get());
-        } catch (Exception e) {
-            log.debug("Unable to check whether " + resolvedTypeDecl.get().getName() + " implements \"Iterator\".", e);
-        }
-        if (!implementsIterator) {
+        if (!safeCheckAssignableBy(iteratorDecl, resolvedTypeDecl.get())) {
             return Optional.empty();
         }
 
