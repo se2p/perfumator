@@ -66,7 +66,12 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
      */
     @SuppressWarnings("unchecked")
     public DetectedInstance(@NotNull DetectedInstance<T> detectedInstance) {
-        this.detectable = detectedInstance.detectable != null ? (T) detectedInstance.detectable.clone() : null;
+        try {
+            this.detectable = detectedInstance.detectable != null ? (T) detectedInstance.detectable.clone() : null;
+        } catch (CloneNotSupportedException e) {
+            this.detectable = null;
+        }
+
         this.typeName = detectedInstance.typeName;
         this.codeRanges.addAll(detectedInstance.codeRanges);
         this.codeSnippets.addAll(detectedInstance.codeSnippets);

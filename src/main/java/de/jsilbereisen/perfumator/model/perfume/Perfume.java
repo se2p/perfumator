@@ -85,9 +85,4 @@ public class Perfume extends Detectable {
         return super.compareTo(other);
     }
 
-    @Override
-    public Perfume clone() {
-        return new Perfume(this);
-    }
-
 }

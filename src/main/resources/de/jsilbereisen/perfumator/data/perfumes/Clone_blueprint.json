@@ -1,0 +1,9 @@
+{
+  "name": "Clone blueprint",
+  "description": "Implementing the \"java.lang.Cloneable\" interface is a common way to provide a copy-functionality for a certain class of objects. Even though this might not be the ideal way to implement this, as for example Joshua Bloch explains in his book \"Effective Java\", it is still a valid option, if done correctly. As the CWE-580 (CWE: Common Weakness Enumeration) shows, \"super.clone()\" should be consistently called in \"clone\" overrides, in order to not mess up the runtime typing of the cloned object when implementing an inheritance hierarchy. This also ensures that the required parts of \"clone\" contract of \"java.lang.Object\" are met, namely, that a new object is returned with the same type as the object that the clone-method was called on. SonarSource also has the rule \"Classes that override 'clone' should be 'Cloneable' and call 'super.clone()'\", which flags missing of the \"super.clone()\" as a Code Smell.",
+  "detectorClassSimpleName": "CloneBlueprintDetector",
+  "i18nBaseBundleName": "cloneBlueprint",
+  "source": "J. Bloch: Effective Java, Chap. 3.4; https://cwe.mitre.org/data/definitions/580; https://rules.sonarsource.com/java/RSPEC-1182/",
+  "relatedPattern": "SMELL",
+  "additionalInformation": "An exception to the rule, that every override has to call \"super.clone()\" can be made for classes that are \"final\", as they can't have inheritors. But, as mentioned in the description, implementing \"Cloneable\" should not be the preferred option for implementing functionality that copies an object. For example, one can often also solve this problem with a copy-constructor (see the \"Copy constructor\" Perfume) or with a self-defined copy-method (e.g. via an interface)."
+}

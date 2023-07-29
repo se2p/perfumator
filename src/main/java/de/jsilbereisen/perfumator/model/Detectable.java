@@ -163,7 +163,9 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
      * @return The clone.
      */
     @Override
-    public abstract Detectable clone();
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 
     // TODO: useful toString
 }
