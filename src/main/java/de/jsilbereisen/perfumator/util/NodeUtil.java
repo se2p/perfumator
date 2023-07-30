@@ -2,6 +2,8 @@ package de.jsilbereisen.perfumator.util;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeParameters;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -19,9 +21,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.util.MethodDeclarationMatcher;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for {@link Node}s from the <i>JavaParser</i> AST library.
@@ -187,38 +193,6 @@ public final class NodeUtil {
         return Optional.ofNullable(resolved);
     }
 
-    /*
-    public static <TO extends Node & Resolvable<ResolvedValueDeclaration>,
-            WHAT extends Node & NodeWithSimpleName<WHAT> & Resolvable<ResolvedReferenceTypeDeclaration>>
-    boolean safeCanBeAssignedTo(@NotNull TO potentialSuperType, @NotNull WHAT base, @NotNull Detector<?> detector) {
-
-        Optional<ResolvedValueDeclaration> resolvedValueDecl = resolveSafely(potentialSuperType, detector,
-                potentialSuperType.toString());
-        if (resolvedValueDecl.isEmpty()) {
-            return false;
-        }
-
-        ResolvedType resolvedValueDeclType = resolvedValueDecl.get().getType();
-        if (!resolvedValueDeclType.isReferenceType()) {
-            return false;
-        }
-
-        ResolvedReferenceType resolvedRefType = resolvedValueDeclType.asReferenceType();
-        Optional<ResolvedReferenceTypeDeclaration> resolvedValueDeclTypeDecl = resolvedRefType.getTypeDeclaration();
-        if (resolvedValueDeclTypeDecl.isEmpty()) {
-            return false;
-        }
-
-        Optional<ResolvedReferenceTypeDeclaration> resolvedBaseTypeDecl = resolveSafely(base, detector,
-                base.getNameAsString());
-        if (resolvedBaseTypeDecl.isEmpty()) {
-            return false;
-        }
-
-        return safeCheckAssignableBy(resolvedValueDeclTypeDecl.get(), resolvedBaseTypeDecl.get());
-    }
-    */
-
     /**
      * Safely checks whether the given base type could be assigned to the given potential super type.
      *
@@ -252,5 +226,32 @@ public final class NodeUtil {
         } catch (UnsolvedSymbolException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Finds the first {@link MethodDeclaration} in the given {@link TypeDeclaration} where the given
+     * {@link MethodDeclarationMatcher} matches.
+     *
+     * @param type The type whose declared methods should be considered.
+     * @param matcher The matcher which matches each {@link MethodDeclaration}.
+     * @return An {@link Optional} with the first {@link MethodDeclaration} that matches, or {@link Optional#empty()}
+     * if none match.
+     */
+    public static Optional<MethodDeclaration> findFirstMatch(@NotNull TypeDeclaration<?> type,
+                                                             @NotNull MethodDeclarationMatcher matcher) {
+        return type.getMethods().stream().filter(matcher::matches).findFirst();
+    }
+
+    /**
+     * Finds all {@link MethodDeclaration}s in the given {@link TypeDeclaration} where the given
+     * {@link MethodDeclarationMatcher} matches.
+     *
+     * @param type The type whose declared methods should be considered.
+     * @param matcher The matcher which matches each {@link MethodDeclaration}.
+     * @return A modifiable {@link List} with all the {@link MethodDeclaration}s that match.
+     */
+    public static List<MethodDeclaration> findMatches(@NotNull TypeDeclaration<?> type,
+                                                      @NotNull MethodDeclarationMatcher matcher) {
+        return type.getMethods().stream().filter(matcher::matches).collect(Collectors.toCollection(ArrayList::new));
     }
 }

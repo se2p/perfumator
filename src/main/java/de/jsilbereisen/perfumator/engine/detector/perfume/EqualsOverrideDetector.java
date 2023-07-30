@@ -4,8 +4,6 @@ import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.resolution.MethodUsage;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
@@ -20,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.util.EqualsMethodDeclarationMatcher;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -28,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static de.jsilbereisen.perfumator.util.NodeUtil.findFirstMatch;
 import static de.jsilbereisen.perfumator.util.NodeUtil.resolveSafely;
 
 /**
@@ -81,7 +80,7 @@ public class EqualsOverrideDetector implements Detector<Perfume> {
         }
 
         // Check if it overrides equals
-        Optional<MethodDeclaration> equalsOverride = detectEqualsOverride(clazz);
+        Optional<MethodDeclaration> equalsOverride = findFirstMatch(clazz, new EqualsMethodDeclarationMatcher());
         if (equalsOverride.isEmpty()) {
             return Optional.empty();
         }
@@ -129,29 +128,6 @@ public class EqualsOverrideDetector implements Detector<Perfume> {
         });
 
         return resolvedAncestors.stream().anyMatch(this::overridesEquals);
-    }
-
-    private Optional<MethodDeclaration> detectEqualsOverride(@NotNull ClassOrInterfaceDeclaration clazz) {
-        List<MethodDeclaration> potentialEquals = clazz.getMethods().stream().filter(
-                method -> method.isPublic() && method.getType().equals(PrimitiveType.booleanType())
-                        &&  method.getNameAsString().equals("equals")).collect(Collectors.toList());
-
-        if (potentialEquals.isEmpty()) {
-            return Optional.empty();
-        }
-
-        for (MethodDeclaration method : potentialEquals) {
-            List<Parameter> params = method.getParameters();
-            if (params.size() != 1) {
-                continue;
-            }
-
-            if (params.get(0).getType().asString().equals("Object")) {
-                return Optional.of(method);
-            }
-        }
-
-        return Optional.empty();
     }
 
     private boolean overridesEquals(@NotNull ResolvedReferenceType resolvedReferenceType) {

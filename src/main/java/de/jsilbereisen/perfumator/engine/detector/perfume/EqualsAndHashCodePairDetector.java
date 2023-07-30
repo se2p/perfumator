@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.util.EqualsMethodDeclarationMatcher;
+import de.jsilbereisen.perfumator.engine.detector.util.HashCodeMethodDeclarationMatcher;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -19,16 +21,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.as;
+import static de.jsilbereisen.perfumator.util.NodeUtil.findFirstMatch;
 
 /**
  * {@link Detector} for the 'Paired "equals" and "hashCode"' {@link Perfume}.
  */
 @EqualsAndHashCode
 public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
-
-    private static final String EQUALS_NAME = "equals";
-
-    private static final String HASHCODE_NAME = "hashCode";
 
     private Perfume perfume;
 
@@ -74,40 +73,11 @@ public class EqualsAndHashCodePairDetector implements Detector<Perfume> {
             return Optional.empty();
         }
 
-        MethodDeclaration equals = null;
-        MethodDeclaration hashCode = null;
+        Optional<MethodDeclaration> equals = findFirstMatch(type, new EqualsMethodDeclarationMatcher());
+        Optional<MethodDeclaration> hashCode = findFirstMatch(type, new HashCodeMethodDeclarationMatcher());
 
-        for (MethodDeclaration method : type.getMethods()) {
-            String methodName = method.getNameAsString();
-
-            if (!method.isPublic()) {
-                continue;
-            }
-
-            // Checking for the method's return type and Parameters is enough to validate the override
-            if (EQUALS_NAME.equals(methodName)) {
-                boolean returnsBoolean = method.getType().asString().equals("boolean");
-                boolean hasSingleObjectParameter = method.getParameters()
-                        .stream().filter(param -> param.getType().asString().equals("Object"))
-                        .count() == 1;
-
-                if (returnsBoolean && hasSingleObjectParameter) {
-                    equals = method;
-                }
-
-            } else if (HASHCODE_NAME.equals(methodName)) {
-                boolean returnsInt = method.getType().asString().equals("int");
-                boolean hasNoParameters = method.getParameters().isEmpty();
-
-                if (returnsInt && hasNoParameters) {
-                    hashCode = method;
-                }
-            }
-        }
-
-        return equals != null && hashCode != null
-                ? Optional.of(DetectedInstance.from(perfume, type, equals, hashCode))
+        return equals.isPresent() && hashCode.isPresent()
+                ? Optional.of(DetectedInstance.from(perfume, type, equals.get(), hashCode.get()))
                 : Optional.empty();
     }
-
 }
