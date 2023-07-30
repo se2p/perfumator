@@ -1,0 +1,9 @@
+{
+  "name": "Override equals of superclass",
+  "description": "When implementing an inheritance hierarchy, classes often add fields to the already defined fields from their superclasses. If one of the superclasses in the inheritance hierarchy already overrides the \"equals\" method, while the subclass that adds one or more fields does not, this is likely to be a mistake. SonarSource detects this as a Code Smell, because the programs behaviour might not match the expectation of the developers, as the additional fields are ignored due to \"equals\" not being overridden. The Perfume is inspired by the \"Subclasses that add fields to classes that override 'equals' should also override 'equals'\" rule from SonarSource, that flags a missing equals-override in this case as a minor Code Smell.",
+  "detectorClassSimpleName": "EqualsOverrideDetector",
+  "i18nBaseBundleName": "equalsOverride",
+  "source": "https://rules.sonarsource.com/java/RSPEC-2160/",
+  "relatedPattern": "SMELL",
+  "additionalInformation": null
+}
