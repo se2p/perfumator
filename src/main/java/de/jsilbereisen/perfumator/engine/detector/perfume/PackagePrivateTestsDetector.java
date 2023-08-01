@@ -5,6 +5,7 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,8 @@ import java.util.Set;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.as;
 
+// TODO: Doc
+@EqualsAndHashCode
 public class PackagePrivateTestsDetector implements Detector<Perfume> {
 
     /**

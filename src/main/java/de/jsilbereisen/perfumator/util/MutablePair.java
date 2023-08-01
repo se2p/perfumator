@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Data
 @Accessors(chain = true)
-public class MutablePair<A, B> {
+public final class MutablePair<A, B> {
 
     private A first;
 

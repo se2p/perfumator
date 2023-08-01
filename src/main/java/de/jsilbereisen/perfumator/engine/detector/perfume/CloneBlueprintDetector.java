@@ -8,6 +8,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithImplements;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +36,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
  *     <li>The class that contains the method implements {@link Cloneable} (or inherits it from an ancestor).</li>
  * </ul>
  */
+@EqualsAndHashCode
 public class CloneBlueprintDetector implements Detector<Perfume> {
 
     private Perfume perfume;

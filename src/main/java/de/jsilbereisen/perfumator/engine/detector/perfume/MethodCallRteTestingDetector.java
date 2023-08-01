@@ -14,6 +14,7 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +44,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.as;
  * Only if none of the known framework methods are imported, all try-statements are visited and checked for
  * fitting the try-catch-idiom for RuntimeException testing, and for being perfumed.
  */
+@EqualsAndHashCode
 public class MethodCallRteTestingDetector implements Detector<Perfume> {
 
     /**

@@ -7,6 +7,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.SynchronizedStmt;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.as;
  * Accessors are here identified through their usual naming, which leads to missing of accessors if these do not follow
  * the "get"/"set" naming strategy, but not following this naming should probably not be worth of being perfumed anyway.
  */
+@EqualsAndHashCode
 public class SynchronizedAccessorsDetector implements Detector<Perfume> {
 
     /**

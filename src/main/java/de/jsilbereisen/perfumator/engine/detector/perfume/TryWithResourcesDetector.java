@@ -5,6 +5,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,7 @@ import java.util.List;
  * So, a perfume should be detected if a try-statement uses at least one resource.
  */
 @Slf4j
+@EqualsAndHashCode
 public class TryWithResourcesDetector implements Detector<Perfume> {
 
     private Perfume perfume;

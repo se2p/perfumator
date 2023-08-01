@@ -13,6 +13,7 @@ import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +38,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.resolveSafely;
  * resolve inheritance hierarchies.
  */
 @Slf4j
+@EqualsAndHashCode
 public class EqualsOverrideDetector implements Detector<Perfume> {
 
     private Perfume perfume;

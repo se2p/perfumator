@@ -4,6 +4,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: Doc
+@EqualsAndHashCode
 public class PatternMatchingDetector implements Detector<Perfume> {
 
     private Perfume perfume;

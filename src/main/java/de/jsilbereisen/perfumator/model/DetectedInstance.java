@@ -196,7 +196,7 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
         Optional<ClassOrInterfaceDeclaration> parentType = node.findAncestor(ClassOrInterfaceDeclaration.class);
         parentType.ifPresentOrElse(
                 type -> detection.setTypeName(type.getNameAsString()),
-                () -> detection.setTypeName(ast.getPrimaryTypeName().orElse("UNKNOWN"))
+                () -> detection.setTypeName(ast.getPrimaryTypeName().orElse("### UNKNOWN ###"))
         );
 
         return detection;

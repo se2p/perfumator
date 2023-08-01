@@ -15,14 +15,20 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 
 import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
+import de.jsilbereisen.perfumator.model.CodeRange;
+import de.jsilbereisen.perfumator.model.Detectable;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.util.PathUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public abstract class AbstractDetectorTest {
@@ -203,4 +209,20 @@ public abstract class AbstractDetectorTest {
         return JavaParserFacade.get(typeSolver);
     }
 
+    /**
+     * Checks whether the given {@link DetectedInstance} contains the expected {@link Detectable}, the
+     * expected type name and the expected {@link CodeRange}s.
+     *
+     * @param detected The {@link DetectedInstance} to check. Must not be {@code null}.
+     * @param expectedDetectable The expected {@link Detectable} for the detection, may be {@code null}.
+     * @param typeName The expected type name for the detection. May be {@code null}.
+     * @param codeRanges The expected {@link CodeRange}s. The order matters. Must not be {@code null}, if none are
+     *                   expected, just don't give any.
+     */
+    protected static void checkDetectedInstance(@NotNull DetectedInstance<?> detected, @Nullable Detectable expectedDetectable,
+                                                @Nullable String typeName, @NotNull CodeRange... codeRanges) {
+        assertThat(detected.getDetectable()).isEqualTo(expectedDetectable);
+        assertThat(detected.getTypeName()).isEqualTo(typeName);
+        assertThat(detected.getCodeRanges()).containsExactly(codeRanges);
+    }
 }

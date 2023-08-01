@@ -23,6 +23,7 @@ import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclar
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,6 +59,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.safeResolutionAction;
  * For the analysis of the constructors, see {@link #isPerfumedCopyConstructor} and the methods use in it.
  * </p>
  */
+@EqualsAndHashCode
 public class CopyConstructorDetector implements Detector<Perfume> {
 
     /**

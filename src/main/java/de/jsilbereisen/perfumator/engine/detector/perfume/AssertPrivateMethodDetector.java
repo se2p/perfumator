@@ -11,6 +11,8 @@ import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.visitor.TypeVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
+
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
  *     if that {@code assert} expression has an error message.</li>
  * </ul>
  */
+@EqualsAndHashCode
 public class AssertPrivateMethodDetector implements Detector<Perfume> {
 
     private Perfume perfume;

@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
  * So, this detector detects pairings of overrides of {@code equals} and {@code compareTo}, and checks whether the
  * type is actually a {@link Comparable}.
  */
+@EqualsAndHashCode
 public class CompareToAndEqualsPairDetector implements Detector<Perfume> {
 
     /**
