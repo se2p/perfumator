@@ -1,0 +1,9 @@
+{
+  "name": "Builder pattern",
+  "description": "Making use of established design patterns brings benefits to a program's structure and architecture. A problem that a lot of Java programmers will come across are classes, that have plenty of fields, which makes the number of possible constructor overloads rise exponentially. To avoid defining too many constructor overloads, which bloats the class and is inflexible regarding future field additions, one can make use of the \"Builder\" pattern, an inner class that is responsible for creating instances of the outer class. A \"builder\" for a specific class can be extended more easily, the same builder can also be used to create multiple instances of the class that it is responsible to build, it is generally more flexible than constructors, according to Joshua Bloch in his book \"Effective Java\". He suggests evaluating usage of a builder when classes' constructor would have 4 or more parameters.",
+  "detectorClassSimpleName": "BuilderPatternDetector",
+  "i18nBaseBundleName": "builderPattern",
+  "source": "J. Bloch: Effective Java, Chap. 2.2",
+  "relatedPattern": "DESIGN_PATTERN",
+  "additionalInformation": null
+}

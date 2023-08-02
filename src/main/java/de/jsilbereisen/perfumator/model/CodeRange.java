@@ -3,8 +3,6 @@ package de.jsilbereisen.perfumator.model;
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

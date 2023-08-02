@@ -3,8 +3,6 @@ package de.jsilbereisen.perfumator.engine.detector.util;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.type.PrimitiveType;
 
-import java.util.List;
-
 /**
  * <p>
  * {@link MethodDeclarationMatcher} for the {@link Comparable#compareTo} method.

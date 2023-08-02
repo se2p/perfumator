@@ -9,8 +9,6 @@ import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ComparatorsAndComparablesTest {

@@ -12,5 +12,7 @@ public enum RelatedPattern {
 
     SMELL,
 
-    STYLE
+    STYLE,
+
+    DESIGN_PATTERN
 }
