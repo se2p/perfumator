@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static de.jsilbereisen.perfumator.util.NodeUtil.returnsClass;
+
 /**
  * <p>
  *     {@link Detector} for the "Builder pattern" {@link Perfume}. This detects <i>basic</i> implementation
@@ -240,15 +242,5 @@ public class BuilderPatternDetector implements Detector<Perfume> {
 
         return methods.stream().filter(method -> !method.isStatic() && method.isPublic() && !method.equals(buildMethod.get()))
                 .allMatch(method -> method.getType().isVoidType() || returnsClass(method, potentialBuilder));
-    }
-
-    private boolean returnsClass(@NotNull MethodDeclaration method,
-                                 @NotNull ClassOrInterfaceDeclaration expectedReturnClass) {
-        Type returnType = method.getType();
-        if (!returnType.isClassOrInterfaceType()) {
-            return false;
-        }
-
-        return returnType.asClassOrInterfaceType().getNameAsString().equals(expectedReturnClass.getNameAsString());
     }
 }

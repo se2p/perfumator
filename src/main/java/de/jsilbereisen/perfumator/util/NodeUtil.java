@@ -2,11 +2,14 @@ package de.jsilbereisen.perfumator.util;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeParameters;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.resolution.Resolvable;
 import com.github.javaparser.resolution.TypeSolver;
@@ -253,5 +256,43 @@ public final class NodeUtil {
     public static List<MethodDeclaration> findMatches(@NotNull TypeDeclaration<?> type,
                                                       @NotNull MethodDeclarationMatcher matcher) {
         return type.getMethods().stream().filter(matcher::matches).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * Checks whether the given type has any constructor that is non-private, declared explicitly or via the default
+     * constructor.
+     *
+     * @param type The type to check.
+     * @return {@code true}, if the type has no constructor at all (has implicitly the default constructor then) or
+     * if any constructor is declared explicitly with a non-private visibility.
+     */
+    public static boolean hasNonPrivateConstructor(@NotNull TypeDeclaration<?> type) {
+        List<ConstructorDeclaration> constructorDeclarations = type.getConstructors();
+
+        if (constructorDeclarations.isEmpty()) {
+            return true;
+        }
+
+        return constructorDeclarations.stream().anyMatch(constructor -> !constructor.isPrivate());
+    }
+
+    /**
+     * Checks whether the given method returns a {@link ClassOrInterfaceType} with the name of the given
+     * {@link ClassOrInterfaceDeclaration}. The check does <b>NOT</b> include type parameters, just checked by simple
+     * name.
+     *
+     * @param method The method to check.
+     * @param expectedReturnClass The expected return type (by name).
+     * @return {@code true} if the return type has the same simple name as the given
+     * {@link ClassOrInterfaceDeclaration}.
+     */
+    public static boolean returnsClass(@NotNull MethodDeclaration method,
+                                        @NotNull ClassOrInterfaceDeclaration expectedReturnClass) {
+        Type returnType = method.getType();
+        if (!returnType.isClassOrInterfaceType()) {
+            return false;
+        }
+
+        return returnType.asClassOrInterfaceType().getNameAsString().equals(expectedReturnClass.getNameAsString());
     }
 }

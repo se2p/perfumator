@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static de.jsilbereisen.perfumator.util.NodeUtil.hasNonPrivateConstructor;
+
 /**
  * Detector for the 'No utility initialization' {@link Perfume}. Detects a Perfume when all of a classes' methods are
  * static and the class has only private constructors.
@@ -71,16 +73,6 @@ public class NoUtilityInitializationDetector implements Detector<Perfume> {
         }
 
         return Optional.of(DetectedInstance.from(type, perfume));
-    }
-
-    private boolean hasNonPrivateConstructor(ClassOrInterfaceDeclaration type) {
-        List<ConstructorDeclaration> constructorDeclarations = type.getConstructors();
-
-        if (constructorDeclarations.isEmpty()) {
-            return true;
-        }
-
-        return constructorDeclarations.stream().anyMatch(constructor -> !constructor.isPrivate());
     }
 
     private boolean areNotUtilityMethods(ClassOrInterfaceDeclaration type) {
