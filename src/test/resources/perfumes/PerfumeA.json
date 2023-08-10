@@ -3,7 +3,7 @@
   "description": "Test description.",
   "detectorClassSimpleName": "DummyDetector",
   "i18nBaseBundleName": null,
-  "source": "My head",
+  "sources": [ "My head" ],
   "relatedPattern": "BUG",
   "additionalInformation": null
 }

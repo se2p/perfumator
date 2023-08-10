@@ -10,6 +10,7 @@ import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.model.perfume.RelatedPattern;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 import static org.mockito.Mockito.when;
@@ -19,11 +20,10 @@ public final class PerfumeTestUtil {
     public static final Path EXAMPLE_PROJECT_DIR_STRUCTURE = Path.of("src", "main", "java", "de", "jsilbereisen");
 
     private static final Perfume SINGLE_EXAMPLE_PERFUME = new Perfume("Example", "Example description",
-            "Example source", RelatedPattern.BUG, "Example info", "ExampleDetector", "exampleBundleName");
+            List.of("Example source"), RelatedPattern.BUG, "Example info", "ExampleDetector", "exampleBundleName");
 
     private static final DetectedInstance<Perfume> SINGLE_EXAMPLE_DETECTED_INSTANCE = new DetectedInstance<>(SINGLE_EXAMPLE_PERFUME,
-            "ExampleClass", 10, 20, "public class ExampleClass { }",
-            Path.of("")).setSourceFile(null);
+            "ExampleClass", 10, 20, Path.of("")).setSourceFile(null);
 
     private PerfumeTestUtil() {
     }

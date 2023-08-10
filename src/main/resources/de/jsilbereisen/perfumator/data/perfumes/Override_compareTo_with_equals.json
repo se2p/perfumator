@@ -3,7 +3,7 @@
   "description": "The \"java.lang.Comparable\" interface defines the \"compareTo\" method, which allows defining a natural ordering between instances of the same class. The method's contract recommends that when two objects are equal according to the \"equals\" method, that they are also equal according to the \"compareTo\" method (meaning it returns the value zero), and vice versa. Even though this is only a recommendation and not strictly required, it is still good practice to override the \"equals\" method when overriding \"compareTo\", in order to avoid bugs due to inconsistencies between those. This Perfume is a solution pattern to the SonarSource rule \"'equals(Object obj)' should be overridden along with the 'compareTo(T obj)' method\", which flags a violation as a minor Code Smell.",
   "detectorClassSimpleName": "CompareToAndEqualsPairDetector",
   "i18nBaseBundleName": "compareToAndEqualsOverride",
-  "source": "https://rules.sonarsource.com/java/RSPEC-1210/",
+  "sources": ["https://rules.sonarsource.com/java/RSPEC-1210/"],
   "relatedPattern": "SMELL",
   "additionalInformation": "If an inconsistent behaviour between \"compareTo\" and \"equals\" is actually desired, one should clearly mention this in the \"compareTo\" method's JavaDoc documentation. The method's API in \"java.lang.Comparable\" gives a suggestion for a simple but clear phrasing for this purpose."
 }

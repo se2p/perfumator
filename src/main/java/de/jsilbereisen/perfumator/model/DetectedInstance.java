@@ -8,8 +8,6 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,25 +36,17 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
     private final Set<CodeRange> codeRanges = new TreeSet<>();
 
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private final List<String> codeSnippets = new ArrayList<>();
-
     private Path sourceFile;
 
     public DetectedInstance() {
     }
 
     public DetectedInstance(@Nullable T detectable, @Nullable String typeName, int beginningLineNumber,
-                            int endingLineNumber, @Nullable String codeSnippet, @NotNull Path sourceFile) {
+                            int endingLineNumber, @NotNull Path sourceFile) {
         this.codeRanges.add(CodeRange.of(beginningLineNumber, endingLineNumber));
         this.detectable = detectable;
         this.typeName = typeName;
         this.sourceFile = sourceFile;
-
-        if (codeSnippet != null) {
-            this.codeSnippets.add(codeSnippet);
-        }
     }
 
     /**
@@ -74,11 +64,9 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
         this.typeName = detectedInstance.typeName;
         this.codeRanges.addAll(detectedInstance.codeRanges);
-        this.codeSnippets.addAll(detectedInstance.codeSnippets);
         this.sourceFile = detectedInstance.sourceFile;
     }
 
-    // TODO: i18n? Wenn dann ist Detectable bereits i18n
     // TODO: toString
 
     /**
@@ -150,7 +138,6 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
         detectedInstance.detectable = detected;
         CodeRange.of(node).ifPresent(detectedInstance.codeRanges::add);
-        detectedInstance.codeSnippets.add(node.toString());
 
         return detectedInstance;
     }
@@ -166,7 +153,6 @@ public class DetectedInstance<T extends Detectable> implements Comparable<Detect
 
         for (NodeWithRange<?> node : perfumedCodeParts) {
             CodeRange.of(node).ifPresent(detectedInstance.codeRanges::add);
-            detectedInstance.codeSnippets.add(node.toString());
         }
 
         return detectedInstance;

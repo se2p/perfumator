@@ -47,9 +47,6 @@ class ComparatorsAndComparablesTest {
         p1.setDescription("bli");
         p2.setDescription("bla");
 
-        p1.setSource("blub");
-        p2.setSource("blob");
-
         p1.setAdditionalInformation("...");
         p2.setAdditionalInformation(":::");
 
@@ -111,10 +108,6 @@ class ComparatorsAndComparablesTest {
         p2.getCodeRanges().add(CodeRange.of(0, 1));
 
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isZero();
-
-        // Other fields are irrelevant to the comparison
-        p1.getCodeSnippets().add("bli");
-        p2.getCodeSnippets().add("bla");
 
         assertThat(DETECTED_PERFUME_COMPARATOR.compare(p1, p2)).isZero();
     }

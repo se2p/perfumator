@@ -29,7 +29,7 @@ public class DummyDetector implements Detector<Perfume> {
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         return List.of(new DetectedInstance<>(perfume, astRoot.getPrimaryTypeName().orElse("No type name found"), 1, 1,
-                "public class SomeClassName { }", Path.of("somewhere/over/the/rainbow")));
+                Path.of("somewhere/over/the/rainbow")));
     }
 
     @Override

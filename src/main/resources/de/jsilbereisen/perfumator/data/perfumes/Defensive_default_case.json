@@ -3,7 +3,7 @@
   "description": "Switch statements are a great structure that beginners should learn using properly, as it allows avoiding unnecessary chaining of if-statements. The switch construct provides a simple way to deal with every possibility of the switch-variable, that is not covered by a case-statement: the \"default\" case. Here, the developer can make sure that no unexpected behaviour, through forgetting certain cases, occurs. When the default-case is present at the end of a \"switch\" statement, it shows the defensive thinking of the programmer, trying to be prepared\nfor potential edge cases. This thinking pattern is important to support when it comes to beginning programmers, as nasty surprises could be avoided through a defensive style of programming. This Code Perfume also acts as a Solution Pattern to the \"'switch' statements should have 'default' clauses\" Code Smell, defined by SonarSource.",
   "detectorClassSimpleName": "DefensiveDefaultCaseDetector",
   "i18nBaseBundleName": "defensiveDefaultCase",
-  "source": "https://rules.sonarsource.com/java/type/Code%20Smell/RSPEC-131",
+  "sources": ["https://rules.sonarsource.com/java/type/Code%20Smell/RSPEC-131"],
   "relatedPattern": null,
   "additionalInformation": "\"Return-switch\" constructs are not supported by the used JavaParser API, as it covers only language features up to Java 17."
 }

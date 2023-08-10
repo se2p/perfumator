@@ -3,7 +3,7 @@
   "description": "The \"equals\" and \"hashCode\" methods in java.lang.Object can be overridden by (almost) any class. It is best practice to always override these two methods in together, or none of both, in order to not violate the contract these methods form. Especially the contract of \"hashCode\" states, that for two objects that are seen as equal by the \"equals\" implementation, the same hashCode must be returned. Even though there is no explicit need for overriding \"equals\" after overriding \"hashCode\" according to the contract, as it states, that two distinct (according to \"equals\") objects may have the same \"hashCode\" result, it is still recommended in order to assure consistent behaviour and to improve performance when using hash tables. Not overriding both together and thus potentially violating the contracts of the methods can cause hard to find issues. It is classified as a bug by SonarSource.",
   "detectorClassSimpleName": "EqualsAndHashCodePairDetector",
   "i18nBaseBundleName": "pairEqualsAndHashCode",
-  "source": "https://rules.sonarsource.com/java/RSPEC-1206/",
+  "sources": ["https://rules.sonarsource.com/java/RSPEC-1206/"],
   "relatedPattern": "BUG",
   "additionalInformation": "Obviously, overriding these methods together is just the first step towards fulfilling their contracts. The more difficult part, at least for inexperienced beginners, can be ensuring that the implementation of the methods does not violate the contract. For implementation guidance regarding the \"equals\" method, have a look at the \"Equals blueprint\" Perfume, it validates the basic structure and first steps for an \"equals\" implementation, that stays true to its contract."
 }

@@ -8,7 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.i18n.I18nList;
 import de.jsilbereisen.perfumator.model.Detectable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data object for a Code Perfume definition.
@@ -20,7 +24,8 @@ import de.jsilbereisen.perfumator.model.Detectable;
 @EqualsAndHashCode(callSuper = true)
 public class Perfume extends Detectable {
 
-    private String source;
+    @I18nList(key = "source")
+    private List<String> sources;
 
     private RelatedPattern relatedPattern;
 
@@ -36,13 +41,13 @@ public class Perfume extends Detectable {
      * Constructor containing all fields.
      * No checks are performed whether a {@link Detector} class with the given name even exists.
      */
-    public Perfume(@Nullable String name, @Nullable String description, @Nullable String source,
+    public Perfume(@Nullable String name, @Nullable String description, @Nullable List<String> sources,
                    @Nullable RelatedPattern relatedPattern,
                    @Nullable String additionalInformation,
                    @Nullable String detectorClassSimpleName, @Nullable String i18nBaseBundleName) {
         super(name, description, detectorClassSimpleName, i18nBaseBundleName);
 
-        this.source = source;
+        this.sources = new ArrayList<>(sources);
         this.relatedPattern = relatedPattern;
         this.additionalInformation = additionalInformation;
     }
@@ -55,7 +60,7 @@ public class Perfume extends Detectable {
     public Perfume(@NotNull Perfume perfume) {
         super(perfume);
 
-        this.source = perfume.source;
+        this.sources = new ArrayList<>(perfume.sources);
         this.relatedPattern = perfume.relatedPattern;
         this.additionalInformation = perfume.additionalInformation;
     }

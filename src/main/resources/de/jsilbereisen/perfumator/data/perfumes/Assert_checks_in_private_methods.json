@@ -3,7 +3,7 @@
   "description": "The \"assert\" keyword in Java throws an \"AssertionError\", if the boolean-expression that follows it evaluates to \"false\" at runtime. A use-case for \"assert\" is validation of method parameters. But, because assertions have to be explicitly enabled for the JVM by passing the \"-ea\" flag, the \"assert\" construct should not be used in public methods, as one has no control over whether the caller of the method actually has assertions enabled. For that reason, the best usage practice is to use \"assert\" in private methods, in order to validate parameters during the development process. As an \"AssertionError\" is not very self-explanatory regarding its cause, the \"assert\" expression allows the definition of a message for the \"AssertionError\", in case the assertion fails. This should be used, as it enhances the code clarity and a helpful message eases the search for errors. This perfume is inspired by the \"Asserts should not be used to check the parameters of a public method\" Code Smell by SonarSource.",
   "detectorClassSimpleName": "AssertPrivateMethodDetector",
   "i18nBaseBundleName": "assertPrivateMethod",
-  "source": "https://rules.sonarsource.com/java/RSPEC-4274/",
+  "sources": ["https://rules.sonarsource.com/java/RSPEC-4274/"],
   "relatedPattern": "SMELL",
   "additionalInformation": null
 }

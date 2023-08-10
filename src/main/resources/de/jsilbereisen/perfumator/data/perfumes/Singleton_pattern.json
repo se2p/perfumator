@@ -3,7 +3,7 @@
   "description": "Making use of established design patterns brings benefits to a program's structure and architecture. If one wants to enforce that there exists EXACTLY one single instance of a class, using the \"Singleton\" pattern is a great option. Joshua Bloch describes 3 main ways to implement the \"Singleton\" pattern in his book \"Effective Java\": a public \"instance\" field, a public static instance factory-method or defining the class as an enum type with a single constant. Each one has its own advantages, and all are valid options, which are rewarded by the Perfume. In Joshua Bloch's opinion, the enum-type way is the best option in most cases, as one does not have to worry about (de-)serialization and the code is quite elegant.",
   "detectorClassSimpleName": "SingletonPatternDetector",
   "i18nBaseBundleName": "singletonPattern",
-  "source": "J. Bloch: Effective Java, Chap. 2.3",
+  "sources": ["J. Bloch: Effective Java, Chap. 2.3"],
   "relatedPattern": "DESIGN_PATTERN",
   "additionalInformation": "The Perfume does not make any preferences between the three options which Joshua Bloch describes. But, if a class is a non-enum singleton and implements the \"java.io.Serializable\" interface, the Perfume verifies the additional required steps (according to Joshua Bloch) that avoid serialization bugs: all non-static fields have to be \"transient\" and one has provide a \"Object readResolve()\" Method, that returns the singleton-instance."
 }

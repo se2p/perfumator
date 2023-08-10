@@ -7,6 +7,5 @@
   } ],
   "detectable_name" : "Example",
   "typeName" : "ExampleClass",
-  "codeSnippets" : [ "public class ExampleClass { }" ],
   "sourceFile" : null
 }

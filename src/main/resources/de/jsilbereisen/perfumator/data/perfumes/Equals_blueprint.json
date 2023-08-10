@@ -3,7 +3,7 @@
   "description": "The \"equals\" method in java.lang.Object can be overridden by (almost) any class, but it has a contract that has to be fulfilled. Precisely, the equals Method implements an equivalence relation between instances of the class. Coding this can be troublesome if you are not experienced with it, and even then, forgetting a necessary step can happen. To reduce the danger of making mistakes when writing the equals method, Joshua Bloch gives a short guideline in his book \"Effective Java\":\n- Check if the Object-References are the same, if yes, return true\n- Check if the other Object has the correct type by using the \"instanceof\" operator. If yes, cast the other Object to that type. If no, return false.\n- Check for every Field of the class whether their values are equal and return the result.\nFor this perfume, only the first two steps are checked upon as a blueprint, as the third step, namely the comparison of the field of the classes, can vary, dependent on the fields. This Perfume rewards usage of the blueprint, as Best Practices are great to know and take advantage of.",
   "detectorClassSimpleName": "EqualsBlueprintDetector",
   "i18nBaseBundleName": "equalsBlueprint",
-  "source": "J. Bloch: Effective Java, Chap. 3.1",
+  "sources": ["J. Bloch: Effective Java, Chap. 3.1"],
   "relatedPattern": null,
   "additionalInformation": "The Perfume does by no means ensure correct method behaviour, but rather it checks the method's structure. If your \"equals\" method does not work as expected, have a close look again at each step, in particular the last step with the comparison of the class fields."
 }

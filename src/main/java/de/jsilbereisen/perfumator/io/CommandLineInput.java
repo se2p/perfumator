@@ -17,7 +17,7 @@ import java.util.Locale;
 @Setter
 public class CommandLineInput {
 
-    @Option(name = "-i", aliases = {"--input-dir"}, metaVar = "option.metaVar.path",
+    @Option(name = "-i", aliases = {"--input"}, metaVar = "option.metaVar.path",
             usage = "option.usage.inputDir")
     private Path pathToSourceDir;
 

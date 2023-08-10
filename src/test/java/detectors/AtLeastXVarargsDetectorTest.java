@@ -46,13 +46,10 @@ class AtLeastXVarargsDetectorTest extends AbstractDetectorTest {
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("Inner");
         assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 16, 9));
-        assertThat(detected.getCodeSnippets()).isNotEmpty();
-
         detected = detections.get(1);
         assertThat(detected.getDetectable()).isEqualTo(perfume);
         assertThat(detected.getTypeName()).isEqualTo("VarargsPerfume");
         assertThat(detected.getCodeRanges()).containsExactly(CodeRange.of(6, 5, 9, 5));
-        assertThat(detected.getCodeSnippets()).isNotEmpty();
     }
 
 }

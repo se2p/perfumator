@@ -46,7 +46,7 @@ class PerfumeRegistryTest {
         assertThat(perfumeA.getDescription()).isEqualTo("Test description.");
         assertThat(perfumeA.getDetectorClassSimpleName()).isEqualTo("DummyDetector");
         assertThat(perfumeA.getI18nBaseBundleName()).isNull();
-        assertThat(perfumeA.getSource()).isEqualTo("My head");
+        assertThat(perfumeA.getSources()).containsExactly("My head");
         assertThat(perfumeA.getRelatedPattern()).isEqualTo(RelatedPattern.BUG);
         assertThat(perfumeA.getAdditionalInformation()).isNull();
 
@@ -55,7 +55,7 @@ class PerfumeRegistryTest {
         assertThat(perfumeB.getDescription()).isEqualTo("Anderes Parfuem.");
         assertThat(perfumeB.getDetectorClassSimpleName()).isEqualTo("DummyDetector");
         assertThat(perfumeB.getI18nBaseBundleName()).isEqualTo("TestResources");
-        assertThat(perfumeB.getSource()).isEqualTo("Mein Kopf");
+        assertThat(perfumeB.getSources()).containsExactly("Mein Kopf");
         assertThat(perfumeB.getRelatedPattern()).isEqualTo(RelatedPattern.BUG);
         assertThat(perfumeB.getAdditionalInformation()).isEqualTo("More information.");
 

@@ -3,7 +3,7 @@
   "description": "Optimization in terms of memory usage and execution speed is a key factor in many applications. While one often has to develop own solutions for optimization problems, it is good to know what is already available through the Java standard library, so one is not endangered to introduce bugs with the optimization and saves time. This Perfume targets usage of the optimized classes of the \"Collections\" API for Enums in Java, namely \"java.util.EnumSet\" for a set of Enum values and  \"java.util.EnumMap\" for mappings from Enum-keys to any value. Joshua Bloch highly recommends using these optimized collections for Enums in his book \"Effective Java\", as they bring advantages in terms of efficiency, speed, type-safety and flexibility of the implemented interfaces. SonarSource also defines rules that suggest replacement of unoptimized Sets/Maps, if they use Enums and could be optimized.",
   "detectorClassSimpleName": "OptimizedEnumCollectionsDetector",
   "i18nBaseBundleName": "optimizedEnumCollections",
-  "source": "J. Bloch: Effective Java, Chap. 6.3, 6.4;https://rules.sonarsource.com/java/RSPEC-1641/;https://rules.sonarsource.com/java/RSPEC-1640/",
+  "sources": ["J. Bloch: Effective Java, Chap. 6.3, 6.4", "https://rules.sonarsource.com/java/RSPEC-1641/", "https://rules.sonarsource.com/java/RSPEC-1640/"],
   "relatedPattern": "SMELL",
   "additionalInformation": null
 }

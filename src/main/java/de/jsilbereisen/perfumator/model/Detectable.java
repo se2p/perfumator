@@ -13,6 +13,7 @@ import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.i18n.Bundles;
 import de.jsilbereisen.perfumator.i18n.BundlesLoader;
 import de.jsilbereisen.perfumator.i18n.I18nIgnore;
+import de.jsilbereisen.perfumator.i18n.I18nList;
 import de.jsilbereisen.perfumator.i18n.Internationalizable;
 import de.jsilbereisen.perfumator.i18n.InternationalizationException;
 import de.jsilbereisen.perfumator.util.StringUtil;
@@ -20,6 +21,8 @@ import de.jsilbereisen.perfumator.util.StringUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Abstract class for data objects with information for detectable concepts, e.g. Code Perfumes or Code Smells.
@@ -110,31 +113,44 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
             return;
         }
 
-        Class<? extends Internationalizable> clazz = getClass();
         Field[] classFields = FieldUtils.getAllFields(getClass());
-        Method[] classMethods = clazz.getMethods();
 
         for (Field field : classFields) {
-            if (field.getType().equals(String.class) && !field.isAnnotationPresent(I18nIgnore.class)) {
+            if (field.isAnnotationPresent(I18nIgnore.class)) {
+                continue;
+            }
+
+            if (field.getType().equals(String.class)) {
                 String fieldName = field.getName();
                 String internationalizedContent = resourceHolder.getResource(i18nBaseBundleName + "." + fieldName);
 
                 if (!StringUtil.isEmpty(internationalizedContent)) {
-                    String setterName = "set" + fieldName.substring(0, 1).toUpperCase()
-                            + fieldName.substring(1);
+                    callSetter(fieldName, internationalizedContent);
+                }
 
-                    for (Method method : classMethods) {
-                        if (method.getName().equals(setterName)) {
-                            try {
-                                method.invoke(this, internationalizedContent);
-                            } catch (InvocationTargetException | IllegalAccessException e) {
-                                throw new InternationalizationException(
-                                        String.format("Invocation of setter \"%s\" for Field \"%s\" of class "
-                                                + "\"%s\" failed.", setterName, fieldName, clazz.getSimpleName()),
-                                        e);
-                            }
-                        }
+            } else if (field.getType().isAssignableFrom(List.class) && field.isAnnotationPresent(I18nList.class)) {
+                String fieldName = field.getName();
+                I18nList annotation = field.getAnnotation(I18nList.class);
+
+                List<String> internationalizedContent = new ArrayList<>();
+
+                // Get all resources in the correct order from the Bundles
+                int elementCounter = 1;
+                while (elementCounter > 0) {
+                    String nextItem = resourceHolder.getResource(i18nBaseBundleName + "."
+                            + annotation.key() + annotation.enumerationSuffix() + elementCounter);
+
+                    if (nextItem != null) {
+                        internationalizedContent.add(nextItem);
+                        elementCounter++;
+                    } else {
+                        elementCounter = Integer.MIN_VALUE;
                     }
+                }
+
+                // Only change the field if the List is non-empty!
+                if (!internationalizedContent.isEmpty()) {
+                    callSetter(fieldName, internationalizedContent);
                 }
             }
         }
@@ -165,6 +181,26 @@ public abstract class Detectable implements Internationalizable, Comparable<Dete
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    private void callSetter(@NotNull String fieldName, @NotNull Object arg) {
+        Method[] classMethods = getClass().getMethods();
+
+        String setterName = "set" + fieldName.substring(0, 1).toUpperCase()
+                + fieldName.substring(1);
+
+        for (Method method : classMethods) {
+            if (method.getName().equals(setterName)) {
+                try {
+                    method.invoke(this, arg);
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    throw new InternationalizationException(
+                            String.format("Invocation of setter \"%s\" for Field \"%s\" of class "
+                                    + "\"%s\" failed.", setterName, fieldName, getClass().getSimpleName()),
+                            e);
+                }
+            }
+        }
     }
 
     // TODO: useful toString

@@ -3,7 +3,7 @@
   "description": "Another Perfume.",
   "detectorClassSimpleName": "DummyDetector",
   "i18nBaseBundleName": "TestResources",
-  "source": "My head",
+  "sources": [ "My head" ],
   "relatedPattern": "BUG",
   "additionalInformation": "More information."
 }

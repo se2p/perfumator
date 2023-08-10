@@ -13,7 +13,6 @@ import de.jsilbereisen.perfumator.model.Detectable;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,18 +78,23 @@ class InternationalizableTest {
     @Test
     void testPerfumeI18n() {
         Perfume perfume = new Perfume();
-        perfume.setI18nBaseBundleName("Just not be empty");
+        perfume.setI18nBaseBundleName("bundle");
 
         Bundles bundles = mock(Bundles.class);
-        when(bundles.getResource(anyString())).thenReturn("x");
+        when(bundles.getResource("bundle.name")).thenReturn("x");
+        when(bundles.getResource("bundle.description")).thenReturn("x");
+        when(bundles.getResource("bundle.i18nBaseBundleName")).thenReturn("x");
+        when(bundles.getResource("bundle.source#1")).thenReturn("Hallo");
+        when(bundles.getResource("bundle.source#2")).thenReturn("Test");
+        when(bundles.getResource("bundle.additionalInformation")).thenReturn("x");
 
         perfume.internationalize(bundles);
 
         assertThat(perfume.getName()).isEqualTo("x");
         assertThat(perfume.getDescription()).isEqualTo("x");
         assertThat(perfume.getDetectorClassSimpleName()).isNull();
-        assertThat(perfume.getI18nBaseBundleName()).isEqualTo("Just not be empty");
-        assertThat(perfume.getSource()).isEqualTo("x");
+        assertThat(perfume.getI18nBaseBundleName()).isEqualTo("bundle");
+        assertThat(perfume.getSources()).containsExactly("Hallo", "Test");
         assertThat(perfume.getRelatedPattern()).isNull();
         assertThat(perfume.getAdditionalInformation()).isEqualTo("x");
     }

@@ -3,7 +3,7 @@
   "description": "The \"instanceof\" operator in Java is used to check the type of an object at runtime. Before Java 16, one then had to manually cast the object into that checked type, if you wanted to further use it with that specific type. Even though this is still possible, with Java 16, \"pattern matching\" with \"instanceof\" was finalized (was in preview status since Java 14), which allows for a concise type-check AND cast in one \"instanceof\" statement. This results in cleaner and more readable code. The Perfume is inspired by the \"Pattern Matching for 'instanceof' operator should be used instead of simple 'instanceof' + cast\" rule by SonarSource.",
   "detectorClassSimpleName": "PatternMatchingDetector",
   "i18nBaseBundleName": "patternMatching",
-  "source": "https://rules.sonarsource.com/java/RSPEC-6201/",
+  "sources": ["https://rules.sonarsource.com/java/RSPEC-6201/"],
   "relatedPattern": "SMELL",
   "additionalInformation": "The pattern matching advanced Java language feature also finds usage in switch-Statements, allowing for switch-cases based on object types, but this feature has to be manually activated for the JVM, as it is (as of Java 20) still in preview (since Java 17). This also means that it will not be detected as a Perfume, as JavaParser does not support it."
 }
