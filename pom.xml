@@ -7,7 +7,7 @@
 
     <groupId>de.jsilbereisen</groupId>
     <artifactId>perfumator-java</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <developers>
@@ -25,7 +25,7 @@
 
     <properties>
         <!-- Module versions -->
-        <!-- no submodules yet, placeholder for future modularization -->
+        <!-- no submodules yet, placeholder for potential future modularization -->
 
         <!-- Dependency versions -->
         <javaparser.version>3.25.4</javaparser.version>
@@ -36,7 +36,8 @@
         <logback.version>1.4.7</logback.version>
         <classgraph.version>4.8.158</classgraph.version>
         <mockito-core.version>5.3.1</mockito-core.version>
-        <mockito-inline.version>5.2.0</mockito-inline.version>
+        <junit.version>5.9.2</junit.version>
+        <assertj.version>3.24.2</assertj.version>
         <apache-commons-lang.version>3.12.0</apache-commons-lang.version>
 
         <!-- Build properties -->
@@ -124,21 +125,21 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.9.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
+            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
 
