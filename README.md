@@ -27,8 +27,10 @@ The following arguments **must** be provided for analysis execution (not if `-h`
 Additional, optional arguments:
 
 - `-h` or `--help`: Prints the help-overview over all available commands, then terminates the application, no matter which other arguments are given.
-- `-f FORMAT` or `--format FORMAT`: Sets the format for the output. **Currently, only JSON is supported.**
+- `-f FORMAT` or `--format`: Sets the format for the output. **Currently, only JSON is supported.**
 - `-l LANGUAGE_TAG` or `--language`: Sets the _preferred_ language for the tool. This means, if available, all log messages/error messages/output resources/perfumes have the given language. If any resource is not available in that language, the English version is used as a fallback. Currently, the only supported languages are English and German, including Perfume and CLI resources.
+- `-d "path;path2;..."` or `--dependencies`: A list of dependencies for the analysis. A dependency can be JAR or simply a source root directory of a project. If you want to only analyse a single file, you should at least provide the project's source root (if the file is part of a project) as a dependency, for some context. If required external dependencies are missing, some Perfumes might not be detected under certain circumstances/at all.
+- `-b BATCH_SIZE` or `--batch-size`: Sets the batch size (size for the listings of detections) for the serialized output, default: 10000. If you encounter an OOM error when running the analysis, lowering the batch size might help.
 
 ## API
 
@@ -48,9 +50,6 @@ By implementing the `DetectionEngine` interface, the engine offers two main meth
 For huge projects, `detect` might cause an `OutOfMemoryError` (OOM), because it holds all detections in memory to return them,
 while `detectAndSerialize` allows specification of a batch-size, after which the current list of detections in memory is flushed
 to the output directory, to avoid OOMs.
-
-Both methods take a path to the source file/directory to analyse and a Varargs list of Paths of dependencies as their parameters,
-with `detectAndSerialize` additionally requiring arguments that specify the output format/configuration.
 
 **Note** that if the directory to analyse follows a Maven/Gradle project structure (has sources in `src/main/java`,
 resources in `src/main/resources`, and equivalent directories for the unit tests), then all Java source files that are
