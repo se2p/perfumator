@@ -47,9 +47,11 @@ class PerfumeDetectionEngineTest {
 
     @Test
     void detectInSingleFile() {
-        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null);
+        PerfumeDetectionEngine engine = PerfumeDetectionEngine.builder()
+                .registry(registryMock)
+                .build();
 
-        List<DetectedInstance<Perfume>> detectedInstances = engine.detect(SINGLE_JAVA_SOURCE);
+        List<DetectedInstance<Perfume>> detectedInstances = engine.detect(SINGLE_JAVA_SOURCE).getDetections();
 
         assertThat(detectedInstances).hasSize(1);
         assertThat(detectedInstances.get(0).getDetectable().getName()).isEqualTo("Some Perfume");
@@ -57,24 +59,33 @@ class PerfumeDetectionEngineTest {
 
     @Test
     void detectInSingleFileUnhappyPaths() {
-        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null, bundlesMock);
+        PerfumeDetectionEngine engine = PerfumeDetectionEngine.builder()
+                .registry(registryMock)
+                .i18nResources(bundlesMock)
+                .build();
 
         assertThatThrownBy(() -> engine.detect(SINGLE_NON_JAVA)).isInstanceOf(IllegalArgumentException.class);
-        assertThat(engine.detect(SINGLE_MALFORMED_JAVA_SOURCE)).isEmpty();
+        assertThat(engine.detect(SINGLE_MALFORMED_JAVA_SOURCE).getDetections()).isEmpty();
     }
 
     @Test
     void detectInEmptyDir() {
-        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null, bundlesMock);
+        PerfumeDetectionEngine engine = PerfumeDetectionEngine.builder()
+                .registry(registryMock)
+                .i18nResources(bundlesMock)
+                .build();
 
-        assertThat(engine.detect(DIR_EMPTY)).isEmpty();
+        assertThat(engine.detect(DIR_EMPTY).getDetections()).isEmpty();
     }
 
     @Test
     void detectInSmallProject() {
-        PerfumeDetectionEngine engine = new PerfumeDetectionEngine(registryMock, null, bundlesMock);
+        PerfumeDetectionEngine engine = PerfumeDetectionEngine.builder()
+                .registry(registryMock)
+                .i18nResources(bundlesMock)
+                .build();
 
-        List<DetectedInstance<Perfume>> detectedInstances = engine.detect(DIR_SMALL_PROJECT);
+        List<DetectedInstance<Perfume>> detectedInstances = engine.detect(DIR_SMALL_PROJECT).getDetections();
         assertThat(detectedInstances).hasSize(4);
 
         List<String> detectedTypesNames = detectedInstances.stream().map(DetectedInstance::getTypeName)

@@ -210,8 +210,17 @@ public class BuilderPatternDetector implements Detector<Perfume> {
         return hasBuilderMethod(topLevelClass, potentialBuilder);
     }
 
+    /**
+     * Checks if the given top-level class has a public static method with the name {@link #BUILDER_FACTORY_METHOD_NAME}.
+     * Can have any amount of parameters, but must return the give builder class.
+     *
+     * @param topLevelClass The top-level class, which should contain a {@link #BUILDER_FACTORY_METHOD_NAME} method.
+     * @param builderClass The type that the searched-for method should return.
+     * @return {@code true} if the top-level class has a {@link #BUILDER_FACTORY_METHOD_NAME} method that returns the
+     * given builder class type.
+     */
     private boolean hasBuilderMethod(@NotNull ClassOrInterfaceDeclaration topLevelClass, @NotNull ClassOrInterfaceDeclaration builderClass) {
-        List<MethodDeclaration> builderMethods = topLevelClass.getMethodsBySignature(BUILDER_FACTORY_METHOD_NAME);
+        List<MethodDeclaration> builderMethods = topLevelClass.getMethodsByName(BUILDER_FACTORY_METHOD_NAME);
         if (builderMethods.isEmpty()) {
             return false;
         }

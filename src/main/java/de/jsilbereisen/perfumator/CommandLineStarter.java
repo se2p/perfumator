@@ -14,15 +14,13 @@ import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
 import de.jsilbereisen.perfumator.model.EngineConfiguration;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
-import java.io.IOException;
-
 /**
  * Entry point of the application when running from the command line.
  */
 @Slf4j
 public class CommandLineStarter {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         CommandLineInput cliInput = new CommandLineInput();
         CmdLineParser cliParser = new CmdLineParser(cliInput,
                 ParserProperties.defaults().withUsageWidth(120).withShowDefaults(false));
@@ -40,8 +38,13 @@ public class CommandLineStarter {
             return;
         }
 
-        DetectionEngine<Perfume> engine = new PerfumeDetectionEngine(config.getResourcesLocale());
-        engine.detectAndSerialize(config.getSourcesPath(), OutputConfiguration.from(config.getOutputDir()),
-                config.getOutputFormat());
+        PerfumeDetectionEngine.Builder engineBuilder = PerfumeDetectionEngine.builder(config.getResourcesLocale())
+                .setDependencies(config.getDependencies());
+
+        DetectionEngine<Perfume> engine = engineBuilder.build();
+        OutputConfiguration outputConfiguration =
+                OutputConfiguration.from(config.getOutputDir()).setBatchSize(config.getBatchSize());
+
+        engine.detectAndSerialize(config.getSourcesPath(), outputConfiguration, config.getOutputFormat());
     }
 }

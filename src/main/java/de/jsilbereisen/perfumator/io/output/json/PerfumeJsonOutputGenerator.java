@@ -50,7 +50,8 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
         numberOfOutputFilesToCreate += detectedInstances.size() % config.getBatchSize() > 0 ? 1 : 0;
 
         if (numberOfOutputFilesToCreate == 1) {
-            createSingleListing(detectedInstances, lastListingNumber++);
+            createSingleListing(detectedInstances, lastListingNumber == 0 ? lastListingNumber : lastListingNumber + 1);
+            lastListingNumber++;
         } else {
             createMultipleListings(detectedInstances, numberOfOutputFilesToCreate, lastListingNumber + 1);
             lastListingNumber += numberOfOutputFilesToCreate;
@@ -94,12 +95,15 @@ public class PerfumeJsonOutputGenerator extends JsonOutputGenerator<Perfume> {
 
     private void createMultipleListings(List<DetectedInstance<Perfume>> detectedInstances, int numberOfOutputFiles,
                                         int firstNewListingNumber) throws IOException {
-        for (int i = firstNewListingNumber; i < numberOfOutputFiles + firstNewListingNumber; i++) {
-            Path toCreate = config.getOutputDirectory().resolve(listingFileName(i));
+        for (int fileNum = firstNewListingNumber, batchRound = 1;
+             fileNum < numberOfOutputFiles + firstNewListingNumber;
+             fileNum++, batchRound++) {
+
+            Path toCreate = config.getOutputDirectory().resolve(listingFileName(fileNum));
             Path created = Files.createFile(toCreate);
 
-            int low = (i - 1) * config.getBatchSize();
-            int high = Math.min(i * config.getBatchSize(), detectedInstances.size());
+            int low = (batchRound - 1) * config.getBatchSize();
+            int high = Math.min(batchRound * config.getBatchSize(), detectedInstances.size());
             mapper.writeValue(created.toFile(), detectedInstances.subList(low, high));
         }
     }

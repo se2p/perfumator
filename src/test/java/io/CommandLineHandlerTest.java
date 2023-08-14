@@ -55,6 +55,6 @@ class CommandLineHandlerTest {
         CommandLineHandler handler = new CommandLineHandler(MOCKED_PARSER, MOCKED_BUNDLES);
 
         assertThat(handler.handleArguments(commandLineInput))
-                .isEqualTo(new EngineConfiguration(PATH_TO_THIS_CLASS, PATH_TO_EMPTY_DIR));
+                .isEqualTo(EngineConfiguration.builder(PATH_TO_THIS_CLASS, PATH_TO_EMPTY_DIR).build());
     }
 }

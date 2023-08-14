@@ -1,56 +1,108 @@
 package de.jsilbereisen.perfumator.model;
 
-import lombok.Value;
+import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import de.jsilbereisen.perfumator.io.LanguageTag;
 import de.jsilbereisen.perfumator.io.output.OutputFormat;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.nio.file.Path;
-import java.util.Locale;
+import java.util.*;
 
 /**
- * Configuration data for the analysis engine. Instances of this class are immutable.
+ * Configuration DTO for the analysis engine, usually stems from commandline input.
  */
-@Value
+@Getter
+@EqualsAndHashCode
 public class EngineConfiguration {
 
-    Path sourcesPath;
+    private final Path sourcesPath;
 
-    Path outputDir;
+    private final Path outputDir;
 
-    Locale resourcesLocale;
+    private final Locale resourcesLocale;
 
-    OutputFormat outputFormat;
+    private final OutputFormat outputFormat;
 
-    /**
-     * Constructor with must-have parameters. The {@link Locale} to use for resource loading
-     * will be set to {@link LanguageTag#getDefault()} and the {@link OutputFormat} will be set to
-     * {@link OutputFormat#getDefault()}.
-     *
-     * @param sourcesPath Path to directory with Java Sources to analyze, or to a single Java source file.
-     * @param outputDir   Path where the output should be generated. Has to be a directory.
-     */
-    public EngineConfiguration(@NotNull Path sourcesPath, @NotNull Path outputDir) {
-        this.sourcesPath = sourcesPath;
-        this.outputDir = outputDir;
-        this.resourcesLocale = LanguageTag.getDefault().getRelatedLocale();
-        this.outputFormat = OutputFormat.getDefault();
+    private final int batchSize;
+
+    @Unmodifiable
+    private final List<Path> dependencies;
+
+    private EngineConfiguration(@NotNull Builder builder) {
+        this.sourcesPath = builder.sourcesPath;
+        this.outputDir = builder.outputDir;
+        this.resourcesLocale = builder.resourcesLocale;
+        this.outputFormat = builder.outputFormat;
+        this.batchSize = builder.batchSize;
+        this.dependencies = Collections.unmodifiableList(builder.dependencies);
     }
 
-    /**
-     * Constructor with all possible configuration fields.
-     *
-     * @param sourcesPath     Path to directory with Java Sources to analyze, or to a single Java source file.
-     * @param outputDir       Path where the output should be generated. Has to be a directory.
-     * @param resourcesLocale The locale the engine should use when resources are loaded.
-     * @param outputFormat    The format for the generated output.
-     */
-    public EngineConfiguration(@NotNull Path sourcesPath, @NotNull Path outputDir,
-                               @NotNull Locale resourcesLocale, @NotNull OutputFormat outputFormat) {
-        this.sourcesPath = sourcesPath;
-        this.outputDir = outputDir;
-        this.resourcesLocale = resourcesLocale;
-        this.outputFormat = outputFormat;
+    public static Builder builder(@NotNull Path sourcesPath, @NotNull Path outputDir) {
+        return new Builder(sourcesPath, outputDir);
+    }
+
+    public static class Builder {
+
+        private final Path sourcesPath;
+
+        private final Path outputDir;
+
+        private Locale resourcesLocale = LanguageTag.getDefault().getRelatedLocale();
+
+        private OutputFormat outputFormat = OutputFormat.getDefault();
+
+        private int batchSize = OutputConfiguration.DEFAULT_BATCH_SIZE;
+
+        @NotNull
+        private List<Path> dependencies = new ArrayList<>();
+
+        public Builder(@NotNull Path sourcesPath, @NotNull Path outputDir) {
+            this.sourcesPath = sourcesPath;
+            this.outputDir = outputDir;
+        }
+
+        public Builder resourcesLocale(@NotNull Locale locale) {
+            this.resourcesLocale = locale;
+            return this;
+        }
+
+        public Builder resourcesLocale(@NotNull LanguageTag languageTag) {
+            this.resourcesLocale = languageTag.getRelatedLocale();
+            return this;
+        }
+
+        public Builder outputFormat(@NotNull OutputFormat format) {
+            this.outputFormat = format;
+            return this;
+        }
+
+        public Builder batchSize(int batchSize) {
+            this.batchSize = batchSize;
+            return this;
+        }
+
+        public Builder setDependencies(@NotNull Collection<Path> dependencies) {
+            this.dependencies = new ArrayList<>(dependencies);
+            return this;
+        }
+
+        public Builder clearDependencies() {
+            this.dependencies = new ArrayList<>();
+            return this;
+        }
+
+        public Builder addDependency(@NotNull Path dependency) {
+            this.dependencies.add(dependency);
+            return this;
+        }
+
+        @NotNull
+        public EngineConfiguration build() {
+            return new EngineConfiguration(this);
+        }
     }
 }

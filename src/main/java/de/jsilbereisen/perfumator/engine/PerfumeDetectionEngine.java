@@ -11,11 +11,14 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
+import de.jsilbereisen.perfumator.model.AnalysisResult;
+import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,17 +33,15 @@ import de.jsilbereisen.perfumator.io.output.OutputFormat;
 import de.jsilbereisen.perfumator.io.output.OutputGenerator;
 import de.jsilbereisen.perfumator.io.output.json.PerfumeJsonOutputGenerator;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import de.jsilbereisen.perfumator.util.PathUtil;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static de.jsilbereisen.perfumator.util.PathUtil.toRealPath;
@@ -60,10 +61,11 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     private final DetectableRegistry<Perfume> perfumeRegistry;
 
     @NotNull
-    private final Locale locale;
+    private final Bundles i18n;
 
     @NotNull
-    private final Bundles i18n;
+    @Unmodifiable
+    private final List<Path> analysisDependencies;
 
     @Getter
     @Setter
@@ -71,42 +73,28 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     private JavaParser astParser;
 
     @Getter
-    @Setter
     @Nullable
     private JavaParserFacade analysisContext;
 
-    public PerfumeDetectionEngine() {
-        this(LanguageTag.getDefault().getRelatedLocale());
-    }
-
-    public PerfumeDetectionEngine(@Nullable Locale locale) {
-        this(new PerfumeRegistry(), locale);
-
-        perfumeRegistry.loadRegistry(this.locale);
-    }
-
-    public PerfumeDetectionEngine(@Nullable Locale locale, @NotNull Bundles bundles) {
-        this(new PerfumeRegistry(), locale, bundles);
-
-        perfumeRegistry.loadRegistry(this.locale);
-    }
-
-    public PerfumeDetectionEngine(@NotNull DetectableRegistry<Perfume> perfumeRegistry, @Nullable Locale locale) {
-        this(perfumeRegistry, locale, new Bundles());
-
-        BundlesLoader bundlesLoader = new BundlesLoader(BundlesLoader.STANDARD_INTERNATIONALIZATION_PACKAGE, BundlesLoader.STANDARD_PERFUMES_PACKAGE, BundlesLoader.STANDARD_APPLICATION_PACKAGE);
-        bundlesLoader.loadApplicationBundle(i18n, this.locale);
-    }
-
-    public PerfumeDetectionEngine(@NotNull DetectableRegistry<Perfume> perfumeRegistry, @Nullable Locale locale, @NotNull Bundles bundles) {
-        this(perfumeRegistry, locale, bundles, getConfiguredJavaParser());
-    }
-
-    public PerfumeDetectionEngine(@NotNull DetectableRegistry<Perfume> perfumeRegistry, @Nullable Locale locale, @NotNull Bundles bundles, @NotNull JavaParser astParser) {
+    private PerfumeDetectionEngine(@NotNull DetectableRegistry<Perfume> perfumeRegistry, @NotNull Bundles bundles,
+                                   @NotNull JavaParser astParser, @NotNull List<Path> dependencies) {
         this.perfumeRegistry = perfumeRegistry;
-        this.locale = locale != null ? locale : LanguageTag.getDefault().getRelatedLocale();
         this.astParser = astParser;
         this.i18n = bundles;
+        this.analysisDependencies = Collections.unmodifiableList(dependencies);
+    }
+
+    /**
+     * Returns a builder with default settings and the default language {@link LanguageTag#getDefault()}.
+     *
+     * @return the builder.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Builder builder(@NotNull Locale locale) {
+        return new Builder(locale);
     }
 
     /**
@@ -131,19 +119,36 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     }
 
     @Override
-    public List<DetectedInstance<Perfume>> detect(@NotNull Path sources, @NotNull Path... dependencies) {
+    @NotNull
+    public AnalysisResult<Perfume> detect(@NotNull Path sources) {
         if (!(Files.isDirectory(sources) || PathUtil.isJavaSourceFile(sources))) {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.invalidSourcesPath"));
         }
 
+        StatisticsSummary<Perfume> summary = StatisticsSummary.from(perfumeRegistry);
         List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
 
-        analysisContext = createAnalysisContext(sources, dependencies);
+        // Has to be recreated to include the given sources
+        analysisContext = createAnalysisContext(sources, analysisDependencies);
+
+        StopWatch timer = StopWatch.create();
+        timer.start();
 
         if (Files.isDirectory(sources)) {
             try (Stream<Path> dirWalk = Files.walk(sources)) {
                 dirWalk.filter(path -> PathUtil.isRelevantJavaFile(path, sources.getFileName().toString()))
-                        .forEach(sourceFile -> detectedPerfumes.addAll(detectInSingleSourceFile(sourceFile)));
+                        .forEach(sourceFile -> {
+                            List<DetectedInstance<Perfume>> detections = detectInSingleSourceFile(sourceFile);
+
+                            // Keep statistics
+                            toRealPath(sourceFile).ifPresentOrElse(
+                                    summary::addToStatistics,
+                                    () -> summary.addToStatistics(sourceFile)
+                            );
+                            summary.addToStatistics(detections);
+
+                            detectedPerfumes.addAll(detections);
+                        });
 
             } catch (Exception e) {
                 log.error(i18n.getApplicationResource("log.error.analysis.unknown"));
@@ -151,16 +156,24 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
             }
 
         } else {
-            detectedPerfumes.addAll(detectInSingleSourceFile(sources));
+            List<DetectedInstance<Perfume>> detections = detectInSingleSourceFile(sources);
+
+            summary.addToStatistics(sources);
+            summary.addToStatistics(detections);
+
+            detectedPerfumes.addAll(detections);
         }
 
-        return detectedPerfumes;
+        timer.stop();
+        Path analysisPath = toRealPath(sources).orElse(sources);
+        log.info(i18n.getApplicationResource("log.info.analysis.done"), analysisPath, timer.getTime(TimeUnit.SECONDS));
+
+        return new AnalysisResult<>(detectedPerfumes, summary);
     }
 
     @Override
     public void detectAndSerialize(@NotNull Path sources, @NotNull OutputConfiguration config,
-                                   @NotNull OutputFormat format, @NotNull Path... dependencies)
-            throws SerializationException {
+                                   @NotNull OutputFormat format) throws SerializationException {
         if (!(Files.isDirectory(sources) || PathUtil.isJavaSourceFile(sources))) {
             throw new IllegalArgumentException(i18n.getApplicationResource("exception.invalidSourcesPath"));
         }
@@ -171,7 +184,10 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
         StatisticsSummary<Perfume> summary = StatisticsSummary.from(perfumeRegistry);
 
-        analysisContext = createAnalysisContext(sources, dependencies);
+        analysisContext = createAnalysisContext(sources, analysisDependencies);
+
+        StopWatch timer = StopWatch.create();
+        timer.start();
 
         if (Files.isDirectory(sources)) {
             List<DetectedInstance<Perfume>> detectedPerfumes = new ArrayList<>();
@@ -212,6 +228,10 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
             generateListing(detections, outputGenerator);
         }
+
+        timer.stop();
+        Path analysisPath = toRealPath(sources).orElse(sources);
+        log.info(i18n.getApplicationResource("log.info.analysis.done"), analysisPath, timer.getTime(TimeUnit.SECONDS));
 
         // Generate Summary
         try {
@@ -334,7 +354,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
      * latter is not validated!
      */
     @NotNull
-    private JavaParserFacade createAnalysisContext(@NotNull Path sources, @NotNull Path... dependencies) {
+    private JavaParserFacade createAnalysisContext(@NotNull Path sources, @NotNull List<Path> dependencies) {
         if (astParser == null) {
             astParser = getConfiguredJavaParser();
         }
@@ -374,5 +394,94 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         }
 
         return JavaParserFacade.get(typeSolver);
+    }
+
+    public static class Builder {
+
+        private DetectableRegistry<Perfume> perfumeRegistry;
+
+        private Bundles i18n;
+
+        private JavaParser astParser;
+
+        private List<Path> dependencies;
+
+        /**
+         * Constructor, sets the default engine state (loads the default {@link Perfume}s and resources with the
+         * default locale, specified by {@link LanguageTag#getDefault()}).
+         */
+        public Builder() {
+            this(LanguageTag.getDefault().getRelatedLocale());
+        }
+
+        /**
+         * Constructor, sets the default engine state (loads the default {@link Perfume}s and resources with the
+         * given {@link Locale}).
+         */
+        public Builder(@NotNull Locale locale) {
+            perfumeRegistry = new PerfumeRegistry();
+            perfumeRegistry.loadRegistry(locale);
+
+            i18n = new Bundles();
+            BundlesLoader bundlesLoader = new BundlesLoader(BundlesLoader.STANDARD_INTERNATIONALIZATION_PACKAGE, BundlesLoader.STANDARD_PERFUMES_PACKAGE, BundlesLoader.STANDARD_APPLICATION_PACKAGE);
+            bundlesLoader.loadApplicationBundle(i18n, locale);
+
+            astParser = getConfiguredJavaParser();
+
+            dependencies = new ArrayList<>();
+        }
+
+        /**
+         * Sets the registry. Does <b>not</b> call {@link DetectableRegistry#loadRegistry}.
+         *
+         * @param registry The registry to use.
+         * @return {@code this}.
+         */
+        @NotNull
+        public Builder registry(@NotNull DetectableRegistry<Perfume> registry) {
+            this.perfumeRegistry = registry;
+            return this;
+        }
+
+        @NotNull
+        public Builder i18nResources(@NotNull Bundles i18nResources) {
+            this.i18n = i18nResources;
+            return this;
+        }
+
+        @NotNull
+        public Builder javaParser(@NotNull JavaParser parser) {
+            this.astParser = parser;
+            return this;
+        }
+
+        @NotNull
+        public Builder setDependencies(@NotNull Collection<Path> dependencies) {
+            this.dependencies = new ArrayList<>(dependencies);
+            return this;
+        }
+
+        @NotNull
+        public Builder setDependencies(@NotNull Path... dependencies) {
+            this.dependencies = new ArrayList<>(List.of(dependencies));
+            return this;
+        }
+
+        @NotNull
+        public Builder addDependency(@NotNull Path dependency) {
+            this.dependencies.add(dependency);
+            return this;
+        }
+
+        @NotNull
+        public Builder clearDependencies() {
+            this.dependencies.clear();
+            return this;
+        }
+
+        @NotNull
+        public PerfumeDetectionEngine build() {
+            return new PerfumeDetectionEngine(perfumeRegistry, i18n, astParser, dependencies);
+        }
     }
 }

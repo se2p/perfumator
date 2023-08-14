@@ -1,12 +1,16 @@
 package de.jsilbereisen.perfumator.io;
 
+import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
 import lombok.Getter;
 import lombok.Setter;
 import org.kohsuke.args4j.Option;
 
 import de.jsilbereisen.perfumator.io.output.OutputFormat;
+import org.kohsuke.args4j.spi.MultiPathOptionHandler;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -39,4 +43,11 @@ public class CommandLineInput {
             handler = LocaleOptionHandler.class)
     private Locale locale = LocaleOptionHandler.getDefault();
 
+    @Option(name = "-d", aliases = {"--dependencies"}, metaVar = "option.metaVar.dependencies",
+            usage = "option.usage.dependencies", handler = MultiPathOptionHandler.class)
+    private List<Path> dependencies = new ArrayList<>();
+
+    @Option(name = "-b", aliases = {"--batch-size"}, metaVar = "option.metaVar.batchSize",
+            usage = "option.usage.batchSize")
+    private int batchSize = OutputConfiguration.DEFAULT_BATCH_SIZE;
 }

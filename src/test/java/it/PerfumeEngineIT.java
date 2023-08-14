@@ -25,9 +25,9 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
 
     @Test
     void analyseSourceDirectoryWithoutSerialization() {
-        DetectionEngine<Perfume> engine = new PerfumeDetectionEngine();
+        DetectionEngine<Perfume> engine = PerfumeDetectionEngine.builder().build();
 
-        List<DetectedInstance<Perfume>> detections = engine.detect(IT_TEST_PROJECT.resolve("src"));
+        List<DetectedInstance<Perfume>> detections = engine.detect(IT_TEST_PROJECT.resolve("src")).getDetections();
         detections.sort(null);
 
         assertThat(detections).hasSize(7);
@@ -72,7 +72,7 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
 
     @Test
     void analyseSourceDirectoryWithOutput() {
-        DetectionEngine<Perfume> engine = new PerfumeDetectionEngine();
+        DetectionEngine<Perfume> engine = PerfumeDetectionEngine.builder().build();
 
         engine.detectAndSerialize(IT_TEST_PROJECT.resolve("src"),
                 OutputConfiguration.from(OUTPUT_TEST_RESULTS_RESOURCES_ROOT_DIR), OutputFormat.JSON);

@@ -15,8 +15,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.jsilbereisen.perfumator.util.PathUtil.toRealPath;
@@ -53,7 +55,10 @@ public class CommandLineHandler {
 
         bundlesLoader.loadCliBundle(cliResourceHolder, applicationLocale);
         ResourceBundle cliBundle = cliResourceHolder.getCliBundle();
-        assert cliBundle != null;
+
+        if (cliBundle == null) {
+            throw new IllegalStateException("Command-line resources missing.");
+        }
 
         log.info(cliBundle.getString("log.generic.locale"), applicationLanguageName);
 
@@ -78,9 +83,22 @@ public class CommandLineHandler {
                 () -> log.info(cliBundle.getString("log.generic.inputPath"), inputPath.toAbsolutePath()));
         toRealPath(outputPath).ifPresentOrElse(path -> log.info(cliBundle.getString("log.generic.outputPath"), path),
                 () -> log.info(cliBundle.getString("log.generic.outputPath"), outputPath.toAbsolutePath()));
+
+        EngineConfiguration.Builder engineConfig = EngineConfiguration.builder(inputPath, outputPath);
+        engineConfig.resourcesLocale(applicationLocale);
+
+        engineConfig.outputFormat(cliInput.getOutputFormat());
         log.info(cliBundle.getString("log.generic.outputFormat"), cliInput.getOutputFormat().getAbbreviation());
 
-        return new EngineConfiguration(inputPath, outputPath, applicationLocale, cliInput.getOutputFormat());
+        engineConfig.batchSize(cliInput.getBatchSize());
+        log.info(cliBundle.getString("log.generic.batchSize"), cliInput.getBatchSize());
+
+        List<Path> dependencyPaths = cliInput.getDependencies().stream().map(path -> toRealPath(path).orElse(path))
+                .collect(Collectors.toList());
+        log.info(cliBundle.getString("log.generic.dependencies"), dependencyPaths);
+        engineConfig.setDependencies(cliInput.getDependencies());
+
+        return engineConfig.build();
     }
 
     /**

@@ -22,7 +22,7 @@ public class OutputConfiguration {
     /**
      * Maximal amount of output instances in a single listing file.
      */
-    public static final int MAX_BATCH_SIZE = 500000;
+    public static final int MAX_BATCH_SIZE = 500_000;
 
     /**
      * Minimal amount of output instances in a single listing file.
