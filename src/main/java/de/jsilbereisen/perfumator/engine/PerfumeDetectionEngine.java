@@ -376,7 +376,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                 log.error(i18n.getApplicationResource("log.error.analysis.nonExistentDependency"));
             }
 
-            if (dependency.endsWith(".jar")) {
+            if (dependency.toString().endsWith(".jar")) {
                 JarTypeSolver jarSolver;
                 try {
                     jarSolver = new JarTypeSolver(dependency);
