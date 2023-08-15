@@ -196,6 +196,8 @@ public final class NodeUtil {
         return Optional.ofNullable(resolved);
     }
 
+    // TODO: Replace & remove method, as it is unsafe (StackOverflowError when checking Reflected vs. JAR-resolved type)
+    // See e.g. SingletonPatternDetector for a way to replace
     /**
      * Safely checks whether the given base type could be assigned to the given potential super type.
      *

@@ -95,22 +95,12 @@ class CopyConstructorDetectorTest extends AbstractDetectorTest {
         ast = parseAstForFile(parser, testDirPerfumed.resolve("DependencyVariations.java"));
         detections = detector.detect(ast);
 
-        assertThat(detections).hasSize(3);
+        assertThat(detections).hasSize(1);
 
         detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("DependencyVariations");
         assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(9, 5, 11, 5));
-
-        detection = detections.get(1);
-        assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("DependencyVariations");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(14, 5, 16, 5));
-
-        detection = detections.get(2);
-        assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("DependencyVariations");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(19, 5, 21, 5));
     }
 
     @Test

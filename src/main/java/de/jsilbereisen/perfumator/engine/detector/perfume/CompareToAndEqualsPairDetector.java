@@ -6,7 +6,9 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.resolution.Resolvable;
+import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
@@ -21,14 +23,10 @@ import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static de.jsilbereisen.perfumator.util.NodeUtil.findFirstMatch;
-import static de.jsilbereisen.perfumator.util.NodeUtil.resolveFromStandardLibrary;
-import static de.jsilbereisen.perfumator.util.NodeUtil.resolveSafely;
-import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
+import static de.jsilbereisen.perfumator.util.NodeUtil.*;
 
 /**
  * {@link Detector} for the "Override 'compareTo' with 'equals'" {@link Perfume}.
@@ -51,13 +49,6 @@ public class CompareToAndEqualsPairDetector implements Detector<Perfume> {
 
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
-        if (analysisContext == null) {
-            return Collections.emptyList(); // Need resolution context to resolve the Comparable interface
-        }
-
-        ResolvedReferenceTypeDeclaration comparable = resolveFromStandardLibrary(COMPARABLE, analysisContext, "Unable"
-                + " to resolve " + COMPARABLE + " from the standard library.");
-
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
 
         TypeVisitor typeVisitor = new TypeVisitor();
@@ -68,7 +59,7 @@ public class CompareToAndEqualsPairDetector implements Detector<Perfume> {
         types.addAll(typeVisitor.getRecordDeclarations());
 
         for (TypeDeclaration<?> type : types) {
-            analyseType(type, comparable).ifPresent(detections::add);
+            analyseType(type).ifPresent(detections::add);
         }
 
         return detections;
@@ -86,20 +77,18 @@ public class CompareToAndEqualsPairDetector implements Detector<Perfume> {
 
     /**
      * First checks if the given type overrides {@code equals} and {@code compareTo}. If so, tries to resolve the
-     * type and verifies, that the given type is assignable to {@link Comparable}.<br/>
+     * type and verifies, that the given type implements {@link Comparable}.<br/>
      * Uses symbol resolution.
      *
      * @param type The type to analyse. Should only be {@link ClassOrInterfaceDeclaration} or
      *             {@link RecordDeclaration}, otherwise does not make sense to analyse it.
-     * @param comparableDeclaration Resolved declaration of {@link Comparable}.
      * @return If the above described conditions are met, returns an {@link Optional} of a {@link DetectedInstance}
      * for the {@link Perfume}, with the {@link CodeRange}s of the detected {@code equals} and {@code compareTo}
      * overrides. Otherwise, returns {@link Optional#empty()}.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    private Optional<DetectedInstance<Perfume>> analyseType(@NotNull TypeDeclaration<?> type,
-                                                            @NotNull ResolvedReferenceTypeDeclaration comparableDeclaration) {
+    private Optional<DetectedInstance<Perfume>> analyseType(@NotNull TypeDeclaration<?> type) {
         if (!type.isClassOrInterfaceDeclaration() && !type.isRecordDeclaration()) {
             return Optional.empty();
         }
@@ -116,7 +105,19 @@ public class CompareToAndEqualsPairDetector implements Detector<Perfume> {
             return Optional.empty();
         }
 
-        return safeCheckAssignableBy(comparableDeclaration, resolvedTypeDecl.get())
+        if (!resolvedTypeDecl.get().isClass()) {
+            return Optional.empty();
+        }
+
+        ResolvedClassDeclaration resolvedClass = resolvedTypeDecl.get().asClass();
+        Optional<List<ResolvedReferenceType>> implementedInterfaces = safeResolutionAction(resolvedClass::getAllInterfaces);
+        if (implementedInterfaces.isEmpty()) {
+            return Optional.empty();
+        }
+
+        boolean implementsComparable = implementedInterfaces.get().stream().anyMatch(interfaze -> interfaze.getQualifiedName().equals(COMPARABLE));
+
+        return implementsComparable
                 ? Optional.of(DetectedInstance.from(perfume, type, equalsOverride.get(), compareToOverride.get()))
                 : Optional.empty();
     }

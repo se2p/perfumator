@@ -7,9 +7,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class PathUtil {
 
@@ -20,6 +19,16 @@ public class PathUtil {
     public static final Path MAIN_JAVA = Path.of("src", "main", "java");
 
     public static final Path TEST_JAVA = Path.of("src", "test", "java");
+
+    public static final String MAVEN_TARGET_DIR_NAME = "target";
+
+    public static final String GRADLE_BUILD_DIR_NAME = "build";
+
+    public static final Set<String> MAVEN_TARGET_SUBDIRS = Set.of("archive-tmp", "classes", "generated-sources",
+            "generated-test-sources", "maven-archiver", "maven-status", "test-classes");
+
+    public static final Set<String> GRADLE_TARGET_SUBDIRS = Set.of("classes", "generated", "jacoco",
+            "javadoc", "libs", "reports", "test-results");
 
     private PathUtil() {
 
@@ -38,7 +47,7 @@ public class PathUtil {
     /**
      * Checks whether the given {@link Path} represents a relevant Java source file, in the
      * context of static analysis. A Java source file is seen as relevant if it is not a
-     * <i>package-info.java</i> file and if it's not in a <i>resources</i> directory.
+     * <i>package-info.java</i> file and if it's not in a <i>resources</i> or <i>target</i> directory.
      *
      * @param path The path to check.
      * @return {@code true} if the given {@link Path} represents an existing, relevant Java source file.
@@ -54,7 +63,62 @@ public class PathUtil {
             return false;
         }
 
+        if (isInBuildOutputDir(path, analysisRootDirName)) {
+            return false;
+        }
+
         return !isResourceInAnalysisRoot(path, analysisRootDirName);
+    }
+
+    private static boolean isInBuildOutputDir(@NotNull Path path, @NotNull String analysisRootDirName) {
+        Path normalizedPath = path.normalize();
+
+        boolean passedAnalysisRootDir = false;
+
+        // Iterate over all name elements of the path. Looks for target-directory-structure
+        // AFTER the analysis root dir
+        for (int i = 0; i < normalizedPath.getNameCount(); i++) {
+            Path current = normalizedPath.getName(i);
+
+            if (current.toString().equals(analysisRootDirName)) {
+                passedAnalysisRootDir = true;
+            }
+
+            // Look for build output dir
+            if (passedAnalysisRootDir) {
+                if ((current.toString().equals(MAVEN_TARGET_DIR_NAME) || current.toString().equals(GRADLE_BUILD_DIR_NAME))
+                        && i < normalizedPath.getNameCount() - 1) {
+                    Path targetDirSubtpath = normalizedPath.subpath(0, i + 1);
+
+                    if (!Files.isDirectory(targetDirSubtpath)) {
+                        continue;
+                    }
+
+                    // Validate that the detected "target" directory has some typical maven build output directory.
+                    // We dont want to ignore a source-code package just because it is named "target"
+                    boolean hasTypicalTargetSubdir;
+                    Set<String> typicalSubdirs = switch (current.toString()) {
+                        case MAVEN_TARGET_DIR_NAME -> MAVEN_TARGET_SUBDIRS;
+                        case GRADLE_BUILD_DIR_NAME -> GRADLE_TARGET_SUBDIRS;
+                        default -> Collections.emptySet();
+                    };
+
+                    try (Stream<Path> subdirs = Files.list(targetDirSubtpath)) {
+                        hasTypicalTargetSubdir = subdirs.anyMatch(pathInTargetDir -> Files.isDirectory(pathInTargetDir)
+                                && typicalSubdirs.contains(pathInTargetDir.getFileName().toString()));
+                    } catch (IOException e) {
+                        // ignored
+                        continue;
+                    }
+
+                    if (hasTypicalTargetSubdir) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

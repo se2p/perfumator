@@ -14,7 +14,9 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.utils.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -245,10 +247,17 @@ public class SingletonPatternDetector implements Detector<Perfume> {
             Optional<ResolvedReferenceTypeDeclaration> resolved = resolveSafely(clazz, this, clazz.getNameAsString());
 
             if (resolved.isPresent()) {
-                ResolvedReferenceTypeDeclaration serializable = resolveFromStandardLibrary(SERIALIZABLE_CLASS.b,
-                        analysisContext, "Could not resolve " + SERIALIZABLE_CLASS.b + " from the JDK.");
+                if (!resolved.get().isClass()) {
+                    return false;
+                }
 
-                return safeCheckAssignableBy(serializable, resolved.get());
+                ResolvedClassDeclaration resolvedClass = resolved.get().asClass();
+                Optional<List<ResolvedReferenceType>> implementedInterfaces = safeResolutionAction(resolvedClass::getAllInterfaces);
+                if (implementedInterfaces.isEmpty()) {
+                    return false;
+                }
+
+                return implementedInterfaces.get().stream().anyMatch(interfaze -> interfaze.getQualifiedName().equals(SERIALIZABLE_CLASS.b));
             }
         }
 

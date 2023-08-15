@@ -6,7 +6,9 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithImplements;
 import com.github.javaparser.resolution.Resolvable;
+import com.github.javaparser.resolution.declarations.ResolvedClassDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
@@ -23,11 +25,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static de.jsilbereisen.perfumator.util.NodeUtil.resolveFromStandardLibrary;
-import static de.jsilbereisen.perfumator.util.NodeUtil.resolveSafely;
-import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
+import static de.jsilbereisen.perfumator.util.NodeUtil.*;
 
 /**
+ * <p>
  * {@link Detector} for the "Clone blueprint" {@link Perfume}. Verifies the following criteria, in order for a method
  * to be perfumed:<br/>
  * <ul>
@@ -35,9 +36,21 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
  *     <li>The method at some point calls {@code super.clone()}.</li>
  *     <li>The class that contains the method implements {@link Cloneable} (or inherits it from an ancestor).</li>
  * </ul>
+ * </p>
+ * <p>
+ *     <b>Note 2023-08-15:</b> we avoid calling {@link de.jsilbereisen.perfumator.util.NodeUtil#safeCheckAssignableBy}
+ *  here now for checking a type implements {@link Cloneable}, because this causes a lot of issues with infinite recursion,
+ *  and thus causing {@link StackOverflowError}s. This is most likely caused by a <i>JavaParser</i> bug, as {@link com.github.javaparser.symbolsolver.reflectionmodel.ReflectionInterfaceDeclaration#isAssignableBy}
+ *  might call {@code other.canBeAssignedTo(this)}, and if {@code other} is a {@link com.github.javaparser.symbolsolver.javassistmodel.JavassistInterfaceDeclaration} or
+ *  similar (basically something that does not override {@link ResolvedReferenceTypeDeclaration#canBeAssignedTo}),
+ *  it will call back on the reflected iterator.<br/>
+ *  Same issue as in {@link IteratorNextContractDetector}.
+ * </p>
  */
 @EqualsAndHashCode
 public class CloneBlueprintDetector implements Detector<Perfume> {
+
+    public static final String CLONEABLE_QUALIFIED = "java.lang.Cloneable";
 
     private Perfume perfume;
 
@@ -95,10 +108,17 @@ public class CloneBlueprintDetector implements Detector<Perfume> {
                     .anyMatch(implementedType -> implementedType.getNameAsString().equals("Cloneable"));
         }
 
-        ResolvedReferenceTypeDeclaration cloneable = resolveFromStandardLibrary("java.lang.Cloneable",
-                analysisContext, "Unable to resolve \"java.lang.Cloneable\" from the standard library.");
+        if (!resolvedType.get().isClass()) {
+            return false;
+        }
 
-        return safeCheckAssignableBy(cloneable, resolvedType.get());
+        ResolvedClassDeclaration resolvedClass = resolvedType.get().asClass();
+        Optional<List<ResolvedReferenceType>> implementedInterfaces = safeResolutionAction(resolvedClass::getAllInterfaces);
+        if (implementedInterfaces.isEmpty()) {
+            return false;
+        }
+
+        return implementedInterfaces.get().stream().anyMatch(interfaze -> interfaze.getQualifiedName().equals(CLONEABLE_QUALIFIED));
     }
 
     private boolean callsSuperClone(@NotNull MethodDeclaration methodDeclaration) {

@@ -24,6 +24,7 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.as;
 import static de.jsilbereisen.perfumator.util.NodeUtil.resolveSafely;
-import static de.jsilbereisen.perfumator.util.NodeUtil.safeCheckAssignableBy;
 import static de.jsilbereisen.perfumator.util.NodeUtil.safeResolutionAction;
 
 // TODO: What if the field is a List, and just fieldname.addAll is called?
@@ -58,8 +58,22 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.safeResolutionAction;
  * filtering of the constructors, see {@link #findCopyConstructors}.
  * For the analysis of the constructors, see {@link #isPerfumedCopyConstructor} and the methods use in it.
  * </p>
+ * <p>
+ *     <b>Note 2023-08-15</b>: Unable to currently support {@link RecordDeclaration}s for the {@link Perfume},
+ *     as {@link com.github.javaparser.symbolsolver.JavaSymbolSolver#toTypeDeclaration} does not support Records.
+ * </p>
+ * <p>
+ *     <b>Note 2023-08-15:</b> we avoid calling {@link de.jsilbereisen.perfumator.util.NodeUtil#safeCheckAssignableBy}
+ *  here now for checking type compatibility of the constructor arg, because this causes a lot of issues with infinite recursion,
+ *  and thus causing {@link StackOverflowError}s. This is most likely caused by a <i>JavaParser</i> bug, as {@link com.github.javaparser.symbolsolver.reflectionmodel.ReflectionInterfaceDeclaration#isAssignableBy}
+ *  might call {@code other.canBeAssignedTo(this)}, and if {@code other} is a {@link com.github.javaparser.symbolsolver.javassistmodel.JavassistInterfaceDeclaration} or
+ *  similar (basically something that does not override {@link ResolvedReferenceTypeDeclaration#canBeAssignedTo}),
+ *  it will call back on the reflected class.<br/>
+ *  Same issue as in {@link IteratorNextContractDetector} or {@link CloneBlueprintDetector}.
+ * </p>
  */
 @EqualsAndHashCode
+@Slf4j
 public class CopyConstructorDetector implements Detector<Perfume> {
 
     /**
@@ -78,8 +92,7 @@ public class CopyConstructorDetector implements Detector<Perfume> {
 
         TypeVisitor typeVisitor = new TypeVisitor();
         astRoot.accept(typeVisitor, null);
-        List<TypeDeclaration<?>> types = new ArrayList<>(typeVisitor.getClassOrInterfaceDeclarations());
-        types.addAll(typeVisitor.getRecordDeclarations());
+        List<ClassOrInterfaceDeclaration> types = typeVisitor.getClassOrInterfaceDeclarations();
 
         for (TypeDeclaration<?> type : types) {
             detections.addAll(analyseType(type));
@@ -192,27 +205,17 @@ public class CopyConstructorDetector implements Detector<Perfume> {
      * <ul>
      *     <li>The constructor is not private.</li>
      *     <li>The constructor has exactly one parameter.</li>
-     *     <li>The parameters type either matches the name of the type that declares it, or if not,
-     *     can be resolved as a super-type of the declaring class.</li>
+     *     <li>The parameters type matches the type that declares it.</li>
      * </ul>
      * </p>
-     *
      * <p>
-     * <b>Notes:</b><br/>
-     * The check for the parameter being a super-type is currently not used in a meaningful manner. The idea behind
-     * it was for example the copy-constructors of the {@link Collection}s API, where one can e.g. call {@code new
-     * HashSet<>()} on any {@link Collection}, in order to be able to comfortably switch between data structure
-     * implementations.<br/>
-     * Joshua Bloch calls these constructors in his book <i>convert-sonstructors</i> (German:
-     * <i>Umwandlungs-Kontstruktoren</i>), as the parameter does not have the same type as the class which declares
-     * the constructor.<br/>
-     * The code that resolves the types and checks the assignability between them is for now still left in though,
-     * as it might have use in future perfume enhancements, or could be extracted for a new convert-constructor
-     * perfume, or whatever.
+     * <b>2023-08-15</b> Records currently are not supported by {@link com.github.javaparser.symbolsolver.JavaSymbolSolver#toTypeDeclaration},
+     * do not consider {@link RecordDeclaration}s anymore in {@link #detect}, as well as wrap the resolution of the param in
+     * try-catch, as it could be a record.
      * </p>
-     * @param constructor
-     * @param type
-     * @return
+     * @param constructor The constructor to check
+     * @param type The type that declares the given constructor
+     * @return {@code true} if the constructor might be a copy constructor, looking at its declaration
      * @param <T>
      */
     private <T extends Node & NodeWithTypeParameters<T> & NodeWithSimpleName<T> & Resolvable<ResolvedReferenceTypeDeclaration>>
@@ -245,7 +248,13 @@ public class CopyConstructorDetector implements Detector<Perfume> {
             return false;
         }
 
-        Optional<ResolvedType> resolvedParamType = safeResolutionAction(resolvedParam.get()::getType);
+        Optional<ResolvedType> resolvedParamType;
+        try {
+            resolvedParamType = safeResolutionAction(resolvedParam.get()::getType);
+        } catch (Exception e) {
+            log.debug("Exception when getting the resolved Parameter type.", e);
+            return false;
+        }
         if (resolvedParamType.isEmpty() || !resolvedParamType.get().isReferenceType()) {
             return false;
         }
@@ -256,7 +265,7 @@ public class CopyConstructorDetector implements Detector<Perfume> {
             return false;
         }
 
-        return safeCheckAssignableBy(resolvedParamTypeDecl.get(), resolvedTypeDeclaration.get());
+        return resolvedTypeDeclaration.get().getQualifiedName().equals(resolvedParamTypeDecl.get().getQualifiedName());
     }
 
     /**

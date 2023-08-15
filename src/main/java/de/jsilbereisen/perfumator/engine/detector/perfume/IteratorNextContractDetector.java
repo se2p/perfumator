@@ -1,7 +1,6 @@
 package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.*;
@@ -9,13 +8,12 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.ThrowStmt;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.declarations.*;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.utils.Pair;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +35,20 @@ import java.util.Optional;
 import static de.jsilbereisen.perfumator.util.NodeUtil.*;
 
 /**
+ * <p>
  * {@link Detector} for the "Iterator next() follows the contract" {@link Perfume}. Note that this
  * implementation checks whether {@link Iterator#hasNext()} or a boolean variable with a fitting name is used in
  * the if-Statement where the expected {@link NoSuchElementException} shall be thrown. So there are going to be
  * cases that are missed, due to unexpected variable names for example.
+ * </p>
+ * <p>
+ *     <b>Note 2023-08-15:</b> we avoid calling {@link de.jsilbereisen.perfumator.util.NodeUtil#safeCheckAssignableBy}
+ *     here now for checking a type implements {@link Iterator}, because this causes a lot of issues with infinite recursion,
+ *     and thus causing {@link StackOverflowError}s. This is most likely caused by a <i>JavaParser</i> bug, as {@link com.github.javaparser.symbolsolver.reflectionmodel.ReflectionInterfaceDeclaration#isAssignableBy}
+ *     might call {@code other.canBeAssignedTo(this)}, and if {@code other} is a {@link com.github.javaparser.symbolsolver.javassistmodel.JavassistInterfaceDeclaration} or
+ *     similar (basically something that does not override {@link ResolvedReferenceTypeDeclaration#canBeAssignedTo}),
+ *     it will call back on the reflected iterator.
+ * </p>
  */
 @Slf4j
 @EqualsAndHashCode
@@ -88,15 +96,17 @@ public class IteratorNextContractDetector implements Detector<Perfume> {
 
     @NotNull
     private Optional<DetectedInstance<Perfume>> analyseType(@NotNull ClassOrInterfaceDeclaration type) {
-        Optional<Type> iteratorTypeArgument = checkImplementsIterator(type);
-        if (iteratorTypeArgument.isEmpty()) {
+        Optional<ResolvedType> iteratorTypeArgument = checkImplementsIterator(type);
+        if (iteratorTypeArgument.isEmpty() || !iteratorTypeArgument.get().isReferenceType()) {
             return Optional.empty();
         }
+
+        ResolvedReferenceType iteratorType = iteratorTypeArgument.get().asReferenceType();
 
         Optional<MethodDeclaration> nextMethod = type.getMethods().stream()
                 .filter(method -> {
                     boolean hasCorrectName = method.getNameAsString().equals("next");
-                    boolean hasCorrectReturnType = method.getType().equals(iteratorTypeArgument.get());
+                    boolean hasCorrectReturnType = method.getType().asString().equals(iteratorType.getTypeDeclaration().map(ResolvedDeclaration::getName).orElse("....."));
                     boolean hasNoParameters = method.getParameters().isEmpty();
 
                     return method.isPublic() && hasCorrectName && hasCorrectReturnType && hasNoParameters;
@@ -114,39 +124,33 @@ public class IteratorNextContractDetector implements Detector<Perfume> {
     }
 
     @NotNull
-    private Optional<Type> checkImplementsIterator(@NotNull ClassOrInterfaceDeclaration type) {
+    private Optional<ResolvedType> checkImplementsIterator(@NotNull ClassOrInterfaceDeclaration type) {
         // Resolve the type's declaration
         Optional<ResolvedReferenceTypeDeclaration> resolvedTypeDecl = resolveSafely(type, this, type.getNameAsString());
-        if (resolvedTypeDecl.isEmpty()) {
+        if (resolvedTypeDecl.isEmpty() || !resolvedTypeDecl.get().isClass()) {
             return Optional.empty();
         }
 
-        // Resolve the type declaration of java.util.Iterator
-        assert analysisContext != null;
-        ResolvedReferenceTypeDeclaration iteratorDecl = resolveFromStandardLibrary(ITERATOR_QUALIFIED, analysisContext,
-                "Detector \"" + getClass().getSimpleName() + "\": \"" + ITERATOR_QUALIFIED
-                        + "\" could not be resolved. Make sure the given context has a ReflectionTypeSolver "
-                        + "configured and that the fully qualified class name is correct and indeed part of the JDK in "
-                        + "the correctverion.");
+        ResolvedClassDeclaration resolvedClass = resolvedTypeDecl.get().asClass();
+        Optional<List<ResolvedReferenceType>> implementedInterfaces = safeResolutionAction(resolvedClass::getAllInterfaces);
 
-        // Check whether the given type or one of its ancestors implements the Iterator interface
-        if (!safeCheckAssignableBy(iteratorDecl, resolvedTypeDecl.get())) {
+        if (implementedInterfaces.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<ResolvedReferenceType> iterator = implementedInterfaces.get().stream().filter(interfaze -> interfaze.getQualifiedName().equals(ITERATOR_QUALIFIED))
+                .findFirst();
+        if (iterator.isEmpty()) {
             return Optional.empty();
         }
 
         // Find the type argument, which concrete Iterator is implemented
-        ClassOrInterfaceType iteratorInDecl = type.getImplementedTypes().stream()
-                .filter(implemented -> implemented.getNameAsString().equals("Iterator")).findFirst().orElse(null);
-        if (iteratorInDecl == null) {
+        List<Pair<ResolvedTypeParameterDeclaration, ResolvedType>> iteratorTypeParams = iterator.get().getTypeParametersMap();
+        if (iteratorTypeParams.size() != 1) {
             return Optional.empty();
         }
 
-        List<Type> typeArgs = iteratorInDecl.getTypeArguments().orElse(new NodeList<>());
-        if (typeArgs.size() != 1) {
-            return Optional.empty();
-        }
-
-        return Optional.of(typeArgs.get(0));
+        return Optional.of(iteratorTypeParams.get(0).b);
     }
 
     private boolean analyseNextMethod(@NotNull MethodDeclaration methodDeclaration) {

@@ -57,6 +57,12 @@ import static de.jsilbereisen.perfumator.util.PathUtil.toRealPath;
 @Slf4j
 public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
 
+    /**
+     * Limits the cache size of a {@link JavaParserTypeSolver}.
+     * This value is more or less experimental - you might want to increase this for better performance.
+     */
+    public static final int JAVA_PARSER_CACHE_LIMIT = 100;
+
     @NotNull
     private final DetectableRegistry<Perfume> perfumeRegistry;
 
@@ -285,7 +291,16 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         // Apply all Detectors on the AST
         for (Detector<Perfume> detector : perfumeRegistry.getRegisteredDetectors()) {
             detector.setAnalysisContext(analysisContext);
-            List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+            List<DetectedInstance<Perfume>> detections;
+            try {
+                detections = detector.detect(ast);
+            } catch (Throwable t) {
+                // We want to catch EVERYTHING here, e.g. also StackOverflowError, just to be able to
+                // give it additional context by giving the file name that was being analysed + the detector.
+                throw new AnalysisException("Exception when analysing source file " + javaSourceFilePath
+                        + " with detector " + detector.getClass().getSimpleName(), t);
+            }
 
             detections.forEach(det -> toRealPath(javaSourceFilePath).ifPresentOrElse(
                     det::setSourceFile,
@@ -387,8 +402,8 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
                 typeSolver.add(jarSolver);
 
             } else {
-                // TODO Cache limit ?
-                JavaParserTypeSolver jpTypeSolver = new JavaParserTypeSolver(dependency, astParser.getParserConfiguration());
+                JavaParserTypeSolver jpTypeSolver = new JavaParserTypeSolver(dependency, astParser.getParserConfiguration(),
+                        JAVA_PARSER_CACHE_LIMIT);
                 typeSolver.add(jpTypeSolver);
             }
         }
