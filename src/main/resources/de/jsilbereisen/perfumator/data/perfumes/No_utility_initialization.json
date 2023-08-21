@@ -1,9 +1,11 @@
 {
-  "name": "No utility initialization",
+  "name": "No utility instantiation",
   "description": "A utility class with only static methods does not need to be instantiated, as one can call methods through the class itself. To avoid instantiation of the class, defining a private constructor comes in handy. This is quite easy to forget about, as Java adds an implicit default constructor when no other is defined, so using a single private constructor shows understanding of this Java mechanic and also the object-oriented understanding that an instance is in no case needed.",
-  "detectorClassSimpleName": "NoUtilityInitializationDetector",
-  "i18nBaseBundleName": "noUtilityInitialization",
-  "sources": ["https://rules.sonarsource.com/java/RSPEC-1118"],
+  "detectorClassSimpleName": "NoUtilityInstantiationDetector",
+  "i18nBaseBundleName": "noUtilityInstantiation",
+  "sources": [
+    "https://rules.sonarsource.com/java/RSPEC-1118"
+  ],
   "relatedPattern": "SMELL",
   "additionalInformation": "One could alternatively use an Enum-Type without any declared Enum-Constants as a Utility-Class."
 }

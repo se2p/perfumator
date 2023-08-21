@@ -1,9 +1,6 @@
 package it;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.jupiter.api.Test;
-import test.AbstractJsonOutputTest;
-
 import de.jsilbereisen.perfumator.engine.DetectionEngine;
 import de.jsilbereisen.perfumator.engine.PerfumeDetectionEngine;
 import de.jsilbereisen.perfumator.io.output.OutputConfiguration;
@@ -12,6 +9,8 @@ import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import org.junit.jupiter.api.Test;
+import test.AbstractJsonOutputTest;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -50,7 +49,7 @@ class PerfumeEngineIT extends AbstractJsonOutputTest {
         perf = detections.get(3);
         assertThat(perf.getTypeName()).isEqualTo("HasPerfumes2");
         assertThat(perf.getCodeRanges()).containsExactly(CodeRange.of(4, 1, 12, 1));
-        assertThat(perf.getDetectable().getDetectorClassSimpleName()).isEqualTo("NoUtilityInitializationDetector");
+        assertThat(perf.getDetectable().getDetectorClassSimpleName()).isEqualTo("NoUtilityInstantiationDetector");
 
         // Here, the order of the perfumes is different from the other tests, because the RelatedPattern is also
         // considered! (Is NULL in the JSON-listings)

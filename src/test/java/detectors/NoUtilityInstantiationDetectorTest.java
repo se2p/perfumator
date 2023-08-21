@@ -1,6 +1,12 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.perfume.NoUtilityInstantiationDetector;
+import de.jsilbereisen.perfumator.model.CodeRange;
+import de.jsilbereisen.perfumator.model.DetectedInstance;
+import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
+import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -8,21 +14,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import test.AbstractDetectorTest;
 
-import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.engine.detector.perfume.NoUtilityInitializationDetector;
-import de.jsilbereisen.perfumator.model.CodeRange;
-import de.jsilbereisen.perfumator.model.DetectedInstance;
-import de.jsilbereisen.perfumator.model.DetectedInstanceComparator;
-import de.jsilbereisen.perfumator.model.perfume.Perfume;
-
 import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class NoUtilityInitializationDetectorTest extends AbstractDetectorTest {
+class NoUtilityInstantiationDetectorTest extends AbstractDetectorTest {
 
-    private static final Detector<Perfume> DETECTOR = new NoUtilityInitializationDetector();
+    private static final Detector<Perfume> DETECTOR = new NoUtilityInstantiationDetector();
 
     private static final Path TEST_FILES_DIR = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("no_utility_initialization");
 
