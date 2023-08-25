@@ -1,9 +1,11 @@
 {
-  "name": "Resource Management in Try-catch",
+  "name": "Resource management in try-catch",
   "description": "In order to always ensure the closing of resources that are used within a try-catch statement,\nJava introduced the try-with-resources statement. Using this is a best practice to avoid accidental\nleaking of resources. Beginners might come across this when doing first exercises on reading files\nand using I/O streams. They should be rewarded for using this pattern, as the code itself is way cleaner\nand the alternative of not using it endangers them of forgetting to close the resources.\nThis perfume is a Solution Pattern, inspired by the \"Try-with-resources should be used\" Code Smell from SonarSource.",
   "detectorClassSimpleName": "TryWithResourcesDetector",
   "i18nBaseBundleName": "useTryWithResources",
-  "sources": ["https://rules.sonarsource.com/java/RSPEC-2093"],
+  "sources": [
+    "https://rules.sonarsource.com/java/RSPEC-2093"
+  ],
   "relatedPattern": "SMELL",
   "additionalInformation": null
 }
