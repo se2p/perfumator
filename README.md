@@ -3,7 +3,7 @@
 Repository for the "Perfumator" project for Java. A simple command line application to detect certain
 Code Perfumes in Java source code.
 
-The application is packaged as an executable jar with dependencies. For packaging, navigate to the project folder in a
+The application is packaged as an executable JAR with dependencies. For packaging, navigate to the project folder in a
 terminal and execute:
 `mvn clean package`.
 
