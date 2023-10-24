@@ -87,7 +87,7 @@ public class EqualsOverrideDetector implements Detector<Perfume> {
             return Optional.empty();
         }
 
-        // Only then check if any superclass overrides equals (requeries transitive resolution of ancestors)
+        // Only then check if any superclass overrides equals (requires transitive resolution of ancestors)
         if (!hasSuperclassThatOverridesEquals(clazz)) {
             return Optional.empty();
         }

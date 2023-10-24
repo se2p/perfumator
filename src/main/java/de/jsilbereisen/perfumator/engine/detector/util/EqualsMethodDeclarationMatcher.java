@@ -13,8 +13,11 @@ import java.util.List;
  * Object}, but which is not {@code java.lang.Object}.
  * </p>
  *
- * @// TODO: 30.07.2023  This could be fixed by additional symbol resolution of the type, but I see it as very
+ * @// Note: 30.07.2023  This could be fixed by additional symbol resolution of the type, but I see it as very
  * unlikely that this edge case happens, so it's left out for now.
+ * @// Note 24.10.2023: Would not recommend symbol resolution in this case, because I see the danger of not being able
+ * to resolve the class because of missing dependencies higher than the danger of someone defining a custom "equals(Object)"
+ * method, where Object is <i>not</i> java.lang.Object, as quite low.
  */
 public class EqualsMethodDeclarationMatcher extends PrimitiveMethodDeclarationMatcher {
 

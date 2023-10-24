@@ -30,6 +30,10 @@ public class PathUtil {
     public static final Set<String> GRADLE_TARGET_SUBDIRS = Set.of("classes", "generated", "jacoco",
             "javadoc", "libs", "reports", "test-results");
 
+    public static final String PACKAGE_INFO = "package-info.java";
+
+    public static final String MODULE_INFO = "module-info.java";
+
     private PathUtil() {
 
     }
@@ -58,8 +62,8 @@ public class PathUtil {
             return false;
         }
 
-        boolean isPackageInfo = path.getFileName().toString().equals("package-info.java");
-        if (isPackageInfo) {
+        String fileNameOfPath = path.getFileName().toString();
+        if (fileNameOfPath.equals(PACKAGE_INFO) || fileNameOfPath.equals(MODULE_INFO)) {
             return false;
         }
 

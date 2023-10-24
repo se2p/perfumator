@@ -19,6 +19,7 @@ import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.returnsClass;
 
@@ -40,7 +41,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.returnsClass;
  *             {@link #analyseConstructors}.
  *         </li>
  *         <li>
- *             The outer class and the builder have at least {@link #MIN_REQUIRED_FIELDS} fields. See
+ *             The outer class and the builder have at least {@link #MIN_REQUIRED_FIELDS} non-static fields. See
  *             {@link #hasBuilderPattern} and {@link #checkConstructorAndFieldRequirements}.
  *         </li>
  *         <li>
@@ -130,7 +131,7 @@ public class BuilderPatternDetector implements Detector<Perfume> {
      * @see BuilderPatternDetector Class documentation
      */
     private boolean hasBuilderPattern(@NotNull ClassOrInterfaceDeclaration topLevelClass) {
-        if (topLevelClass.getFields().size() < MIN_REQUIRED_FIELDS) {
+        if (topLevelClass.getFields().stream().filter(field -> !field.isStatic()).count() < MIN_REQUIRED_FIELDS) {
             return false;
         }
 

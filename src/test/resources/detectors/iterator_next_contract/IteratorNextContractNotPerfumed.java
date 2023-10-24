@@ -68,23 +68,4 @@ public class IteratorNextContractNotPerfumed {
             return "";
         }
     }
-
-    /*
-      Test case where hasNext() can not be resolved not possible currently,
-      as the ReflectionTypeSolver will always resolve it from the implemented Iterator interface.
-      This feels like a JavaParser bug, as it obviously does not have a default implementation.
-      BUT: would not even compile as in the Test case
-      TODO: submit issue/fix PR to JavaParser when there is time
-
-      Test case code:
-
-      static class CantResolveHasNext implements Iterator<String> {
-        public String next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            return "";
-        }
-      }
-     */
 }

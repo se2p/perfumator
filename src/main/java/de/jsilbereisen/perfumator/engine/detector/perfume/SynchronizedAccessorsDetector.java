@@ -37,6 +37,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.as;
  * Accessors are here identified through their usual naming, which leads to missing of accessors if these do not follow
  * the "get"/"set" naming strategy, but not following this naming should probably not be worth of being perfumed anyway.
  */
+// TODO: "is" fuer getter von boolean-Variable bedenken
 @EqualsAndHashCode
 public class SynchronizedAccessorsDetector implements Detector<Perfume> {
 

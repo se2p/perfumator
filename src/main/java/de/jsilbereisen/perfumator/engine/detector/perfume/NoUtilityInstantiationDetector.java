@@ -31,6 +31,7 @@ public class NoUtilityInstantiationDetector implements Detector<Perfume> {
 
     private JavaParserFacade analysisContext;
 
+    // TODO: consider Enum utility: no constant + only static methods -> Perfumed
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedInstances = new ArrayList<>();
@@ -66,14 +67,14 @@ public class NoUtilityInstantiationDetector implements Detector<Perfume> {
             return Optional.empty();
         }
 
-        if (areNotUtilityMethods(type)) {
+        if (isNotUtilityByMethods(type)) {
             return Optional.empty();
         }
 
         return Optional.of(DetectedInstance.from(type, perfume));
     }
 
-    private boolean areNotUtilityMethods(ClassOrInterfaceDeclaration type) {
+    private boolean isNotUtilityByMethods(ClassOrInterfaceDeclaration type) {
         List<MethodDeclaration> methods = type.getMethods();
 
         if (methods.isEmpty()) {

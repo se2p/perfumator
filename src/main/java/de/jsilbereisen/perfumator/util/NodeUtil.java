@@ -198,6 +198,7 @@ public final class NodeUtil {
 
     // TODO: Replace & remove method, as it is unsafe (StackOverflowError when checking Reflected vs. JAR-resolved type)
     // See e.g. SingletonPatternDetector for a way to replace
+    // Note 24.10.2023: Fix in the JavaParser library is seemingly complete in newer versions, see https://github.com/javaparser/javaparser/issues/3673
     /**
      * Safely checks whether the given base type could be assigned to the given potential super type.
      *

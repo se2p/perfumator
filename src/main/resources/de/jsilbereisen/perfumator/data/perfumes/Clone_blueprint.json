@@ -5,5 +5,5 @@
   "i18nBaseBundleName": "cloneBlueprint",
   "sources": ["J. Bloch: Effective Java, Chap. 3.4", "https://cwe.mitre.org/data/definitions/580", "https://rules.sonarsource.com/java/RSPEC-1182/"],
   "relatedPattern": "SMELL",
-  "additionalInformation": "An exception to the rule, that every override has to call \"super.clone()\" can be made for classes that are \"final\", as they can't have inheritors. But, as mentioned in the description, implementing \"Cloneable\" should not be the preferred option for implementing functionality that copies an object. For example, one can often also solve this problem with a copy-constructor (see the \"Copy constructor\" Perfume) or with a self-defined copy-method (e.g. via an interface)."
+  "additionalInformation": "An exception to the rule, that every override has to call \"super.clone()\" can be made for classes that are \"final\", as they can't have inheritors. This does not mean though that this case is seen as perfumed then. As mentioned in the description, implementing \"Cloneable\" should not be the preferred option for implementing functionality that copies an object. For example, one can often also solve this problem with a copy-constructor (see the \"Copy constructor\" Perfume) or with a self-defined copy-method (e.g. via an interface)."
 }

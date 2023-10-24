@@ -41,8 +41,7 @@ import static de.jsilbereisen.perfumator.util.NodeUtil.as;
  * All method calls to methods with the names, defined by the keys of
  * {@link #EXCEPTION_TEST_METHOD_TO_CLASS}, are searched for and checked for being perfumed. It is also
  * validated via checking the static imports, whether this is actually the method from the framework.
- * Only if none of the known framework methods are imported, all try-statements are visited and checked for
- * fitting the try-catch-idiom for RuntimeException testing, and for being perfumed.
+ * Only if none of the known framework methods are called, the try-catch-idiom is rewarded with Perfumes.
  */
 @EqualsAndHashCode
 public class MethodCallRteTestingDetector implements Detector<Perfume> {
@@ -58,7 +57,7 @@ public class MethodCallRteTestingDetector implements Detector<Perfume> {
             "assertThrowsExactly", Set.of("org.junit.jupiter.api.Assertions"),
             // AssertJ
             "assertThatThrownBy", Set.of("org.assertj.core.api.Assertions"),
-            // Fail method from JUnit 4 - do not support newer ones, the other methods should be prefered
+            // Fail method from JUnit 4 - do not support newer ones, the other methods should be preferred
             "fail", Set.of("org.junit.Assert"));
 
     /**

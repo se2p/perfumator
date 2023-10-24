@@ -90,49 +90,4 @@ public class TryWithResourcesDetector implements Detector<Perfume> {
 
         return !resources.isEmpty();
     }
-
-    // TODO: remove in the future
-    // Legacy Code, written before I saw that in order to compile, a resource HAS TO BE an auto-closeable anyway ...
-    // Keeping it in to be able to look up technique for symbol resolution in the future
-    // Nonetheless, was able to get some experience with the JavaParser API for symbol and type resolution
-    /*
-    private boolean isAutocloseable(@NotNull Expression resourceExpr) {
-        // If the resource is declared directly in the try-with-resources statement, see if it is an AutoCloseable
-        VariableDeclarationExpr variableDecl = as(resourceExpr, VariableDeclarationExpr.class);
-        if (variableDecl != null) {
-            return isAutocloseable(variableDecl);
-        }
-
-        return false;
-    }
-
-    private boolean isAutocloseable(@NotNull VariableDeclarationExpr variableDecl) {
-        List<VariableDeclarator> vars = variableDecl.getVariables();
-
-        for (VariableDeclarator decl : vars) {
-            ClassOrInterfaceType type = as(decl.getType(), ClassOrInterfaceType.class);
-
-            if (type == null) {
-                return false;
-            }
-
-            ResolvedReferenceTypeDeclaration autoCloseable = analysisContext.getTypeSolver().solveType(
-                    "java.lang.AutoCloseable");
-
-            ResolvedType resolvedType = null;
-            try {
-                resolvedType = type.resolve();
-            } catch (UnsolvedSymbolException e) {
-                log.debug("Unable to resolve type: \"" + type + "\". Type not seen as Autocloseable.");
-                return false;
-            }
-
-            if (!autoCloseable.isAssignableBy(resolvedType)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-     */
 }

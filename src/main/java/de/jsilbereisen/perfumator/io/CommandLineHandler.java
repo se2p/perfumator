@@ -44,8 +44,6 @@ public class CommandLineHandler {
                 BundlesLoader.STANDARD_PERFUMES_PACKAGE);
     }
 
-    // TODO: refactor method
-
     /**
      * Handles the given application input according to the set options.
      */

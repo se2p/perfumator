@@ -23,7 +23,22 @@ import java.util.Set;
 
 import static de.jsilbereisen.perfumator.util.NodeUtil.as;
 
-// TODO: Doc
+/**
+ * <p>
+ * {@link Detector} for the "JUnit 5 tests can be package-private" {@link Perfume}.
+ * This Perfume provides a solution pattern to the "<a href="https://rules.sonarsource.com/java/RSPEC-5786/">JUnit5
+ * test classes and methods should have default package visibility</a>" code smell from SonarSource.
+ * </p>
+ * <p>
+ * A test class should be detected as a Perfume when the following conditions apply:
+ * <ul>
+ *     <li>One of the annotations that is defined by {@link #TEST_ANNOTATIONS} is imported (=> Check whether the class is a test class)</li>
+ *     <li>The class is declared package-private and is not an interface nor abstract.</li>
+ *     <li>Every test method is declared package-private.</li>
+ *     <li>The class has at least one test.</li>
+ * </ul>
+ * </p>
+ */
 @EqualsAndHashCode
 public class PackagePrivateTestsDetector implements Detector<Perfume> {
 
@@ -99,6 +114,7 @@ public class PackagePrivateTestsDetector implements Detector<Perfume> {
      *     <li>Every test method is declared package-private.</li>
      *     <li>The class has at least one test.</li>
      * </ul>
+     *
      * @param classDeclaration The class to analyse.
      * @param importedAnnotations The names of the annotations that are imported and thus available.
      * @return An {@link Optional} with the {@link DetectedInstance} of the {@link Perfume} for the class, if the
@@ -110,7 +126,7 @@ public class PackagePrivateTestsDetector implements Detector<Perfume> {
             return Optional.empty();
         }
 
-        // First check whether the class is package-rpivate
+        // First check whether the class is package-private
         if (classDeclaration.isPrivate() || classDeclaration.isProtected() || classDeclaration.isPublic()) {
             return Optional.empty();
         }

@@ -57,15 +57,6 @@ public class OutputConfiguration {
     }
 
     /**
-     * Switching of output mode not supported yet. TODO
-     *
-     * @throws UnsupportedOperationException always.
-     */
-    public void setOutputMode(@NotNull OutputMode outputMode) {
-        throw new UnsupportedOperationException("Switching of output mode not supported yet. Current mode: " + outputMode);
-    }
-
-    /**
      * Setter for the batch size of detections that are put into a single listing.
      *
      * @param batchSize The new batch size.

@@ -3,6 +3,7 @@ package de.jsilbereisen.perfumator.model;
 import lombok.Value;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Result of an analysis run.
@@ -11,6 +12,8 @@ import java.util.List;
  */
 @Value
 public class AnalysisResult<T extends Detectable> {
+
+    UUID analysisResultId = UUID.randomUUID();
 
     List<DetectedInstance<T>> detections;
 

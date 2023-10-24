@@ -119,7 +119,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
                 "\", \"");
         log.info("Loaded Perfumes (internationalized): [\"" + loadedPerfumeNames + "\"]");
 
-        linkPerfumesToDetectors(bundles, loadedPerfumes);
+        linkPerfumesToDetectors(loadedPerfumes);
     }
 
     /**
@@ -139,7 +139,7 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
             allPerfumes.stream()
                     .filter(resource -> resource.getPath().endsWith(".json"))
                     .forEach(resource -> {
-                        Perfume perfume = loadSinglePerfume(bundles, resource);
+                        Perfume perfume = loadSinglePerfume(resource);
 
                         if (perfume != null) {
                             loadedPerfumes.add(perfume);
@@ -158,14 +158,13 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * Loads a single {@link Perfume} from its string-representation in JSON format with the <i>Jackson</i>
      * mapping library's API.
      *
-     * @param bundles  Resources for internationalized exception messages.
      * @param resource Resource with the {@link Perfume}'s JSON representation.
      * @return The loaded {@link Perfume} or {@code null} if some unknown failure, that does not trigger an
      * exception, occurred
      * @throws PerfumeLoadException If the given resource could not be read or if the mapping of the resource's
      *                              content to a {@link Perfume} instance failed notably.
      */
-    private @Nullable Perfume loadSinglePerfume(@NotNull Bundles bundles, @NotNull Resource resource) {
+    private @Nullable Perfume loadSinglePerfume(@NotNull Resource resource) {
         String jsonRepresentation;
         Perfume loadedPerfume = null;
 
@@ -192,14 +191,12 @@ public class PerfumeRegistry implements DetectableRegistry<Perfume> {
      * Instantiates the respective {@link Detector} for each of the given {@link Perfume}s.
      * The detector is loaded by the fully qualified class name, given by
      * {@link Perfume#getDetectorClassSimpleName()}, with the {@link #STANDARD_PERFUME_DETECTORS_PACKAGE} prepended.
-     *
-     * @param bundles        Resources for internationalized exception messages.
      * @param loadedPerfumes The Perfumes for which the detectors should be instanced.
      * @throws DetectorLoadException When being unable to instantiate the {@link Detector} for a {@link Perfume}
      *                               or when simply no {@link Detector} is found for it.
      */
     @SuppressWarnings("unchecked")
-    private void linkPerfumesToDetectors(@NotNull Bundles bundles, @NotNull List<Perfume> loadedPerfumes) {
+    private void linkPerfumesToDetectors(@NotNull List<Perfume> loadedPerfumes) {
         for (Perfume perfume : loadedPerfumes) {
             Class<?> detectorClass = null;
             try {

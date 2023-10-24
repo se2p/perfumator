@@ -56,7 +56,7 @@ public class OptimizedEnumCollectionsDetector implements Detector<Perfume> {
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detections = new ArrayList<>();
 
-        // Optimization: only one AST traversal, new visitor that registers all method-calls + "new ..." expressions
+        // TODO Optimization: only one AST traversal, new visitor that registers all method-calls + "new ..." expressions
         detections.addAll(detectEnumSetMethodCalls(astRoot));
         detections.addAll(detectEnumMapConstructorCalls(astRoot));
 

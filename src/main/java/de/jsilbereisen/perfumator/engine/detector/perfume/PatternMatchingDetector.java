@@ -17,7 +17,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// TODO: Doc
+/**
+ * {@link Detector} for the "Pattern matching with 'instanceof'" {@link Perfume}.
+ * An instance of this Perfume should be detected everytime that the pattern matching language feature is used
+ * with the {@code instanceof} operator (pattern matching with switch expressions is not yet supported by JavaParser.
+ * <br/>
+ * Acts as a solution pattern to the SonarSource rule "<a href="https://rules.sonarsource.com/java/RSPEC-6201/">Pattern
+ * Matching for "instanceof" operator should be used instead of simple "instanceof" + cast</a>"
+ */
 @EqualsAndHashCode
 public class PatternMatchingDetector implements Detector<Perfume> {
 
