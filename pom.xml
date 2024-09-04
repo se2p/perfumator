@@ -28,7 +28,7 @@
         <!-- no submodules yet, placeholder for potential future modularization -->
 
         <!-- Dependency versions -->
-        <javaparser.version>3.25.4</javaparser.version>
+        <javaparser.version>3.26.2</javaparser.version>
         <args4j.version>2.33</args4j.version>
         <jackson.version>2.15.0</jackson.version>
         <lombok.version>1.18.26</lombok.version>
