@@ -1,0 +1,9 @@
+{
+  "name": "Setup or teardown method",
+  "description": "Common setup and teardown tasks should preferably be performed inside methods annotated with either '@BeforeEach', '@BeforeAll', '@AfterEach' or '@AfterAll'. This can greatly reduce the boilerplate code inside individual tests.",
+  "detectorClassSimpleName": "SetupAndTeardownMethodDetector",
+  "i18nBaseBundleName": "setupAndTeardownMethod",
+  "sources": null,
+  "relatedPattern": "SMELL",
+  "additionalInformation": null
+}

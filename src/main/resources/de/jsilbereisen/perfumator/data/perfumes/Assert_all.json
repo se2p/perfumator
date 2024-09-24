@@ -1,0 +1,9 @@
+{
+  "name": "Assert all",
+  "description": "By using an assertAll instead of multiple assertThat expressions, the programmer is informed about all results, even though some assertions may fail. In contrast, a failing assertThat would terminate the test execution.",
+  "detectorClassSimpleName": "AssertAllDetector",
+  "i18nBaseBundleName": "assertAll",
+  "sources": null,
+  "relatedPattern": "SMELL",
+  "additionalInformation": null
+}

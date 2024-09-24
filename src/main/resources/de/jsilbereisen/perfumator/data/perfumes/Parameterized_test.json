@@ -1,0 +1,9 @@
+{
+  "name": "Parameterized test",
+  "description": "Similar tests should be grouped in a single Parameterized test",
+  "detectorClassSimpleName": "ParameterizedTestDetector",
+  "i18nBaseBundleName": "parameterizedTests",
+  "sources": ["https://rules.sonarsource.com/java/RSPEC-5976/"],
+  "relatedPattern": "SMELL",
+  "additionalInformation": null
+}
