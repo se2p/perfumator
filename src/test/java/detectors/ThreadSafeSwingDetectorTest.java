@@ -2,7 +2,7 @@ package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.engine.detector.perfume.ParameterizedTestDetector;
+import de.jsilbereisen.perfumator.engine.detector.perfume.ThreadSafeSwingDetector;
 import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -15,9 +15,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
+public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
 
-    private static final Path TEST_FILE = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("ParameterizedTests.java");
+    private static final Path TEST_FILE = 
+            DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("swing").resolve("InvokeLaterInvokeAndWait.java");
 
     private static Perfume perfume;
 
@@ -28,9 +29,9 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
     @BeforeAll
     static void init() {
         perfume = new Perfume();
-        perfume.setName("Parameterized Test");
+        perfume.setName("Thread safe Swing");
 
-        detector = new ParameterizedTestDetector();
+        detector = new ThreadSafeSwingDetector();
         detector.setConcreteDetectable(perfume);
 
         ast = parseAstForFile(TEST_FILE);
@@ -40,12 +41,16 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
     void detect() {
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
-        assertThat(detections).hasSize(1);
+        assertThat(detections).hasSize(2);
 
         DetectedInstance<Perfume> detection = detections.get(0);
-
         assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("ParameterizedTests");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(22, 5, 26, 5));
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWait");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(9, 9, 11, 10));
+
+        detection = detections.get(1);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWait");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 15, 10));
     }
 }
