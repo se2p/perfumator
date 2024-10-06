@@ -1,9 +1,9 @@
 {
   "name": "Setup or teardown method",
-  "description": "Common setup and teardown tasks should preferably be performed inside methods annotated with either '@BeforeEach', '@BeforeAll', '@AfterEach' or '@AfterAll'. This can greatly reduce the boilerplate code inside individual tests.",
+  "description": "Common setup and teardown tasks should preferably be performed inside methods annotated with either \"@BeforeEach\", \"@BeforeAll\", \"@AfterEach\" or \"@AfterAll\". This can greatly reduce the boilerplate code inside individual tests and makes the tests more focused on the actual logic that is being tested.",
   "detectorClassSimpleName": "SetupAndTeardownMethodDetector",
-  "i18nBaseBundleName": "setupAndTeardownMethod",
-  "sources": null,
+  "i18nBaseBundleName": "setupAndTeardownMethods",
+  "sources": ["https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall"],
   "relatedPattern": "SMELL",
   "additionalInformation": null
 }

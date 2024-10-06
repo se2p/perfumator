@@ -1,9 +1,9 @@
 {
   "name": "Assert all",
-  "description": "By using an assertAll instead of multiple assertThat expressions, the programmer is informed about all results, even though some assertions may fail. In contrast, a failing assertThat would terminate the test execution.",
+  "description": "The \"org.junit.jupiter.api.assertAll\" is used group multiple individual assertions together. The advantage of using this method to group the assertions instead of calling them individually is that if one assertion fails, the others are still executed. Therefore, the user gains insight on the results of all tests, instead of only the tests up to the failed assertion, where the thrown exception would otherwise terminate the test execution.",
   "detectorClassSimpleName": "AssertAllDetector",
   "i18nBaseBundleName": "assertAll",
-  "sources": null,
-  "relatedPattern": "SMELL",
+  "sources": ["https://stackoverflow.com/questions/40796756/assertall-vs-multiple-assertions-in-junit5"],
+  "relatedPattern": null,
   "additionalInformation": null
 }

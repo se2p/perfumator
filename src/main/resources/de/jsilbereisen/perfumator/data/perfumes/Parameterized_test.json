@@ -1,8 +1,8 @@
 {
   "name": "Parameterized test",
-  "description": "Similar tests should be grouped in a single Parameterized test",
+  "description": "Tests can be annotated with the \"org.junit.jupiter.params.ParameterizedTest\" annotation. Such parameterized tests makes the tested code reusable in cases where the logic is similar, and is preferable over writing multiple tests that essentially test the same thing with different values.",
   "detectorClassSimpleName": "ParameterizedTestDetector",
-  "i18nBaseBundleName": "parameterizedTests",
+  "i18nBaseBundleName": "parameterizedTest",
   "sources": ["https://rules.sonarsource.com/java/RSPEC-5976/"],
   "relatedPattern": "SMELL",
   "additionalInformation": null

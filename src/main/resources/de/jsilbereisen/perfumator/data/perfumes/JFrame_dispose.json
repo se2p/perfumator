@@ -1,6 +1,6 @@
 {
   "name": "JFrame dispose",
-  "description": "Instead of calling \"System.exit()\", which completely terminates the java virtual machine, the \"javax.swing.JFrame.dispose()\" closes the frame and its assigned resources in a more controlled manner. Closing the application this way, one has to make sure to terminate all remaining threads programmatically. While this may seem like a downside, it ultimately provides the most control, as ongoing processes can be waited for until they are completed.",
+  "description": "Instead of calling \"System.exit\", which completely terminates the java virtual machine, the \"javax.swing.JFrame.dispose\" closes the frame and its assigned resources in a more controlled manner. Closing the application this way, one has to make sure to terminate all remaining threads programmatically. While this may seem like a downside, it ultimately provides the most control, as ongoing processes can be completed before the program is terminated.",
   "detectorClassSimpleName": "JFrameDisposeDetector",
   "i18nBaseBundleName": "jFrameDispose",
   "sources": ["Programmierung II - Uni Passau", "https://stackoverflow.com/questions/13360430/jframe-dispose-vs-system-exit"],

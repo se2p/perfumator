@@ -1,6 +1,6 @@
 {
   "name": "Thread safe Swing",
-  "description": "Java Swing application make use of the event dispatch thread. This thread must handle the initialization of and update operations on the GUI components, as well as event handling. Event handlers We as programmers are responsible that GUI components are created and updated in the event dispatch thread. We can achieve this by placing the related code inside a Runnable that we pass as an argument to either the \"SwingUtilities.invokeLater\" or the \"SwingUtilities.invokeAndWait\" method.",
+  "description": "Java Swing application make use of the event dispatch thread. This thread must handle the initialization of and update operations on the GUI components, as well as event handling. We as programmers are responsible that GUI components are created and updated in the event dispatch thread. We can achieve this by placing the related code inside a Runnable that we pass as an argument to either the \"SwingUtilities.invokeLater\" or the \"SwingUtilities.invokeAndWait\" method.",
   "detectorClassSimpleName": "ThreadSafeSwingDetector",
   "i18nBaseBundleName": "threadSafeSwing",
   "sources": ["Programmierung II - Uni Passau", "https://docs.oracle.com/javase/tutorial/uiswing/concurrency/dispatch.html"],
