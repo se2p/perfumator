@@ -7,7 +7,7 @@
 
     <groupId>de.jsilbereisen</groupId>
     <artifactId>perfumator-java</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
     <packaging>jar</packaging>
 
     <developers>
