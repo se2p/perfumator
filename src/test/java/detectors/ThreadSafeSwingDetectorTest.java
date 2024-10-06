@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
 
-    private static final Path TEST_FILE = 
-            DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("swing").resolve("InvokeLaterInvokeAndWait.java");
+    private static final Path TEST_FILES_DIR = 
+            DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("swing").resolve("invoke_later_invoke_and_wait");
 
     private static Perfume perfume;
 
@@ -33,24 +33,68 @@ public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
 
         detector = new ThreadSafeSwingDetector();
         detector.setConcreteDetectable(perfume);
-
-        ast = parseAstForFile(TEST_FILE);
     }
 
     @Test
-    void detect() {
+    void detectStaticImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticImport.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(2);
 
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWait");
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitStaticImport");
         assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(9, 9, 11, 10));
 
         detection = detections.get(1);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWait");
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitStaticImport");
         assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(13, 9, 15, 10));
     }
+
+    @Test
+    void detectWithoutStaticImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoStaticImport.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).hasSize(2);
+
+        DetectedInstance<Perfume> detection = detections.get(0);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitNoStaticImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(8, 9, 10, 10));
+
+        detection = detections.get(1);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitNoStaticImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(12, 9, 14, 10));
+    }
+
+    @Test
+    void detectWithWildcardImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticWildcardImport.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).hasSize(2);
+
+        DetectedInstance<Perfume> detection = detections.get(0);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitStaticWildcardImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(8, 9, 10, 10));
+
+        detection = detections.get(1);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("InvokeLaterInvokeAndWaitStaticWildcardImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(12, 9, 14, 10));
+    }
+    
+    @Test
+    void detectNoPerfume() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoPerfume.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+        
+        assertThat(detections).isEmpty();
+    }
+    
 }

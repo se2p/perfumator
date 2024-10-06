@@ -2,9 +2,11 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.engine.visitor.MethodCallByNameVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import lombok.EqualsAndHashCode;
@@ -14,6 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link Detector} for the "Assert all" {@link Perfume}.
+ * Detects the perfume only if the method is part of the {@link org.junit.jupiter.api.Assertions} class.
+ */
 @EqualsAndHashCode
 public class AssertAllDetector implements Detector<Perfume> {
 
@@ -21,7 +27,8 @@ public class AssertAllDetector implements Detector<Perfume> {
 
     private JavaParserFacade analysisContext;
     
-    private static final String ASSERT_ALL_METHOD_NAME = "assertAll";
+    private static final String QUALIFIED_ASSERT_ALL_METHOD_NAME = "org.junit.jupiter.api.Assertions.assertAll";
+    private static final String ASSERTIONS_IMPORT_NAME = "org.junit.jupiter.api.Assertions";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -43,14 +50,22 @@ public class AssertAllDetector implements Detector<Perfume> {
     }
 
     private List<MethodCallExpr> getAssertAllMethodCalls(@NotNull CompilationUnit astRoot) {
-        MethodCallByNameVisitor methodCallByNameVisitor = new MethodCallByNameVisitor();
-        astRoot.accept(methodCallByNameVisitor, null);
-        List<MethodCallExpr> assertAllMethodCallExpressions = new ArrayList<>();
-        for (MethodCallExpr methodCallExpr : methodCallByNameVisitor.getMethodCalls()) {
-            if (ASSERT_ALL_METHOD_NAME.equals(methodCallExpr.getNameAsString())) {
-                assertAllMethodCallExpressions.add(methodCallExpr);
+        return astRoot.findAll(MethodCallExpr.class, expr -> {
+            // contains instead of equals because of possible 'Assertions.assertAll' calls
+            if (!expr.getNameAsString().contains("assertAll")) {
+                return false;
             }
-        }
-        return assertAllMethodCallExpressions;
+            if (expr.getScope().isPresent()) {
+                // for non-static imports
+                ResolvedType resolvedType = expr.getScope().get().calculateResolvedType();
+                return resolvedType instanceof ReferenceTypeImpl referenceType 
+                        && referenceType.getQualifiedName().equals(ASSERTIONS_IMPORT_NAME);
+            } else {
+                // for static imports
+                ResolvedMethodDeclaration resolvedMethodDeclaration = expr.resolve();
+                String qualifiedName = resolvedMethodDeclaration.getQualifiedName();
+                return qualifiedName.equals(QUALIFIED_ASSERT_ALL_METHOD_NAME);
+            }
+        });
     }
 }

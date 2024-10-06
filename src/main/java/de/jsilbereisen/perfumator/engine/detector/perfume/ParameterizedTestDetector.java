@@ -3,9 +3,9 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
-import de.jsilbereisen.perfumator.engine.visitor.MethodDeclarationVisitor;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
 import lombok.EqualsAndHashCode;
@@ -15,6 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link Detector} for the "Parameterized Test" {@link Perfume}.
+ * Detects the perfume only if the annotation is part of JUnit 5 ({@link org.junit.jupiter.params.ParameterizedTest}).
+ */
 @EqualsAndHashCode
 public class ParameterizedTestDetector implements Detector<Perfume> {
 
@@ -22,8 +26,8 @@ public class ParameterizedTestDetector implements Detector<Perfume> {
 
     private JavaParserFacade analysisContext;
     
-    private static final String PARAMETERIZED_TEST_IDENTIFIER = "ParameterizedTest";
-    
+    private static final String PARAMETERIZED_TEST_IDENTIFIER = "org.junit.jupiter.params.ParameterizedTest";
+
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedInstances = new ArrayList<>();
@@ -42,21 +46,11 @@ public class ParameterizedTestDetector implements Detector<Perfume> {
     public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
         this.analysisContext = analysisContext;
     }
-    
-    private List<MethodDeclaration> getParameterizedTestMethodDeclarations(@NotNull CompilationUnit astRoot) {
-        MethodDeclarationVisitor methodDeclarationVisitor = new MethodDeclarationVisitor();
-        astRoot.accept(methodDeclarationVisitor, null);
-        List<MethodDeclaration> parameterizedTestMethodDeclarations = new ArrayList<>();
-        for (MethodDeclaration declaration : methodDeclarationVisitor.getMethodDeclarations()) {
-            boolean hasParameterizedTestAnnotation = declaration.getAnnotations()
-                    .stream()
-                    .map(AnnotationExpr::getNameAsString)
-                    .anyMatch(id -> id.equals(PARAMETERIZED_TEST_IDENTIFIER));
 
-            if (hasParameterizedTestAnnotation) {
-                parameterizedTestMethodDeclarations.add(declaration);
-            }
-        }
-        return parameterizedTestMethodDeclarations;
+    private List<MethodDeclaration> getParameterizedTestMethodDeclarations(@NotNull CompilationUnit astRoot) {
+        return astRoot.findAll(MethodDeclaration.class, methodDeclaration -> methodDeclaration.getAnnotations().stream()
+                .map(AnnotationExpr::resolve)
+                .map(ResolvedTypeDeclaration::getQualifiedName)
+                .anyMatch(name -> name.equals(PARAMETERIZED_TEST_IDENTIFIER)));
     }
 }

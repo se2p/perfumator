@@ -2,6 +2,7 @@ package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
+import de.jsilbereisen.perfumator.engine.detector.perfume.AssertAllDetector;
 import de.jsilbereisen.perfumator.model.CodeRange;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AssertAllDetectorTest extends AbstractDetectorTest {
     
-    private static final Path TEST_FILE = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("AssertAllPerfume.java");
+    private static final Path TEST_FILES_DIR = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("assert_all");
 
     private static Perfume perfume;
 
@@ -29,14 +30,13 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
         perfume = new Perfume();
         perfume.setName("Assert All");
 
-        detector = new de.jsilbereisen.perfumator.engine.detector.perfume.AssertAllDetector();
+        detector = new AssertAllDetector();
         detector.setConcreteDetectable(perfume);
-
-        ast = parseAstForFile(TEST_FILE);
     }
 
     @Test
-    void detect() {
+    void detectStaticImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllStaticImport.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -44,7 +44,43 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
         DetectedInstance<Perfume> detection = detections.get(0);
 
         assertThat(detection.getDetectable()).isEqualTo(perfume);
-        assertThat(detection.getTypeName()).isEqualTo("AssertAllPerfume");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(16, 9, 21, 9));
+        assertThat(detection.getTypeName()).isEqualTo("AssertAllStaticImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(15, 9, 20, 9));
+    }
+
+    @Test
+    void detectWithoutStaticImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllNoStaticImport.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).hasSize(1);
+
+        DetectedInstance<Perfume> detection = detections.get(0);
+
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("AssertAllNoStaticImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(14, 9, 19, 9));
+    }
+
+    @Test
+    void detectWithWildcardImport() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertionsStaticWildcardImport.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).hasSize(1);
+
+        DetectedInstance<Perfume> detection = detections.get(0);
+
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("AssertionsStaticWildcardImport");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(15, 9, 20, 9));
+    }
+
+    @Test
+    void detectNoPerfumeForDifferentAssertAllMethod() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllNoPerfume.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).isEmpty();
     }
 }

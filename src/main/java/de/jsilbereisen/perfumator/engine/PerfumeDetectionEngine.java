@@ -6,10 +6,12 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import de.jsilbereisen.perfumator.model.AnalysisResult;
 import de.jsilbereisen.perfumator.model.StatisticsSummary;
@@ -119,6 +121,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
         ParserConfiguration config = new ParserConfiguration();
 
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+        config.setSymbolResolver(new JavaSymbolSolver(new ReflectionTypeSolver(false)));
         config.setDoNotAssignCommentsPrecedingEmptyLines(false);
 
         return new JavaParser(config);

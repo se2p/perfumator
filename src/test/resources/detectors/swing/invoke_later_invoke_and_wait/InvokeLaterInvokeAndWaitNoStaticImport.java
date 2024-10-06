@@ -1,7 +1,6 @@
 package de.jsilbereisen.test;
 
 import javax.swing.SwingUtilities;
-import static javax.swing.SwingUtilities.invokeAndWait;
 
 public class InvokeLaterInvokeAndWait {
 
@@ -9,16 +8,17 @@ public class InvokeLaterInvokeAndWait {
         SwingUtilities.invokeLater(new Runnable() {
             // perfume
         });
-        
-        invokeAndWait(() -> {
+
+        SwingUtilities.invokeAndWait(() -> {
             // perfume
         });
         
-        // no perfume
-        invokeLater();
+        invokeLater(() -> {
+            // no perfume
+        });
     }
     
-    public static void invokeLater() {
-        // no perfume, not the library method we are looking for
+    public static void invokeLater(Runnable runnable) {
+        
     }
 }

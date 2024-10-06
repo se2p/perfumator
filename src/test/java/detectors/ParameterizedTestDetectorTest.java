@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
 
-    private static final Path TEST_FILE = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("ParameterizedTests.java");
+    private static final Path TEST_FILES_DIR = DEFAULT_DETECTOR_TEST_FILES_DIR.resolve("parameterized_tests");
 
     private static Perfume perfume;
 
@@ -32,12 +32,11 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
 
         detector = new ParameterizedTestDetector();
         detector.setConcreteDetectable(perfume);
-
-        ast = parseAstForFile(TEST_FILE);
     }
 
     @Test
     void detect() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("ParameterizedTests.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -47,5 +46,18 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("ParameterizedTests");
         assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(22, 5, 26, 5));
+    }
+
+    @Test
+    void detectNoPerfumeForOnwAnnotation() {
+        ast = parseAstForFile(TEST_FILES_DIR.resolve("ParameterizedTestsOwnAnnotation.java"));
+        List<DetectedInstance<Perfume>> detections = detector.detect(ast);
+
+        assertThat(detections).hasSize(1);
+        
+        DetectedInstance<Perfume> detection = detections.get(0);
+        assertThat(detection.getDetectable()).isEqualTo(perfume);
+        assertThat(detection.getTypeName()).isEqualTo("ParameterizedTestsOwnAnnotation");
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(17, 5, 21, 5));
     }
 }

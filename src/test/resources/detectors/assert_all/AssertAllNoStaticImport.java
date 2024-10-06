@@ -1,19 +1,17 @@
 package de.jsilbereisen.test;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertAll;
-
-public class AssertAllPerfume {
+public class AssertAllNoStaticImport {
     
     @Test
     void testWithAssertAll() {
         String i = "1";
         int j = 2;
         int k = 3;
-        
-        assertAll(
+
+        Assertions.assertAll(
             "grouped type assertions",
             () -> assertThat(i instanceof Integer),
             () -> assertThat(j instanceof Integer),
