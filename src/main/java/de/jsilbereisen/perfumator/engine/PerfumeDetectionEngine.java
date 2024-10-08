@@ -120,7 +120,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
     public static JavaParser getConfiguredJavaParser() {
         ParserConfiguration config = new ParserConfiguration();
 
-        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
         config.setSymbolResolver(new JavaSymbolSolver(new ReflectionTypeSolver(false)));
         config.setDoNotAssignCommentsPrecedingEmptyLines(false);
 
