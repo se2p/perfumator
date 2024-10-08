@@ -50,16 +50,16 @@ class SwingTimerDetectorTest extends AbstractDetectorTest {
         detection = detections.get(1);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SwingTimer");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(13, 18, 18, 10));
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(14, 18, 19, 10));
 
         detection = detections.get(2);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SwingTimer");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(19, 22, 19, 60));
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(20, 22, 20, 60));
 
         detection = detections.get(3);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("SwingTimer");
-        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(20, 36, 20, 71));
+        assertThat(detection.getCodeRanges()).containsExactly(CodeRange.of(21, 36, 21, 71));
     }
 }

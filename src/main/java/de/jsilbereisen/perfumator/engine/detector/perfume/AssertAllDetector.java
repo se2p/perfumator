@@ -29,6 +29,7 @@ public class AssertAllDetector implements Detector<Perfume> {
     
     private static final String QUALIFIED_ASSERT_ALL_METHOD_NAME = "org.junit.jupiter.api.Assertions.assertAll";
     private static final String ASSERTIONS_IMPORT_NAME = "org.junit.jupiter.api.Assertions";
+    private static final String ASSERT_ALL = "assertAll";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -52,7 +53,7 @@ public class AssertAllDetector implements Detector<Perfume> {
     private List<MethodCallExpr> getAssertAllMethodCalls(@NotNull CompilationUnit astRoot) {
         return astRoot.findAll(MethodCallExpr.class, expr -> {
             // contains instead of equals because of possible 'Assertions.assertAll' calls
-            if (!expr.getNameAsString().contains("assertAll")) {
+            if (!expr.getNameAsString().contains(ASSERT_ALL)) {
                 return false;
             }
             if (expr.getScope().isPresent()) {

@@ -2,6 +2,7 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -47,7 +48,14 @@ public class SwingTimerDetector implements Detector<Perfume> {
     
     private List<ObjectCreationExpr> getNewTimerExpressions(@NotNull CompilationUnit astRoot) {
         return astRoot.findAll(ObjectCreationExpr.class, expr -> {
-            ResolvedType resolvedType = expr.calculateResolvedType();
+            ResolvedType resolvedType;
+            // when classes from the same package are instantiated, the javaparser cannot resolve the type, therefore
+            // we simply skip such occurrences of object creation expressions
+            try {
+                resolvedType = expr.calculateResolvedType();
+            } catch (UnsolvedSymbolException e) {
+                return false;
+            }
             return resolvedType instanceof ReferenceTypeImpl referenceType 
                     && referenceType.getQualifiedName().equals(QUALIFIED_TIMER_NAME);
         });

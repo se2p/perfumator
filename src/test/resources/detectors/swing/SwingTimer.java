@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 public class SwingTimer {
     
     Timer t = new Timer(1000, new ActionListener() {});
+    SomeClass c = new SomeClass();
     
     public static void main(String[] args) {
         Timer timer1;
