@@ -1,0 +1,9 @@
+{
+  "name": "Swing timer",
+  "description": "The timer from the \"javax.swing\" library simplifies GUI updates significantly. Its constructor requires a time intervall (in milliseconds) and an implementation of the \"java.awt.event.ActionListener\" interface. The code provided in the implementation (for example, GUI updates) is executed in the time interval that is defined by the first parameter of the timer. The timer always executes the code in the event dispatch thread.",
+  "detectorClassSimpleName": "SwingTimerDetector",
+  "i18nBaseBundleName": "swingTimer",
+  "sources": ["Programmierung II - Uni Passau", "https://docs.oracle.com/javase/8/docs/api/javax/swing/Timer.html"],
+  "relatedPattern": null,
+  "additionalInformation": null
+}
