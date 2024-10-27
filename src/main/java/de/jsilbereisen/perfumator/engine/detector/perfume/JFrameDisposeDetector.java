@@ -3,6 +3,7 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
+import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -52,7 +53,14 @@ public class JFrameDisposeDetector implements Detector<Perfume> {
             }
             var scope = expr.getScope();
             if (scope.isPresent()) {
-                var resolvedType = scope.get().calculateResolvedType();
+                ResolvedType resolvedType;
+                try {
+                    resolvedType = scope.get().calculateResolvedType();
+                } catch (Exception e) {
+                    System.out.println(expr.getNameAsString());
+                    System.out.println(e.getMessage());
+                    return false;
+                }
                 if (resolvedType instanceof ReferenceTypeImpl referenceType) {
                     return referenceType.getQualifiedName().equals(QUALIFIED_JFRAME_CLASS_NAME);
                 }

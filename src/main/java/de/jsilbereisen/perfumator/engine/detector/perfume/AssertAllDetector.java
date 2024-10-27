@@ -9,12 +9,14 @@ import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import de.jsilbereisen.perfumator.util.NodeUtil;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link Detector} for the "Assert all" {@link Perfume}.
@@ -58,14 +60,22 @@ public class AssertAllDetector implements Detector<Perfume> {
             }
             if (expr.getScope().isPresent()) {
                 // for non-static imports
-                ResolvedType resolvedType = expr.getScope().get().calculateResolvedType();
+                ResolvedType resolvedType;
+                try {
+                    resolvedType = expr.getScope().get().calculateResolvedType();
+                } catch (Exception e) {
+                    System.out.println(expr.getNameAsString());
+                    System.out.println(e.getMessage());
+                    return false;
+                }
                 return resolvedType instanceof ReferenceTypeImpl referenceType 
                         && referenceType.getQualifiedName().equals(ASSERTIONS_IMPORT_NAME);
             } else {
                 // for static imports
-                ResolvedMethodDeclaration resolvedMethodDeclaration = expr.resolve();
-                String qualifiedName = resolvedMethodDeclaration.getQualifiedName();
-                return qualifiedName.equals(QUALIFIED_ASSERT_ALL_METHOD_NAME);
+                Optional<ResolvedMethodDeclaration> resolvedMethodDeclaration 
+                        = NodeUtil.resolveSafely(expr, this, expr.getNameAsString());
+                return resolvedMethodDeclaration.map(methodDeclaration -> methodDeclaration.getQualifiedName().equals(QUALIFIED_ASSERT_ALL_METHOD_NAME))
+                        .orElse(false);
             }
         });
     }

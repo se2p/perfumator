@@ -110,7 +110,7 @@ public class PerfumeDetectionEngine implements DetectionEngine<Perfume> {
      * as it is used by the <i><b>Perfumator</b></i> by default.<br/>
      * List of settings that are changed, compared to the default {@link ParserConfiguration}:
      * <ul>
-     *     <li>Language level: 11 (default) -&gt; 17</li>
+     *     <li>Language level: 21</li>
      *     <li>Do NOT Capture empty line comments: {@code true} -&gt; {@code false}</li>
      * </ul>
      *
