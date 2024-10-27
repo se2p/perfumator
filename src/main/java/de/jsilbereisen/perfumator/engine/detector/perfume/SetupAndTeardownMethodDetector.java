@@ -2,18 +2,15 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
+import de.jsilbereisen.perfumator.util.NodeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,15 +44,25 @@ public class SetupAndTeardownMethodDetector implements Detector<Perfume> {
     public void setAnalysisContext(@Nullable JavaParserFacade analysisContext) {
         this.analysisContext = analysisContext;
     }
-    
+
+    /**
+     * Shorthand to return the fully qualified names of the annotations.
+     * 
+     * @return The Set containing {org.junit.jupiter.api.BeforeEach, org.junit.jupiter.api.BeforeAll, 
+     *         org.junit.jupiter.api.AfterEach, org.junit.jupiter.api.AfterAll}.
+     */
     private Set<String> getQualifiedAnnotations() {
         return TEST_ANNOTATIONS.stream().map(annotation -> IMPORT_QUALIFIER + annotation).collect(Collectors.toSet());
     }
 
     private List<MethodDeclaration> getSetupAndTeardownMethodDeclarations(@NotNull CompilationUnit astRoot) {
         return astRoot.findAll(MethodDeclaration.class, methodDeclaration -> methodDeclaration.getAnnotations().stream()
-                .map(AnnotationExpr::resolve)
-                .map(ResolvedTypeDeclaration::getQualifiedName)
-                .anyMatch(name -> getQualifiedAnnotations().contains(name)));
+                // filter out annotations that do not contain any of the four relevant annotations
+                .filter(annotation -> TEST_ANNOTATIONS.stream().anyMatch(testAnnotation -> annotation.getNameAsString().contains(testAnnotation)))
+                // try to resolve the symbol in order to get the declaration
+                .map(testAnnotation -> NodeUtil.resolveSafely(testAnnotation, this, testAnnotation.getNameAsString()))
+                .filter(Optional::isPresent)
+                .map(resolvedAnnotationDeclaration -> resolvedAnnotationDeclaration.get().getQualifiedName())
+                .anyMatch(qualifiedName -> getQualifiedAnnotations().contains(qualifiedName)));
     }
 }

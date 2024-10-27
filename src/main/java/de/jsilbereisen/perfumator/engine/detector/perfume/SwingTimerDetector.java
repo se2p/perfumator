@@ -2,7 +2,6 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
@@ -26,6 +25,7 @@ public class SwingTimerDetector implements Detector<Perfume> {
     private JavaParserFacade analysisContext;
     
     private static final String QUALIFIED_TIMER_NAME = "javax.swing.Timer";
+    private static final String TIMER_IDENTIFIER = "Timer";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -48,12 +48,17 @@ public class SwingTimerDetector implements Detector<Perfume> {
     
     private List<ObjectCreationExpr> getNewTimerExpressions(@NotNull CompilationUnit astRoot) {
         return astRoot.findAll(ObjectCreationExpr.class, expr -> {
+            if (!expr.getType().getNameAsString().equals(TIMER_IDENTIFIER)) {
+                return false;
+            }
             ResolvedType resolvedType;
             // when classes from the same package are instantiated, the javaparser cannot resolve the type, therefore
             // we simply skip such occurrences of object creation expressions
             try {
                 resolvedType = expr.calculateResolvedType();
-            } catch (UnsolvedSymbolException e) {
+            } catch (Exception e) {
+                System.out.println(expr);
+                System.out.println(e.getMessage());
                 return false;
             }
             return resolvedType instanceof ReferenceTypeImpl referenceType 

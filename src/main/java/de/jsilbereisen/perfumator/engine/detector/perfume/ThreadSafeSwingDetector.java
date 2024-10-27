@@ -59,7 +59,14 @@ public class ThreadSafeSwingDetector implements Detector<Perfume> {
             }
             if (expr.getScope().isPresent()) {
                 // for non-static imports
-                ResolvedType resolvedType = expr.getScope().get().calculateResolvedType();
+                ResolvedType resolvedType;
+                try {
+                    resolvedType = expr.getScope().get().calculateResolvedType();
+                } catch (Exception e) {
+                    System.out.println(expr.getNameAsString());
+                    System.out.println(e.getMessage());
+                    return false;
+                }
                 return resolvedType instanceof ReferenceTypeImpl referenceType
                         && referenceType.getQualifiedName().equals(IMPORT);
             } else {
