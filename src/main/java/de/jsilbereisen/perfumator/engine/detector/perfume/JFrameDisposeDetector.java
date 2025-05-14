@@ -24,7 +24,7 @@ public class JFrameDisposeDetector implements Detector<Perfume> {
     private JavaParserFacade analysisContext;
     
     private static final String DISPOSE_METHOD_NAME = "dispose";
-    private static final String QUALIFIED_METHOD_NAME = "java.awt.Window";
+    private static final String DECLARING_CLASS = "java.awt.Window";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -59,12 +59,12 @@ public class JFrameDisposeDetector implements Detector<Perfume> {
                         return false;
                     }
                     var referenceType = disposeDeclaration.declaringType().asReferenceType();
-                    if (referenceType.getQualifiedName().equals(QUALIFIED_METHOD_NAME)) {
+                    if (referenceType.getQualifiedName().equals(DECLARING_CLASS)) {
                         return true;
                     } else {
                         return referenceType.getAllAncestors().stream()
                                 .anyMatch(ancestor ->
-                                        ancestor.getQualifiedName().equals(QUALIFIED_METHOD_NAME));
+                                        ancestor.getQualifiedName().equals(DECLARING_CLASS));
                     }
                 }).toList();
     }
