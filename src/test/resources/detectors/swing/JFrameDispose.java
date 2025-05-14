@@ -9,6 +9,13 @@ public class JFrameDispose {
         }
     }
 
+    class JFrameSubClass extends JFrame {
+        @Override
+        public void dispose() {
+            super.dispose();
+        }
+    }
+
     public static void main(String[] args) {
         NoRealJFrame frame = new NoRealJFrame();
         JFrame frame1 = new JFrame();
@@ -18,5 +25,6 @@ public class JFrameDispose {
         frame1.dispose();
         frame2.dispose();
         frame3.dispose();
+        new JFrameSubClass().dispose();
     }
 }
