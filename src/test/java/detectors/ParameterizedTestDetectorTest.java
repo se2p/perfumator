@@ -1,6 +1,7 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.ParameterizedTestDetector;
 import de.jsilbereisen.perfumator.model.CodeRange;
@@ -23,8 +24,6 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
 
     private static Detector<Perfume> detector;
 
-    private static CompilationUnit ast;
-
     @BeforeAll
     static void init() {
         perfume = new Perfume();
@@ -34,9 +33,11 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
         detector.setConcreteDetectable(perfume);
     }
 
-    @Test
+    @Test()
     void detect() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("ParameterizedTests.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(parser, TEST_FILES_DIR.resolve("ParameterizedTests.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -50,11 +51,13 @@ public class ParameterizedTestDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectNoPerfumeForOnwAnnotation() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("ParameterizedTestsOwnAnnotation.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("ParameterizedTestsOwnAnnotation.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
-        
+
         DetectedInstance<Perfume> detection = detections.get(0);
         assertThat(detection.getDetectable()).isEqualTo(perfume);
         assertThat(detection.getTypeName()).isEqualTo("ParameterizedTestsOwnAnnotation");

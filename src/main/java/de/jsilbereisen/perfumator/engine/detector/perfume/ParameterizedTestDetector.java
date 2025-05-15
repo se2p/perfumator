@@ -2,6 +2,8 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -23,16 +25,16 @@ public class ParameterizedTestDetector implements Detector<Perfume> {
     private Perfume perfume;
 
     private JavaParserFacade analysisContext;
-    
-    private static final String PARAMETERIZED_TEST_PACKAGE = "org.junit.jupiter.params.";
+
+    private static final String QUALIFIED_NAME = "org.junit.jupiter.params.ParameterizedTest";
     private static final String PARAMETERIZED_TEST_IDENTIFIER = "ParameterizedTest";
 
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedInstances = new ArrayList<>();
         List<MethodDeclaration> parameterizedTestMethodDeclarations = getParameterizedTestMethodDeclarations(astRoot);
-        parameterizedTestMethodDeclarations
-                .forEach(declaration -> detectedInstances.add(DetectedInstance.from(declaration, perfume, astRoot)));
+        parameterizedTestMethodDeclarations.forEach(declaration
+                -> detectedInstances.add(DetectedInstance.from(declaration, perfume, astRoot)));
         return detectedInstances;
     }
 
@@ -47,13 +49,20 @@ public class ParameterizedTestDetector implements Detector<Perfume> {
     }
 
     private List<MethodDeclaration> getParameterizedTestMethodDeclarations(@NotNull CompilationUnit astRoot) {
-        return astRoot.findAll(MethodDeclaration.class, methodDeclaration -> methodDeclaration.getAnnotations().stream()
-                // filter out annotations that do not contain 'ParameterizedTest'
-                .filter(annotation -> annotation.getNameAsString().contains(PARAMETERIZED_TEST_IDENTIFIER))
-                // try to resolve the symbol in order to get the declaration
-                .map(paramTestAnnotation -> NodeUtil.resolveSafely(paramTestAnnotation, this, paramTestAnnotation.getNameAsString()))
-                .filter(Optional::isPresent)
-                .map(resolvedAnnotationDeclaration -> resolvedAnnotationDeclaration.get().getQualifiedName())
-                .anyMatch(qualifiedName -> qualifiedName.equals(PARAMETERIZED_TEST_PACKAGE + PARAMETERIZED_TEST_IDENTIFIER)));
+        return astRoot.findAll(MethodDeclaration.class, expr -> {
+            var annotations = expr.getAnnotations();
+        annotations.removeIf(annotation ->
+                !annotation.getNameAsString().contains(PARAMETERIZED_TEST_IDENTIFIER));
+            return annotations.stream().anyMatch(annotation -> {
+                ResolvedAnnotationDeclaration resolvedAnnotationDeclaration;
+                try {
+                    resolvedAnnotationDeclaration = analysisContext.solve(annotation).getCorrespondingDeclaration();
+                } catch (UnsupportedOperationException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return QUALIFIED_NAME.equals(resolvedAnnotationDeclaration.getQualifiedName());
+            });
+        });
     }
 }
