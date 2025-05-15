@@ -1,6 +1,7 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.AssertAllDetector;
 import de.jsilbereisen.perfumator.model.CodeRange;
@@ -23,8 +24,6 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
 
     private static Detector<Perfume> detector;
 
-    private static CompilationUnit ast;
-
     @BeforeAll
     static void init() {
         perfume = new Perfume();
@@ -36,7 +35,11 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectStaticImport() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllStaticImport.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+
+        CompilationUnit ast = parseAstForFile(parser, TEST_FILES_DIR.resolve("AssertAllStaticImport.java"));
+
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -50,7 +53,11 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectWithoutStaticImport() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllNoStaticImport.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+
+        CompilationUnit ast = parseAstForFile(parser, TEST_FILES_DIR.resolve("AssertAllNoStaticImport.java"));
+
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -64,7 +71,11 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectWithWildcardImport() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertionsStaticWildcardImport.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+
+        CompilationUnit ast = parseAstForFile(parser, TEST_FILES_DIR.resolve("AssertionsStaticWildcardImport.java"));
+
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(1);
@@ -78,7 +89,11 @@ class AssertAllDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectNoPerfumeForDifferentAssertAllMethod() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("AssertAllNoPerfume.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+
+        CompilationUnit ast = parseAstForFile(parser, TEST_FILES_DIR.resolve("AssertAllNoPerfume.java"));
+
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).isEmpty();

@@ -175,7 +175,7 @@ public abstract class AbstractDetectorTest {
     @NotNull
     protected static JavaParserFacade getAnalysisContext(@NotNull JavaParser parser, @NotNull Path... dependencies) {
         // Very very ugly, but i don't see any other way to get the created TypeSolver at the moment
-        CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver());
+        CombinedTypeSolver typeSolver = new CombinedTypeSolver(new ReflectionTypeSolver(false));
         /*
         try {
             typeSolver = (CombinedTypeSolver) FieldUtils.readField(strategy, "typeSolver", true);

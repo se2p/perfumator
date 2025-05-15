@@ -57,12 +57,11 @@ public class SwingTimerDetector implements Detector<Perfume> {
             try {
                 resolvedType = expr.calculateResolvedType();
             } catch (Exception e) {
-                System.out.println(expr);
-                System.out.println(e.getMessage());
+                e.printStackTrace();
                 return false;
             }
             return resolvedType instanceof ReferenceTypeImpl referenceType 
-                    && referenceType.getQualifiedName().equals(QUALIFIED_TIMER_NAME);
+                    && QUALIFIED_TIMER_NAME.equals(referenceType.getQualifiedName());
         });
     }
 }

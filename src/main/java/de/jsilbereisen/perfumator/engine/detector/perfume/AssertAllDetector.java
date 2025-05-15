@@ -3,13 +3,11 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
 import de.jsilbereisen.perfumator.model.perfume.Perfume;
-import de.jsilbereisen.perfumator.util.NodeUtil;
 import lombok.EqualsAndHashCode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,16 +27,15 @@ public class AssertAllDetector implements Detector<Perfume> {
 
     private JavaParserFacade analysisContext;
     
-    private static final String QUALIFIED_ASSERT_ALL_METHOD_NAME = "org.junit.jupiter.api.Assertions.assertAll";
-    private static final String ASSERTIONS_IMPORT_NAME = "org.junit.jupiter.api.Assertions";
+    private static final String DECLARING_CLASS = "org.junit.jupiter.api.Assertions";
     private static final String ASSERT_ALL = "assertAll";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
         List<DetectedInstance<Perfume>> detectedInstances = new ArrayList<>();
         List<MethodCallExpr> assertAllMethodCallExpressions = getAssertAllMethodCalls(astRoot);
-        assertAllMethodCallExpressions
-                .forEach(callExpr -> detectedInstances.add(DetectedInstance.from(callExpr, perfume, astRoot)));
+        assertAllMethodCallExpressions.forEach(callExpr ->
+                detectedInstances.add(DetectedInstance.from(callExpr, perfume, astRoot)));
         return detectedInstances;
     }
 
@@ -53,30 +50,18 @@ public class AssertAllDetector implements Detector<Perfume> {
     }
 
     private List<MethodCallExpr> getAssertAllMethodCalls(@NotNull CompilationUnit astRoot) {
-        return astRoot.findAll(MethodCallExpr.class, expr -> {
-            // contains instead of equals because of possible 'Assertions.assertAll' calls
-            if (!expr.getNameAsString().contains(ASSERT_ALL)) {
-                return false;
-            }
-            if (expr.getScope().isPresent()) {
-                // for non-static imports
-                ResolvedType resolvedType;
-                try {
-                    resolvedType = expr.getScope().get().calculateResolvedType();
-                } catch (Exception e) {
-                    System.out.println(expr.getNameAsString());
-                    System.out.println(e.getMessage());
-                    return false;
-                }
-                return resolvedType instanceof ReferenceTypeImpl referenceType 
-                        && referenceType.getQualifiedName().equals(ASSERTIONS_IMPORT_NAME);
-            } else {
-                // for static imports
-                Optional<ResolvedMethodDeclaration> resolvedMethodDeclaration 
-                        = NodeUtil.resolveSafely(expr, this, expr.getNameAsString());
-                return resolvedMethodDeclaration.map(methodDeclaration -> methodDeclaration.getQualifiedName().equals(QUALIFIED_ASSERT_ALL_METHOD_NAME))
-                        .orElse(false);
-            }
-        });
+        return astRoot.findAll(MethodCallExpr.class).stream()
+                .filter(expr -> expr.getNameAsString().equals(ASSERT_ALL))
+                .filter(expr -> {
+                    ResolvedMethodDeclaration methodDeclaration;
+                    try {
+                        methodDeclaration = analysisContext.solve(expr).getCorrespondingDeclaration();
+                    } catch (UnsupportedOperationException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                    ResolvedReferenceTypeDeclaration referenceType = methodDeclaration.declaringType().asReferenceType();
+                    return DECLARING_CLASS.equals(referenceType.getQualifiedName());
+                }).toList();
     }
 }

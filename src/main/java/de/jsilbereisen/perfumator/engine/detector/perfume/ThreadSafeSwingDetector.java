@@ -3,8 +3,7 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
-import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -29,9 +28,7 @@ public class ThreadSafeSwingDetector implements Detector<Perfume> {
 
     private final static String INVOKE_LATER = "invokeLater";
     private final static String INVOKE_AND_WAIT = "invokeAndWait";
-    private final static Set<String> QUALIFIED_METHOD_NAMES 
-            = Set.of("javax.swing.SwingUtilities.invokeLater", "javax.swing.SwingUtilities.invokeAndWait");
-    private final static String IMPORT = "javax.swing.SwingUtilities";
+    private final static String DECLARING_CLASS = "javax.swing.SwingUtilities";
     
     @Override
     public @NotNull List<DetectedInstance<Perfume>> detect(@NotNull CompilationUnit astRoot) {
@@ -52,29 +49,18 @@ public class ThreadSafeSwingDetector implements Detector<Perfume> {
     }
     
     private List<MethodCallExpr> getInvokeLaterInvokeAndWaitMethodCalls(@NotNull CompilationUnit astRoot) {
-        return astRoot.findAll(MethodCallExpr.class, expr -> {
-            // contains instead of equals because of possible 'SwingUtilities.invokeLater' and '-.invokeAndWait' calls
-            if (!expr.getNameAsString().contains(INVOKE_LATER) && !expr.getNameAsString().contains(INVOKE_AND_WAIT)) {
-                return false;
-            }
-            if (expr.getScope().isPresent()) {
-                // for non-static imports
-                ResolvedType resolvedType;
-                try {
-                    resolvedType = expr.getScope().get().calculateResolvedType();
-                } catch (Exception e) {
-                    System.out.println(expr.getNameAsString());
-                    System.out.println(e.getMessage());
-                    return false;
-                }
-                return resolvedType instanceof ReferenceTypeImpl referenceType
-                        && referenceType.getQualifiedName().equals(IMPORT);
-            } else {
-                // for static imports
-                ResolvedMethodDeclaration resolvedMethodDeclaration = expr.resolve();
-                String qualifiedName = resolvedMethodDeclaration.getQualifiedName();
-                return QUALIFIED_METHOD_NAMES.contains(qualifiedName);
-            }
-        });
+        return astRoot.findAll(MethodCallExpr.class).stream()
+                .filter(expr -> Set.of(INVOKE_AND_WAIT, INVOKE_LATER).contains(expr.getNameAsString()))
+                .filter(expr -> {
+                    ResolvedMethodDeclaration methodDeclaration;
+                    try {
+                        methodDeclaration = analysisContext.solve(expr).getCorrespondingDeclaration();
+                    } catch (UnsupportedOperationException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                    ResolvedReferenceTypeDeclaration referenceType = methodDeclaration.declaringType().asReferenceType();
+                    return DECLARING_CLASS.equals(referenceType.getQualifiedName());
+                }).toList();
     }
 }
