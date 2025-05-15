@@ -3,6 +3,7 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -48,20 +49,18 @@ public class ThreadSafeSwingDetector implements Detector<Perfume> {
     }
     
     private List<MethodCallExpr> getInvokeLaterInvokeAndWaitMethodCalls(@NotNull CompilationUnit astRoot) {
-        return astRoot.findAll(MethodCallExpr.class, expr -> {
-            // contains instead of equals because of possible 'SwingUtilities.invokeLater' and '-.invokeAndWait' calls
-            if (!expr.getNameAsString().contains(INVOKE_LATER) && !expr.getNameAsString().contains(INVOKE_AND_WAIT)) {
-                return false;
-            }
-            ResolvedMethodDeclaration methodDeclaration;
-            try {
-                methodDeclaration = analysisContext.solve(expr).getCorrespondingDeclaration();
-            } catch (UnsupportedOperationException e) {
-                e.printStackTrace();
-                return false;
-            }
-            var referenceType = methodDeclaration.declaringType().asReferenceType();
-            return DECLARING_CLASS.contains(referenceType.getQualifiedName());
-        });
+        return astRoot.findAll(MethodCallExpr.class).stream()
+                .filter(expr -> Set.of(INVOKE_AND_WAIT, INVOKE_LATER).contains(expr.getNameAsString()))
+                .filter(expr -> {
+                    ResolvedMethodDeclaration methodDeclaration;
+                    try {
+                        methodDeclaration = analysisContext.solve(expr).getCorrespondingDeclaration();
+                    } catch (UnsupportedOperationException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                    ResolvedReferenceTypeDeclaration referenceType = methodDeclaration.declaringType().asReferenceType();
+                    return DECLARING_CLASS.equals(referenceType.getQualifiedName());
+                }).toList();
     }
 }

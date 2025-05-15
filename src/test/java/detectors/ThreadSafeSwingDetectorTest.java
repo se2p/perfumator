@@ -37,8 +37,8 @@ public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
     @Test
     void detectStaticImport() {
         JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticImport.java"));
         detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticImport.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(2);
@@ -57,8 +57,8 @@ public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
     @Test
     void detectWithoutStaticImport() {
         JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoStaticImport.java"));
         detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoStaticImport.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(2);
@@ -77,8 +77,8 @@ public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
     @Test
     void detectWithWildcardImport() {
         JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticWildcardImport.java"));
         detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitStaticWildcardImport.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(2);
@@ -97,8 +97,8 @@ public class ThreadSafeSwingDetectorTest extends AbstractDetectorTest {
     @Test
     void detectNoPerfume() {
         JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
-        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoPerfume.java"));
         detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("InvokeLaterInvokeAndWaitNoPerfume.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
         
         assertThat(detections).isEmpty();
