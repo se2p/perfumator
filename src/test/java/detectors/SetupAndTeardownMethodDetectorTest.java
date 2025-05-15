@@ -1,6 +1,7 @@
 package detectors;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.engine.detector.perfume.SetupAndTeardownMethodDetector;
 import de.jsilbereisen.perfumator.model.CodeRange;
@@ -23,8 +24,6 @@ public class SetupAndTeardownMethodDetectorTest extends AbstractDetectorTest {
 
     private static Detector<Perfume> detector;
 
-    private static CompilationUnit ast;
-
     @BeforeAll
     static void init() {
         perfume = new Perfume();
@@ -36,7 +35,9 @@ public class SetupAndTeardownMethodDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detect() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("SetupAndTeardownMethods.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SetupAndTeardownMethods.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(4);
@@ -64,7 +65,9 @@ public class SetupAndTeardownMethodDetectorTest extends AbstractDetectorTest {
 
     @Test
     void detectWithOwnAnnotations() {
-        ast = parseAstForFile(TEST_FILES_DIR.resolve("SetupAndTeardownMethodsOwnAnnotations.java"));
+        JavaParserFacade analysisContext = getAnalysisContext(parser, TEST_FILES_DIR);
+        detector.setAnalysisContext(analysisContext);
+        CompilationUnit ast = parseAstForFile(TEST_FILES_DIR.resolve("SetupAndTeardownMethodsOwnAnnotations.java"));
         List<DetectedInstance<Perfume>> detections = detector.detect(ast);
 
         assertThat(detections).hasSize(4);

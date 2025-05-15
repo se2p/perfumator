@@ -2,6 +2,7 @@ package de.jsilbereisen.perfumator.engine.detector.perfume;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import de.jsilbereisen.perfumator.engine.detector.Detector;
 import de.jsilbereisen.perfumator.model.DetectedInstance;
@@ -56,13 +57,24 @@ public class SetupAndTeardownMethodDetector implements Detector<Perfume> {
     }
 
     private List<MethodDeclaration> getSetupAndTeardownMethodDeclarations(@NotNull CompilationUnit astRoot) {
-        return astRoot.findAll(MethodDeclaration.class, methodDeclaration -> methodDeclaration.getAnnotations().stream()
-                // filter out annotations that do not contain any of the four relevant annotations
-                .filter(annotation -> TEST_ANNOTATIONS.stream().anyMatch(testAnnotation -> annotation.getNameAsString().contains(testAnnotation)))
-                // try to resolve the symbol in order to get the declaration
-                .map(testAnnotation -> NodeUtil.resolveSafely(testAnnotation, this, testAnnotation.getNameAsString()))
-                .filter(Optional::isPresent)
-                .map(resolvedAnnotationDeclaration -> resolvedAnnotationDeclaration.get().getQualifiedName())
-                .anyMatch(qualifiedName -> getQualifiedAnnotations().contains(qualifiedName)));
+        return astRoot.findAll(MethodDeclaration.class, expr -> {
+            var annotations = expr.getAnnotations();
+            // remove annotation if it does not contain any of the four annotations in TEST_ANNOTATIONS
+            annotations.removeIf(annotation ->
+                    TEST_ANNOTATIONS.stream().noneMatch(allowedAnnotation -> annotation.getNameAsString().contains(allowedAnnotation)));
+            return annotations.stream().anyMatch(annotation -> {
+                ResolvedAnnotationDeclaration resolvedAnnotationDeclaration;
+                try {
+                    resolvedAnnotationDeclaration = analysisContext.solve(annotation).getCorrespondingDeclaration();
+                } catch (UnsupportedOperationException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                Set<String> fullyQualifiedAnnotations = TEST_ANNOTATIONS.stream().map(allowedAnnotation ->
+                        IMPORT_QUALIFIER + allowedAnnotation).collect(Collectors.toSet());
+                return fullyQualifiedAnnotations.stream().anyMatch(qualifiedAnnotation ->
+                        resolvedAnnotationDeclaration.getQualifiedName().equals(qualifiedAnnotation));
+            });
+        });
     }
 }
